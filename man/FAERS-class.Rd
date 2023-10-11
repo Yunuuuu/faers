@@ -53,7 +53,7 @@ FAERS classes
 
 \item{\code{quarter:}}{A string specifies the quarter information.}
 
-\item{\code{datatable:}}{For FAERSxml, a \link[data.table:data.table]{data.table}, for
-FAERSascii, a list of \link[data.table:data.table]{data.table}.}
+\item{\code{datatable:}}{For \code{FAERSxml}, a \link[data.table:data.table]{data.table}. For
+\code{FAERSascii}, a list of \link[data.table:data.table]{data.table}.}
 }}
 

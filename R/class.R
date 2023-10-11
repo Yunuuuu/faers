@@ -2,8 +2,8 @@
 #'
 #' @slot year: An integer specifies the year information.
 #' @slot quarter: A string specifies the quarter information.
-#' @slot datatable: For FAERSxml, a [data.table][data.table::data.table], for
-#' FAERSascii, a list of [data.table][data.table::data.table].
+#' @slot datatable: For `FAERSxml`, a [data.table][data.table::data.table]. For
+#' `FAERSascii`, a list of [data.table][data.table::data.table].
 #' @aliases FAERS
 #' @name FAERS-class
 methods::setClass(
