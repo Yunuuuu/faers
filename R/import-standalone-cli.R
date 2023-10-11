@@ -96,7 +96,7 @@ is_installed <- function(pkg, version = NULL) {
             out <- requireNamespace(pkg, quietly = TRUE) &&
                 utils::packageVersion(pkg) >= version
         }
-        faers_cache[[id]] <<- out
+        faers_cache[[id]] <- out
     }
     out
 }
