@@ -64,7 +64,7 @@ download_inform <- function(urls, file_paths, handle_opts = list()) {
         file_paths <- file_paths[!is_existed]
     }
     if (length(urls)) {
-        cli::cli_inform("Downloading {.val {length(urls)}} %s file{?s}")
+        cli::cli_inform("Downloading {.val {length(urls)}} file{?s}")
         arg_list <- c(
             list(
                 urls = urls, destfiles = file_paths, resume = FALSE,
