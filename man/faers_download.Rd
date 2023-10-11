@@ -12,7 +12,7 @@ faers_download(years, quarters, type = c("ascii", "xml"), dir = getwd(), ...)
 \item{quarters}{An atomic character, only "q1", "q2", "q3", and "q4" are
 allowed.}
 
-\item{type}{File type to download, only "ascii" and "xml" are availabe.}
+\item{type}{File type to used, only "ascii" and "xml" are availabe.}
 
 \item{dir}{The destination directory for any downloads. Defaults to
 current working dir.}
