@@ -11,9 +11,9 @@ methods::setGeneric("faers_tidy", function(object, ...) {
 
 #' @param use A character or integer vector specifying the fields to use. If
 #' `NULL`, all fields will be used.
-#' @param all A scalar logical. If `TRUE` rows from all `infos` will be
-#' included, if `FALSE`, no matching row with other infos will be excluded.
-#' [merge][data.table::merge].
+#' @param all A scalar logical. If `TRUE` rows from all fields specified in
+#' `use` will be included, if `FALSE`, no matching row with other fields will be
+#' excluded. See [merge][data.table::merge] for details.
 #' @export
 #' @method faers_tidy FAERSascii
 #' @rdname faers_tidy

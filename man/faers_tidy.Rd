@@ -24,9 +24,9 @@ method, other arguments passed to \link{FAERSascii} or \link{FAERSxml} method.}
 \item{use}{A character or integer vector specifying the fields to use. If
 \code{NULL}, all fields will be used.}
 
-\item{all}{A scalar logical. If \code{TRUE} rows from all \code{infos} will be
-included, if \code{FALSE}, no matching row with other infos will be excluded.
-\link[data.table:merge]{merge}.}
+\item{all}{A scalar logical. If \code{TRUE} rows from all fields specified in
+\code{use} will be included, if \code{FALSE}, no matching row with other fields will be
+excluded. See \link[data.table:merge]{merge} for details.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.
