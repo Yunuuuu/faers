@@ -5,13 +5,13 @@
 #' @inheritParams faers_available
 #' @param type File type to used, only "ascii" and "xml" are availabe.
 #' @param dir The destination directory for any downloads. Defaults to
-#'  current working dir. 
+#'  current working dir.
 #' @param ... Extra handle options passed to each request
 #' [new_handle][curl::new_handle].
 #' @return An atomic character for the path of downloaded files.
 #' @examples
 #' \dontrun{
-#'  faers_download(year = 2018, quarter = "q4", dir = tempdir())
+#' faers_download(year = 2018, quarter = "q4", dir = tempdir())
 #' }
 #' @export
 faers_download <- function(years, quarters, type = c("ascii", "xml"), dir = getwd(), ...) {
@@ -19,11 +19,26 @@ faers_download <- function(years, quarters, type = c("ascii", "xml"), dir = getw
     assert_string(dir, empty_ok = FALSE)
     data_available <- faers_available(years, quarters)
     if (!all(data_available)) {
-        missed_pairs <- paste(years, quarters, sep = ":")[!data_available] # nolint
+        out_pairs <- paste(years, quarters, sep = ":")[ # nolint
+            !data_available
+        ]
         cli::cli_abort(c(
             "Not all data specified in {.arg years} and {.arg quarters} are available",
-            x = "Missed pair{?s}: {.val {missed_pairs}}"
+            x = "Missed pair{?s}: {.val {out_pairs}}"
         ))
+    }
+    if (type == "xml") {
+        # only faers database has xml data files
+        is_aers_pairs <- !is_faers(years, quarters)
+        if (any(is_aers_pairs)) {
+            aers_pairs <- paste(years, quarters, sep = ":")[ # nolint
+                is_aers_pairs
+            ]
+            cli::cli_abort(c(
+                "Only FAERS (from 2012q4) has {.field xml} files",
+                x = "AERS (before 2012q3) pair{?s}: {.val {aers_pairs}}"
+            ))
+        }
     }
     urls <- build_faers_url(type, years, quarters)
     if (!dir.exists(dir)) {
@@ -86,13 +101,18 @@ is_download_success <- function(status, successful_code = c(200L, 206L, 416L)) {
 }
 
 build_faers_url <- function(type, years, quarters) {
+    faers_period <- is_faers(years, quarters)
     sprintf(
         "%s/content/Exports/%s_%s_%s%s.zip",
         fda_url,
-        ifelse(years > 2012L | (years == 2012L & quarters == "q4"),
-            "faers", "aers"
-        ),
-        type, years, quarters
+        ifelse(faers_period, "faers", "aers"),
+        ifelse(type == "ascii" | faers_period, type, "sgml"),
+        years, quarters
     )
 }
+
+is_faers <- function(years, quarters) {
+    years > 2012L | (years == 2012L & quarters == "q4")
+}
+
 fda_url <- "https://fis.fda.gov"
