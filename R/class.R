@@ -65,9 +65,16 @@ methods::setClass(
 )
 
 #######################################################
+#' @export 
+#' @aliases header
+#' @rdname FAERS-class
 methods::setGeneric("header", function(object) {
     methods::makeStandardGeneric("header")
 })
+
+#' @export
+#' @aliases header<-
+#' @rdname FAERS-class
 methods::setGeneric("header<-", function(object, value) {
     methods::makeStandardGeneric("header<-")
 })
@@ -106,9 +113,16 @@ methods::setMethod("show", "FAERS", function(object) {
 })
 
 #######################################################
+#' @export
+#' @aliases year
+#' @rdname FAERS-class
 methods::setGeneric("year", function(object) {
     methods::makeStandardGeneric("year")
 })
+
+#' @export
+#' @aliases year<-
+#' @rdname FAERS-class
 methods::setGeneric("year<-", function(object, value) {
     methods::makeStandardGeneric("year<-")
 })
@@ -132,9 +146,16 @@ methods::setMethod("year<-", "FAERS", function(object, value) {
 })
 
 ##################################################################
+#' @export
+#' @aliases quarter
+#' @rdname FAERS-class
 methods::setGeneric("quarter", function(object) {
     methods::makeStandardGeneric("quarter")
 })
+
+#' @aliases quarter<-
+#' @export
+#' @rdname FAERS-class
 methods::setGeneric("quarter<-", function(object, value) {
     methods::makeStandardGeneric("quarter<-")
 })
@@ -147,9 +168,9 @@ methods::setMethod("quarter", "FAERS", function(object) {
     object@quarter
 })
 
-#' @aliases quarter<-
-#' @method quarter<- FAERS
 #' @export
+#' @method quarter<- FAERS
+#' @aliases quarter<-
 #' @rdname FAERS-class
 methods::setMethod("quarter<-", "FAERS", function(object, value) {
     object@quarter <- as.character(value)
@@ -158,9 +179,15 @@ methods::setMethod("quarter<-", "FAERS", function(object, value) {
 })
 
 #################################################################
+#' @export
+#' @aliases datatable
+#' @rdname FAERS-class
 methods::setGeneric("datatable", function(object) {
     methods::makeStandardGeneric("datatable")
 })
+#' @export
+#' @aliases datatable<-
+#' @rdname FAERS-class
 methods::setGeneric("datatable<-", function(object, value) {
     methods::makeStandardGeneric("datatable<-")
 })

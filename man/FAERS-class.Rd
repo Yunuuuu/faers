@@ -8,38 +8,54 @@
 \alias{FAERSascii}
 \alias{FAERSxml-class}
 \alias{FAERSxml}
-\alias{header,FAERSxml-method}
 \alias{header}
-\alias{header<-,FAERSxml-method}
 \alias{header<-}
+\alias{header,FAERSxml-method}
+\alias{header<-,FAERSxml-method}
 \alias{show,FAERS-method}
-\alias{year,FAERS-method}
 \alias{year}
-\alias{year<-,FAERS-method}
 \alias{year<-}
-\alias{quarter,FAERS-method}
+\alias{year,FAERS-method}
+\alias{year<-,FAERS-method}
 \alias{quarter}
-\alias{quarter<-,FAERS-method}
 \alias{quarter<-}
-\alias{datatable,FAERS-method}
+\alias{quarter,FAERS-method}
+\alias{quarter<-,FAERS-method}
 \alias{datatable}
-\alias{datatable<-,FAERS-method}
 \alias{datatable<-}
+\alias{datatable,FAERS-method}
+\alias{datatable<-,FAERS-method}
 \title{FAERS classes}
 \usage{
+header(object)
+
+header(object) <- value
+
 \S4method{header}{FAERSxml}(object)
 
 \S4method{header}{FAERSxml}(object) <- value
 
 \S4method{show}{FAERS}(object)
 
+year(object)
+
+year(object) <- value
+
 \S4method{year}{FAERS}(object)
 
 \S4method{year}{FAERS}(object) <- value
 
+quarter(object)
+
+quarter(object) <- value
+
 \S4method{quarter}{FAERS}(object)
 
 \S4method{quarter}{FAERS}(object) <- value
+
+datatable(object)
+
+datatable(object) <- value
 
 \S4method{datatable}{FAERS}(object)
 
