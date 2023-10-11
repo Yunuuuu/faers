@@ -20,24 +20,18 @@ methods::setGeneric("faers_tidy", function(object, ...) {
 methods::setMethod("faers_tidy", "FAERSascii", function(object, use = NULL, all = TRUE) {
     use <- use_names_to_integer_indices(use, names(object@datatable))
     lst <- object@datatable[use]
-    lapply(lst, function(x) {
-        data.table::setnames(
-            x,
-            c("isr", "case"), c("primaryid", "caseid"),
-            skip_absent = TRUE
-        )
-    })
-    # check if drug_seq should matched
+    old_names <- c("isr", "case")
+    new_names <- c("primaryid", "caseid")
+    # check if drug_seq should be matched
     if (sum(names(lst) %in% c("indi", "ther", "drug")) >= 2L) {
-        lapply(lst, function(x) {
-            data.table::setnames(
-                x, c("indi_drug_seq", "dsg_drug_seq"),
-                c("drug_seq", "drug_seq"),
-                skip_absent = TRUE
-            )
-        })
+        old_names <- c(old_names, c("indi_drug_seq", "dsg_drug_seq"))
+        new_names <- c(new_names, c("drug_seq", "drug_seq"))
     }
+    lapply(lst, function(x) {
+        data.table::setnames(x, old_names, new_names, skip_absent = TRUE)
+    })
     Reduce(function(x, y) {
+        #  This defaults to the shared key columns between x and y 
         merge(x, y, allow.cartesian = TRUE, all = all)
     }, lst)
 })
