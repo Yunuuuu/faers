@@ -9,7 +9,7 @@
 \usage{
 faers_tidy(object, ...)
 
-\S4method{faers_tidy}{FAERSascii}(object, infos = NULL, all = TRUE)
+\S4method{faers_tidy}{FAERSascii}(object, use = NULL, all = TRUE)
 
 \S4method{faers_tidy}{FAERSxml}(object)
 
@@ -21,9 +21,8 @@ faers_tidy(object, ...)
 \item{...}{Other arguments passed to specific methods. For \link{ListOfFAERS}
 method, other arguments passed to \link{FAERSascii} or \link{FAERSxml} method.}
 
-\item{infos}{Index (integer, logistical, character all will be okay) to
-select informations included in the final object. If \code{NULL}, all infomations
-will be used, Note: this will take much memory.}
+\item{use}{A character or integer vector specifying the fields to use. If
+\code{NULL}, all fields will be used.}
 
 \item{all}{A scalar logical. If \code{TRUE} rows from all \code{infos} will be
 included, if \code{FALSE}, no matching row with other infos will be excluded.
