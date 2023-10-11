@@ -10,7 +10,8 @@ methods::setGeneric("faers_tidy", function(object, ...) {
 })
 
 #' @param use A character or integer vector specifying the fields to use. If
-#' `NULL`, all fields will be used.
+#' `NULL`, all fields will be used. Note: use all fields will consume a lot of
+#' memory.
 #' @param all A scalar logical. If `TRUE` rows from all fields specified in
 #' `use` will be included, if `FALSE`, no matching row with other fields will be
 #' excluded. See [merge][data.table::merge] for details.

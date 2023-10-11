@@ -22,7 +22,8 @@ faers_tidy(object, ...)
 method, other arguments passed to \link{FAERSascii} or \link{FAERSxml} method.}
 
 \item{use}{A character or integer vector specifying the fields to use. If
-\code{NULL}, all fields will be used.}
+\code{NULL}, all fields will be used. Note: use all fields will consume a lot of
+memory.}
 
 \item{all}{A scalar logical. If \code{TRUE} rows from all fields specified in
 \code{use} will be included, if \code{FALSE}, no matching row with other fields will be
