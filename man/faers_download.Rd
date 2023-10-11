@@ -28,6 +28,6 @@ This function downloads the FAERS data for a specific year and quarter.
 }
 \examples{
 \dontrun{
-retrieve_qde(path = ".", year = "2018", quarter = "q4")
+ faers_download(year = 2018, quarter = "q4", dir = tempdir())
 }
 }

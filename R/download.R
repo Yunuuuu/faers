@@ -12,11 +12,12 @@
 #'
 #' @examples
 #' \dontrun{
-#' retrieve_qde(path = ".", year = "2018", quarter = "q4")
+#'  faers_download(year = 2018, quarter = "q4", dir = tempdir())
 #' }
 #' @export
 faers_download <- function(years, quarters, type = c("ascii", "xml"), dir = getwd(), ...) {
     type <- match.arg(type)
+    assert_string(dir, empty_ok = FALSE)
     data_available <- faers_available(years, quarters)
     if (!all(data_available)) {
         missed_pairs <- paste(years, quarters, sep = ":")[!data_available] # nolint
@@ -26,6 +27,9 @@ faers_download <- function(years, quarters, type = c("ascii", "xml"), dir = getw
         ))
     }
     urls <- build_faers_url(type, years, quarters)
+    if (!dir.exists(dir)) {
+        dir.create(dir)
+    }
     dest_files <- file.path(dir, basename(urls))
     download_inform(urls, dest_files, handle_opts = list(...))
 }
