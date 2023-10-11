@@ -24,7 +24,7 @@ faers_meta <- function() {
         "year", "period", "quarter",
         "ascii_urls", "ascii_file_size", "xml_urls", "xml_file_size"
     ))
-    data.table::setorderv(out, "year", order = -1L)
+    data.table::setorderv(out, c("year", "quarter"), order = c(-1L, -1L))[]
 }
 
 faers_meta_doc <- function() {
@@ -41,7 +41,7 @@ utils::globalVariables(c("period", "quarter"))
 
 parse_year_xml_table <- function(year_xml) {
     year <- rvest::html_text2(rvest::html_element(year_xml, ".panel-title"))
-    if (!grepl("^\\d+$", year, perl = TRUE)) {
+    if (!str_detect(year, "^20\\d+$")) {
         return(NULL)
     }
     file_table <- lapply(rvest::html_elements(year_xml, "tbody > tr"), function(quarter_xml) {
@@ -49,10 +49,7 @@ parse_year_xml_table <- function(year_xml) {
         file_xmls <- rvest::html_elements(quarter_xml, "td a")
         files <- rvest::html_text2(file_xmls)
         out <- data.table::data.table(
-            period = sub("\\s*\\d*(\\s*posted.*\\s*)?$",
-                "", period,
-                perl = TRUE
-            ),
+            period = str_replace(period, "\\s*\\d*(\\s*posted.*\\s*)?$", ""),
             urls = rvest::html_attr(file_xmls, "href"),
             file_type = tolower(str_extract(files, "XML|ASCII")),
             file_size = str_extract(files, "\\d[\\d.]*(MB)")
@@ -62,14 +59,14 @@ parse_year_xml_table <- function(year_xml) {
         )
     })
     out_table <- data.table::rbindlist(file_table)
-    out_table[, year := year] # nolint
+    out_table[, year := as.integer(year)] # nolint
 }
 
 period2quarter <- function(x) {
     data.table::fcase(
-        grepl("^October", x), "q4",
-        grepl("^July", x), "q3",
-        grepl("^April", x), "q2",
-        grepl("^January", x), "q1"
+        str_detect(x, "^October"), "q4",
+        str_detect(x, "^July"), "q3",
+        str_detect(x, "^April"), "q2",
+        str_detect(x, "^January"), "q1"
     )
 }
