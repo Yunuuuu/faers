@@ -1,4 +1,19 @@
+#' Parse FAERS Quarterly Data
+#' @param path A string specifies the path of FAERS Quarterly Data. You can pass
+#' the FAERS zip file directly, In this way, all files in the zip file will be
+#' extracted in `compress_dir`. Or, you can also uncompressed youself, and
+#' passed the directory contained the uncompressed files.
+#' @inheritParams faers_download
+#' @param year Year of the FAERS Quarterly Data. Coerced into integer, if
+#' `NULL`, this will be extracted from path. 
+#' @param quarter String specifies quarter of the FAERS data, if `NULL`, this
+#' will be extracted from path. 
+#' @param compress_dir A string specifies the directory to extract files to. It
+#' will be created if necessary.
+#' @return A [FAERSxml] or [FAERSascii] object.
+#' @export 
 faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress_dir = getwd()) {
+    assert_string(path, empty_ok = FALSE)
     if (is.null(type)) {
         type <- str_extract(basename(path), "xml|ascii", ignore.case = TRUE)
         if (!any(type == c("xml", "ascii"))) {
@@ -13,14 +28,22 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
     year <- year %||% str_extract(path, "20\\d+(?=q[1-4])")
     year <- as.integer(year)
     quarter <- quarter %||% str_extract(path, "(?<=20\\d{2})(q[1-4])")
-    if (endsWith(path, ".zip")) {
-        path <- faers_unzip(path, compress_dir)
-        path <- file.path(path, type)
-    } else {
+    quarter <- as.character(quarter)
+    if (dir.exists(path)) {
         path <- file.path(path, type)
         if (!dir.exists(path)) {
             cli::cli_abort("Cannot find {.path {type}} in {.path {path}}")
         }
+    } else if (file.exists(path)) {
+        if (endsWith(path, ".zip")) {
+            assert_string(compress_dir, empty_ok = FALSE)
+            path <- faers_unzip(path, compress_dir)
+            path <- file.path(path, type)
+        } else {
+            cli::cli_abort("Only compressed zip files from FAERS Quarterly Data can work")
+        }
+    } else {
+        cli::cli_abort("{.path {path}} doesn't exist")
     }
     raw_files <- faers_list_files(path, type)
     datatable <- switch(type,
@@ -28,7 +51,7 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
         ascii = parse_ascii(raw_files)
     )
     methods::new(paste0("FAERS", type),
-        year = year, quarter = quarter, 
+        year = year, quarter = quarter,
         datatable = datatable
     )
 }

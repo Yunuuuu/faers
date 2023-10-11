@@ -3,6 +3,7 @@
 export(faers_available)
 export(faers_download)
 export(faers_meta)
+export(faers_parse)
 export(faers_tidy)
 exportMethods("datatable<-")
 exportMethods("quarter<-")
