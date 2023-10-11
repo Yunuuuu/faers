@@ -1,6 +1,6 @@
 #' Download FAERS data
 #'
-#' This function downloads the FAERS data for a specific year and quarter.
+#' This function downloads the FAERS data for selected years and quarters.
 #'
 #' @inheritParams faers_available
 #' @param type File type to download, only "ascii" and "xml" are availabe.

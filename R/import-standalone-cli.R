@@ -86,23 +86,20 @@ format_run <- function(x, target = NULL) {
     is_installed("cli", version = version)
 }
 
-is_installed <- local({
-    cache <- new.env()
-    function(pkg, version = NULL) {
-        id <- if (is.null(version)) pkg else paste(pkg, version, sep = ":")
-        out <- cache[[id]]
-        if (is.null(out)) {
-            if (is.null(version)) {
-                out <- requireNamespace(pkg, quietly = TRUE)
-            } else {
-                out <- requireNamespace(pkg, quietly = TRUE) &&
-                    utils::packageVersion(pkg) >= version
-            }
-            cache[[id]] <<- out
+is_installed <- function(pkg, version = NULL) {
+    id <- if (is.null(version)) pkg else paste(pkg, version, sep = ":")
+    out <- faers_cache[[id]]
+    if (is.null(out)) {
+        if (is.null(version)) {
+            out <- requireNamespace(pkg, quietly = TRUE)
+        } else {
+            out <- requireNamespace(pkg, quietly = TRUE) &&
+                utils::packageVersion(pkg) >= version
         }
-        out
+        faers_cache[[id]] <<- out
     }
-})
+    out
+}
 
 # utils function to collapse characters ---------------------------
 oxford_comma <- function(chr, sep = ", ", final = "and") {

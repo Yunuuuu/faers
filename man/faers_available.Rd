@@ -17,7 +17,7 @@ A logical indicates FAERS can have data for the \code{years} and
 \code{quarters} required?
 }
 \description{
-This function check if data for the year and quarter selected are
+This function check if data for the years and quarters selected are
 available at FAERS to be downloaded.
 }
 \examples{

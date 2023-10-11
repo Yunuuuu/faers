@@ -1,6 +1,6 @@
 #' Check if FAERS year
 #'
-#' This function check if data for the year and quarter selected are
+#' This function check if data for the years and quarters selected are
 #' available at FAERS to be downloaded.
 #'
 #' @param years An atomic integer indicates years for which data are required.

@@ -11,9 +11,7 @@
 #' <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
 #' @export
 faers_meta <- function() {
-    html <- xml2::read_html(
-        sprintf("%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_url)
-    )
+    html <- faers_meta_doc()
     table_xml_list <- rvest::html_elements(html, ".panel.panel-default")
     table_list <- lapply(table_xml_list, parse_year_xml_table)
     out <- data.table::rbindlist(table_list)
@@ -29,6 +27,16 @@ faers_meta <- function() {
     data.table::setorderv(out, "year", order = -1L)
 }
 
+faers_meta_doc <- function() {
+    if (!exists(".faers_meta_doc", where = faers_cache, inherits = FALSE)) {
+        url <- sprintf(
+            "%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_url
+        )
+        cli::cli_alert_info("Reading html: {.url {url}}")
+        faers_cache[[".faers_meta_doc"]] <- xml2::read_html(url)
+    }
+    get(".faers_meta_doc", pos = faers_cache, inherits = FALSE)
+}
 utils::globalVariables(c("period", "quarter"))
 
 parse_year_xml_table <- function(year_xml) {

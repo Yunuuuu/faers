@@ -24,7 +24,7 @@ current working dir.}
 (lgl) TRUE if the download was successful, FALSE otherwise.
 }
 \description{
-This function downloads the FAERS data for a specific year and quarter.
+This function downloads the FAERS data for selected years and quarters.
 }
 \examples{
 \dontrun{
