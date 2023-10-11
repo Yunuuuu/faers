@@ -8,6 +8,10 @@
 \alias{FAERSascii}
 \alias{FAERSxml-class}
 \alias{FAERSxml}
+\alias{header,FAERSxml-method}
+\alias{header}
+\alias{header<-,FAERSxml-method}
+\alias{header<-}
 \alias{show,FAERS-method}
 \alias{year,FAERS-method}
 \alias{year}
@@ -23,6 +27,10 @@
 \alias{datatable<-}
 \title{FAERS classes}
 \usage{
+\S4method{header}{FAERSxml}(object)
+
+\S4method{header}{FAERSxml}(object) <- value
+
 \S4method{show}{FAERS}(object)
 
 \S4method{year}{FAERS}(object)

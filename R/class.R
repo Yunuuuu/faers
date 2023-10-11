@@ -59,10 +59,36 @@ methods::setValidity("FAERSascii", function(object) {
 #' @rdname FAERS-class
 methods::setClass(
     "FAERSxml",
-    slots = list(datatable = "data.table"),
-    prototype = list(datatable = data.table::data.table()),
+    slots = list(datatable = "data.table", header = "list"),
+    prototype = list(datatable = data.table::data.table(), header = list()),
     contains = "FAERS"
 )
+
+#######################################################
+methods::setGeneric("header", function(object) {
+    methods::makeStandardGeneric("header")
+})
+methods::setGeneric("header<-", function(object, value) {
+    methods::makeStandardGeneric("header<-")
+})
+
+#' @export
+#' @method header FAERSxml
+#' @aliases header
+#' @rdname FAERS-class
+methods::setMethod("header", "FAERSxml", function(object) {
+    object@header
+})
+
+#' @export
+#' @method header<- FAERSxml
+#' @aliases header<-
+#' @rdname FAERS-class
+methods::setMethod("header<-", "FAERSxml", function(object, value) {
+    object@year <- as.integer(value)
+    methods::validObject(object)
+    invisible(object)
+})
 
 ######################################################
 #' @param object A [FAERS] object.

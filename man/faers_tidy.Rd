@@ -4,6 +4,7 @@
 \alias{faers_tidy}
 \alias{faers_tidy,FAERSascii-method}
 \alias{faers_tidy,FAERSxml-method}
+\alias{faers_tidy,ListOfFAERS-method}
 \title{Tidy up faers datatable}
 \usage{
 faers_tidy(object, ...)
@@ -11,11 +12,14 @@ faers_tidy(object, ...)
 \S4method{faers_tidy}{FAERSascii}(object, infos = NULL, all = TRUE)
 
 \S4method{faers_tidy}{FAERSxml}(object)
+
+\S4method{faers_tidy}{ListOfFAERS}(object, ...)
 }
 \arguments{
 \item{object}{A \link{FAERSascii} or \link{FAERSxml} object.}
 
-\item{...}{Other arguments passed to specific methods.}
+\item{...}{Other arguments passed to specific methods. For \link{ListOfFAERS}
+method, other arguments passed to \link{FAERSascii} or \link{FAERSxml} method.}
 
 \item{infos}{Index (integer, logistical, character all will be okay) to
 select informations included in the final object. If \code{NULL}, all infomations

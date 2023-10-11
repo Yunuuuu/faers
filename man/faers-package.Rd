@@ -2,8 +2,8 @@
 % Please edit documentation in R/faers-package.R
 \docType{package}
 \name{faers-package}
-\alias{faers}
 \alias{faers-package}
+\alias{_PACKAGE}
 \title{faers: R interface for FDA Adverse Event Reporting System}
 \description{
 R interface for FDA Adverse Event Reporting System (FAERS).

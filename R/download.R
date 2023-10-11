@@ -7,7 +7,7 @@
 #' @param dir The destination directory for any downloads. Defaults to
 #'  current working dir. 
 #' @param ... Extra handle options passed to each request
-#' [new_handle][curl::new_handle] 
+#' [new_handle][curl::new_handle].
 #' @return An atomic character for the path of downloaded files.
 #' @examples
 #' \dontrun{

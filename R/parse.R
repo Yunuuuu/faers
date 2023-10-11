@@ -5,13 +5,13 @@
 #' passed the directory contained the uncompressed files.
 #' @inheritParams faers_download
 #' @param year Year of the FAERS Quarterly Data. Coerced into integer, if
-#' `NULL`, this will be extracted from path. 
+#' `NULL`, this will be extracted from path.
 #' @param quarter String specifies quarter of the FAERS data, if `NULL`, this
-#' will be extracted from path. 
+#' will be extracted from path.
 #' @param compress_dir A string specifies the directory to extract files to. It
 #' will be created if necessary.
 #' @return A [FAERSxml] or [FAERSascii] object.
-#' @export 
+#' @export
 faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress_dir = getwd()) {
     assert_string(path, empty_ok = FALSE)
     if (is.null(type)) {
@@ -46,14 +46,13 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
         cli::cli_abort("{.path {path}} doesn't exist")
     }
     raw_files <- faers_list_files(path, type)
-    datatable <- switch(type,
+    datalist <- switch(type,
         xml = parse_xml(raw_files),
         ascii = parse_ascii(raw_files)
     )
-    methods::new(paste0("FAERS", type),
-        year = year, quarter = quarter,
-        datatable = datatable
-    )
+    do.call(methods::new, c(datalist,
+        Class = paste0("FAERS", type), year = year, quarter = quarter
+    ))
 }
 
 faers_unzip <- function(path, compress_dir) {
@@ -62,7 +61,7 @@ faers_unzip <- function(path, compress_dir) {
     }
     compress_dir <- file.path(
         compress_dir,
-        str_replace(basename(path), "\\.zip$", "")
+        str_replace(basename(path), "\\.zip$", "", ignore.case = TRUE)
     )
     if (!dir.exists(compress_dir)) {
         dir.create(compress_dir)
@@ -76,15 +75,40 @@ faers_list_files <- function(path, type) {
         xml = "\\.xml$",
         ascii = "\\.txt$"
     )
-    list.files(path, pattern = pattern, full.names = TRUE)
+    list.files(path, pattern = pattern, full.names = TRUE, ignore.case = TRUE)
 }
 
 parse_ascii <- function(files) {
-    ids <- str_replace(basename(files), "\\d+q\\d\\.txt$", "")
+    ids <- str_replace(
+        basename(files), "\\d+q\\d\\.txt$", "",
+        ignore.case = TRUE
+    )
     data_list <- lapply(files, function(file) {
-        data.table::fread(file, sep = "$", quote = "")
+        out <- tryCatch(
+            data.table::fread(
+                file,
+                sep = "$", quote = "", fill = TRUE,
+                blank.lines.skip = TRUE,
+                na.strings = c("", "NA"),
+                integer64 = "double"
+            ),
+            # data.table will stop early for some files, leave a lot of rows not
+            # read in 
+            warning = function(cnd) {
+                out <- vroom::vroom(file, delim = "$", show_col_types = FALSE)
+                # vroom will leave the separator "$" in the last column
+                # and treat it as the character column. We just transformed it 
+                # manually
+                data.table::setDT(out)
+                last_col <- rev(names(out))[1L]
+                out[, (last_col) := utils::type.convert(
+                    str_replace(.SD[[1L]], "\\$$", ""), as.is = TRUE
+                ), .SDcols = last_col]
+            }
+        )
+        data.table::setnames(out, tolower)
     })
-    data.table::setattr(data_list, "names", ids)
+    list(datatable = data.table::setattr(data_list, "names", tolower(ids)))
 }
 
 parse_xml <- function(file) {
@@ -100,7 +124,6 @@ parse_xml <- function(file) {
         clear = FALSE
     )
     reports_list <- lapply(seq_len(l), function(i) {
-        i <- 1L
         report <- xml2::as_list(reports_nodesets[[i]])
         report <- make_length_one_list(list_flatten(report))
         for (item in c("patient.drug", "patient.reaction")) {
@@ -117,9 +140,12 @@ parse_xml <- function(file) {
         cli::cli_progress_update(id = bar_id)
         data.table::setDT(report)
     })
-    out <- data.table::rbindlist(reports_list, use.names = TRUE, fill = TRUE)
-    simplify_list_cols(out)
-    data.table::setattr(out, "header", header)
+    datatable <- data.table::rbindlist(reports_list,
+        use.names = TRUE, fill = TRUE
+    )
+    simplify_list_cols(datatable)
+    data.table::setnames(datatable, tolower)
+    list(datatable = datatable, header = header)
 }
 
 list_flatten <- function(x, use.names = TRUE, sep = ".") {
