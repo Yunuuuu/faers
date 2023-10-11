@@ -21,7 +21,7 @@ current working dir.}
 \link[curl:handle]{new_handle}}
 }
 \value{
-(lgl) TRUE if the download was successful, FALSE otherwise.
+An atomic character for the path of downloaded files.
 }
 \description{
 This function downloads the FAERS data for selected years and quarters.
