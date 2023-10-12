@@ -20,13 +20,29 @@ str_subset <- function(string, pattern, ..., fixed = FALSE) {
 }
 
 str_replace <- function(string, pattern, replacement, ..., fixed = FALSE) {
-    sub(pattern = pattern, replacement = replacement, x = string, 
+    sub(
+        pattern = pattern, replacement = replacement, x = string,
+        perl = !fixed, fixed = fixed, ...
+    )
+}
+
+str_remove <- function(string, pattern, ..., fixed = FALSE) {
+    sub(
+        pattern = pattern, replacement = "", x = string,
         perl = !fixed, fixed = fixed, ...
     )
 }
 
 str_replace_all <- function(string, pattern, replacement, ..., fixed = FALSE) {
-    gsub(pattern = pattern, replacement = replacement, x = string, 
+    gsub(
+        pattern = pattern, replacement = replacement, x = string,
+        perl = !fixed, fixed = fixed, ...
+    )
+}
+
+str_remove_all <- function(string, pattern, ..., fixed = FALSE) {
+    gsub(
+        pattern = pattern, replacement = "", x = string,
         perl = !fixed, fixed = fixed, ...
     )
 }
@@ -91,4 +107,15 @@ str_match_all <- function(string, pattern, ..., fixed = FALSE) {
         ),
         invert = FALSE
     )
+}
+
+str_count <- function(string, pattern, ..., fixed = FALSE) {
+    # This information can be gleaned from gregexpr() in base A list of the same
+    #  length as text each element of which is an integer vector giving all
+    #  starting position of the match or −1 if there is none.
+    loc <- gregexpr(
+        pattern = pattern, text = string,
+        perl = !fixed, ..., fixed = fixed
+    )
+    vapply(loc, function(x) sum(x > 0L), integer(1L))
 }

@@ -49,7 +49,7 @@ parse_year_xml_table <- function(year_xml) {
         file_xmls <- rvest::html_elements(quarter_xml, "td a")
         files <- rvest::html_text2(file_xmls)
         out <- data.table::data.table(
-            period = str_replace(period, "\\s*\\d*(\\s*posted.*\\s*)?$", ""),
+            period = str_remove(period, "\\s*\\d*(\\s*posted.*\\s*)?$"),
             urls = rvest::html_attr(file_xmls, "href"),
             file_type = tolower(str_extract(files, "XML|ASCII")),
             file_size = str_extract(files, "\\d[\\d.]*(MB)")

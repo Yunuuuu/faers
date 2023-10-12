@@ -250,7 +250,7 @@ new_ListOfFAERS <- function(x, type) {
 build_ListOfFAERS_type <- function(x) {
     for (allowed_faers in c("FAERSascii", "FAERSxml")) {
         if (all(vapply(x, methods::is, logical(1L), class2 = allowed_faers))) {
-            return(str_replace(allowed_faers, "^FAERS", ""))
+            return(str_remove(allowed_faers, "^FAERS"))
         }
     }
     NULL
