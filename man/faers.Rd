@@ -2,8 +2,6 @@
 % Please edit documentation in R/faers.R
 \name{faers}
 \alias{faers}
-\alias{print.ListOfFAERS}
-\alias{ListOfFAERS}
 \title{Download and parse FAERS Quarterly Data files}
 \usage{
 faers(
@@ -14,8 +12,6 @@ faers(
   compress_dir = dir,
   handle_opts = list()
 )
-
-\method{print}{ListOfFAERS}(x, ...)
 }
 \arguments{
 \item{years}{An atomic integer indicates years for which data are required.}
@@ -34,10 +30,6 @@ will be created if necessary.}
 
 \item{handle_opts}{Extra handle options passed to each request
 \link[curl:handle]{new_handle}.}
-
-\item{x}{A \link{ListOfFAERS} object.}
-
-\item{...}{Not used currently.}
 }
 \value{
 A \link{ListOfFAERS} object if multiple \code{years} and \code{quarters} are
@@ -45,4 +37,7 @@ supplied, otherwise, a \link{FAERSxml} or \link{FAERSascii} object.
 }
 \description{
 Download and parse FAERS Quarterly Data files
+}
+\seealso{
+\link{ListOfFAERS}
 }

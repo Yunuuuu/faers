@@ -96,11 +96,11 @@ methods::setMethod("faers_tidy", "FAERSxml", function(object) {
 })
 
 methods::setOldClass("ListOfFAERS")
-
 #' @export
 #' @method faers_tidy ListOfFAERS
 #' @rdname faers_tidy
 methods::setMethod("faers_tidy", "ListOfFAERS", function(object, ...) {
+    validate_ListOfFAERS(object)
     data.table::rbindlist(lapply(object, faers_tidy, ...),
         use.names = TRUE, fill = TRUE
     )

@@ -6,8 +6,9 @@
 #' @return A [ListOfFAERS] object if multiple `years` and `quarters` are
 #'  supplied, otherwise, a [FAERSxml] or [FAERSascii] object.
 #' @export
-faers <- function(years, quarters, type = c("ascii", "xml"), dir = getwd(), compress_dir = dir, handle_opts = list()) {
-    type <- match.arg(type)
+#' @seealso [ListOfFAERS]
+faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
+    type <- match.arg(type, faers_file_types)
     yq <- refine_length(years = years, quarters = quarters)
     faers_files <- do.call(faers_download, c(
         yq, list(type = type, dir = dir), handle_opts
@@ -19,20 +20,8 @@ faers <- function(years, quarters, type = c("ascii", "xml"), dir = getwd(), comp
     if (length(out) == 1L) {
         out[[1L]]
     } else {
-        structure(out, class = c("ListOfFAERS", paste0("ListOfFAERS", type)))
+        new_ListOfFAERS(out, type = type)
     }
-}
-
-#' @param x A [ListOfFAERS] object.
-#' @param ... Not used currently.
-#' @export
-#' @aliases ListOfFAERS
-#' @rdname faers
-print.ListOfFAERS <- function(x, ...) {
-    cat(sprintf(
-        "A total of %s FDA Adverse Event Reporting System Quarterly Data file%s",
-        length(x), if (length(x) > 1L) "s" else ""
-    ), sep = "\n")
 }
 
 refine_length <- function(..., args = NULL) {

@@ -217,3 +217,66 @@ methods::setMethod("header<-", "FAERSxml", function(object, value) {
     methods::validObject(object)
     invisible(object)
 })
+
+###########################################################
+#' Create ListOfFAERS class
+#'
+#' Packed a list of [FAERSascii] or [FAERSxml] objects into a single object
+#' @param x A list of [FAERSascii] or [FAERSxml] objects.
+#' @return A `ListOfFAERS` object
+#' @export 
+ListOfFAERS <- function(x) {
+    assert_(x, is.list, "a list")
+    type <- build_ListOfFAERS_type(x)
+    if (is.null(type)) abort_ListOfFAERS()
+    new_ListOfFAERS(x, type)
+}
+
+#' @param x A [ListOfFAERS] object.
+#' @param ... Not used currently.
+#' @export
+#' @rdname ListOfFAERS
+print.ListOfFAERS <- function(x, ...) {
+    cat(sprintf(
+        "A total of %s FAERS Quarterly %s Data file%s",
+        length(x), attr(x, "type"), if (length(x) > 1L) "s" else ""
+    ), sep = "\n")
+}
+
+new_ListOfFAERS <- function(x, type) {
+    structure(x, type = type, class = "ListOfFAERS")
+}
+
+build_ListOfFAERS_type <- function(x) {
+    for (allowed_faers in c("FAERSascii", "FAERSxml")) {
+        if (all(vapply(x, methods::is, logical(1L), class2 = allowed_faers))) {
+            return(str_replace(allowed_faers, "^FAERS", ""))
+        }
+    }
+    NULL
+}
+
+validate_ListOfFAERS <- function(x) {
+    actual_type <- attr(x, "type")
+    if (rlang::is_string(actual_type, faers_file_types)) {
+        cli::cli_abort(c(
+            "Invalid {.cls ListOfFAERS} object",
+            i = sprintf(
+                "{.filed type} attribute must be a string of %s",
+                format_val(oxford_comma(faers_file_types, final = "or"))
+            )
+        ))
+    }
+    type <- build_ListOfFAERS_type(x)
+    if (is.null(type)) abort_ListOfFAERS()
+    if (type != actual_type) {
+        cli::cli_abort(sprintf(
+            "For %s, only {.cls FAERS%s} object are allowed",
+            actual_type, actual_type
+        ))
+    }
+}
+
+abort_ListOfFAERS <- function() {
+    cli::cli_abort("values in {.cls ListOfFAERS} must be all {.cls FAERSascii} or {.cls FAERSxml}")
+}
