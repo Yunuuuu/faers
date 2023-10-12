@@ -30,15 +30,16 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
     quarter <- quarter %||% str_extract(path, "(?<=20\\d{2})(q[1-4])")
     quarter <- as.character(quarter)
     if (dir.exists(path)) {
-        path <- file.path(path, type)
+        path0 <- path
+        path <- faers_list_dir(path0, type)
         if (!dir.exists(path)) {
-            cli::cli_abort("Cannot find {.path {type}} in {.path {path}}")
+            cli::cli_abort("Cannot find {.path {type}} in {.path {path0}}")
         }
     } else if (file.exists(path)) {
         if (endsWith(path, ".zip")) {
             assert_string(compress_dir, empty_ok = FALSE)
-            path <- faers_unzip(path, compress_dir)
-            path <- file.path(path, type)
+            path0 <- faers_unzip(path, compress_dir)
+            path <- faers_list_dir(path0, type)
         } else {
             cli::cli_abort("Only compressed zip files from FAERS Quarterly Data can work")
         }
@@ -61,13 +62,18 @@ faers_unzip <- function(path, compress_dir) {
     }
     compress_dir <- file.path(
         compress_dir,
-        str_replace(basename(path), "\\.zip$", "", ignore.case = TRUE)
+        str_remove(basename(path), "\\.zip$", ignore.case = TRUE)
     )
     if (!dir.exists(compress_dir)) {
         dir.create(compress_dir)
     }
     utils::unzip(path, exdir = compress_dir, overwrite = TRUE)
     compress_dir
+}
+
+faers_list_dir <- function(path, type) {
+    path <- list.dirs(path, recursive = FALSE)
+    path[str_detect(basename(path), sprintf("^%s$", type), ignore.case = TRUE)]
 }
 
 faers_list_files <- function(path, type) {
@@ -78,39 +84,99 @@ faers_list_files <- function(path, type) {
     list.files(path, pattern = pattern, full.names = TRUE, ignore.case = TRUE)
 }
 
+# parse ascii files -----------------------------------
 parse_ascii <- function(files) {
-    ids <- str_replace(
-        basename(files), "\\d+q\\d\\.txt$", "",
-        ignore.case = TRUE
-    )
-    data_list <- lapply(files, function(file) {
+    ids <- str_remove(basename(files), "\\d+q\\d\\.txt$", ignore.case = TRUE)
+    ids <- tolower(ids)
+    idx <- match(faers_ascii_files, ids)
+    files <- files[idx]
+    ids <- ids[idx]
+    data_list <- .mapply(function(file, id) {
         out <- tryCatch(
-            data.table::fread(
-                file,
-                sep = "$", quote = "", fill = TRUE,
-                blank.lines.skip = TRUE,
-                na.strings = c("", "NA"),
-                integer64 = "double"
-            ),
-            # data.table will stop early for some files, leave a lot of rows not
-            # read in 
+            read_ascii(file, verbose = FALSE),
             warning = function(cnd) {
-                out <- vroom::vroom(file, delim = "$", show_col_types = FALSE)
-                # vroom will leave the separator "$" in the last column
-                # and treat it as the character column. We just transformed it 
-                # manually
-                data.table::setDT(out)
-                last_col <- rev(names(out))[1L]
-                out[, (last_col) := utils::type.convert(
-                    str_replace(.SD[[1L]], "\\$$", ""), as.is = TRUE
-                ), .SDcols = last_col]
+                read_ascii_safe(file)
             }
         )
+        # always use lower-case column names
         data.table::setnames(out, tolower)
-    })
-    list(datatable = data.table::setattr(data_list, "names", tolower(ids)))
+    }, list(file = files, id = ids), NULL)
+    list(datatable = data.table::setattr(data_list, "names", ids))
 }
 
+faers_ascii_files <- c("demo", "drug", "indi", "ther", "reac", "rpsr", "outc")
+read_ascii <- function(file, ...) {
+    out <- data.table::fread(
+        file = file,
+        sep = "$", quote = "", fill = TRUE,
+        blank.lines.skip = TRUE,
+        na.strings = na_string,
+        ...
+    )
+    # the last columns often messed by the presence OF '$'.
+    # AS PART OF THE ROWTERMINATOR IN DATA ROWS BUT NOT IN THE HEADER ROW
+    # (LAERS)
+    vcolumns <- str_subset(names(out), "^V\\d+$")
+    out[, (vcolumns) := lapply(.SD, function(x) {
+        if (all(is.na(x))) NULL else x
+    }), .SDcols = vcolumns]
+}
+
+read_ascii_safe <- function(file) {
+    # data.table will stop early for some files
+    # leave a lot of rows not read in
+    # this is mainly due to the presence of collapsed lines (two, or more lines
+    # collapsed as one line)
+    file_text <- read_lines(file)
+    n_seps <- str_count(file_text, "$", fixed = TRUE)
+    collapsed_lines <- floor(n_seps / n_seps[2L]) > 1L
+    # collapsed_lines <- collapsed_lines[collapsed_lines > 1L]
+    if (any(collapsed_lines)) {
+        cli::cli_warn("omiting collapsed lines: {which(collapsed_lines)}")
+        file_text <- file_text[!collapsed_lines]
+    }
+    file_text <- str_remove(file_text[!collapsed_lines], "\\$$")
+    read_text(file_text,
+        sep = "$", quote = "", fill = TRUE,
+        blank.lines.skip = TRUE,
+        integer64 = "double"
+    )
+}
+
+read_text <- function(text, ...) {
+    if (!length(text)) {
+        return(data.table::data.table())
+    }
+    file <- tempfile()
+    data.table::fwrite(list(text),
+        file = file,
+        quote = FALSE,
+        na = "NA",
+        col.names = FALSE,
+        logical01 = FALSE,
+        showProgress = FALSE,
+        compress = "none",
+        verbose = FALSE
+    )
+    # brio::write_lines(text, file)
+    on.exit(file.remove(file))
+    data.table::fread(
+        file = file, ...,
+        na.strings = na_string,
+        showProgress = FALSE
+    )
+}
+na_string <- c("NA", "null", "NULL", "Null")
+read_lines <- function(file) {
+    data.table::fread(
+        file = file, sep = "", header = FALSE,
+        blank.lines.skip = TRUE,
+        colClasses = "character",
+        showProgress = FALSE
+    )[[1L]]
+}
+
+# parse xml ----------------------------------------------
 parse_xml <- function(file) {
     xml_doc <- xml2::read_xml(file)
     full_content <- xml2::xml_contents(xml_doc)
