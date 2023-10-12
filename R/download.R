@@ -30,14 +30,14 @@ faers_download <- function(years, quarters, type = NULL, dir = getwd(), ...) {
     }
     if (type == "xml") {
         # only faers database has xml data files
-        is_aers_pairs <- !is_faers(years, quarters)
+        is_aers_pairs <- !is_from_faers(years, quarters)
         if (any(is_aers_pairs)) {
             aers_pairs <- paste(years, quarters, sep = ":")[ # nolint
                 is_aers_pairs
             ]
             cli::cli_abort(c(
                 "Only FAERS (from 2012q4) has {.field xml} files",
-                x = "AERS (before 2012q3) pair{?s}: {.val {aers_pairs}}"
+                x = "Legacy AERS (before 2012q3) pair{?s}: {.val {aers_pairs}}"
             ))
         }
     }
@@ -100,7 +100,7 @@ is_download_success <- function(status, successful_code = c(200L, 206L, 416L)) {
 }
 
 build_faers_url <- function(type, years, quarters) {
-    faers_period <- is_faers(years, quarters)
+    faers_period <- is_from_faers(years, quarters)
     sprintf(
         "%s/content/Exports/%s_%s_%s%s.zip",
         fda_url,
@@ -110,7 +110,7 @@ build_faers_url <- function(type, years, quarters) {
     )
 }
 
-is_faers <- function(years, quarters) {
+is_from_faers <- function(years, quarters) {
     years > 2012L | (years == 2012L & quarters == "q4")
 }
 

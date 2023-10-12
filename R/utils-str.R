@@ -7,6 +7,13 @@ str_which <- function(string, pattern, ..., fixed = FALSE) {
     )
 }
 
+str_c <- function(..., sep = "", collapse = NULL) {
+    na_values <- rowSums(is.na(do.call("cbind", list(...)))) > 0L
+    out <- paste(..., sep = sep, collapse = collapse)
+    out[na_values] <- NA_character_
+    out
+}
+
 str_detect <- function(string, pattern, ..., fixed = FALSE) {
     grepl(pattern = pattern, x = string, ..., perl = !fixed, fixed = fixed)
 }

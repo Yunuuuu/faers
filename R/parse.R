@@ -47,13 +47,10 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
         cli::cli_abort("{.path {path}} doesn't exist")
     }
     raw_files <- faers_list_files(path, type)
-    datalist <- switch(type,
-        xml = parse_xml(raw_files),
-        ascii = parse_ascii(raw_files)
+    switch(type,
+        xml = parse_xml(raw_files, year, quarter),
+        ascii = parse_ascii(raw_files, year, quarter)
     )
-    do.call(methods::new, c(datalist,
-        Class = paste0("FAERS", type), year = year, quarter = quarter
-    ))
 }
 
 faers_unzip <- function(path, compress_dir) {
@@ -85,13 +82,13 @@ faers_list_files <- function(path, type) {
 }
 
 # parse ascii files -----------------------------------
-parse_ascii <- function(files) {
-    ids <- str_remove(basename(files), "\\d+q\\d\\.txt$", ignore.case = TRUE)
-    ids <- tolower(ids)
-    idx <- match(faers_ascii_files, ids)
+parse_ascii <- function(files, year, quarter) {
+    fields <- str_remove(basename(files), "\\d+q\\d\\.txt$", ignore.case = TRUE)
+    fields <- tolower(fields)
+    idx <- match(faers_ascii_fields, fields)
     files <- files[idx]
-    ids <- ids[idx]
-    data_list <- .mapply(function(file, id) {
+    fields <- fields[idx]
+    data_list <- .mapply(function(file, field) {
         out <- tryCatch(
             read_ascii(file, verbose = FALSE),
             warning = function(cnd) {
@@ -99,12 +96,16 @@ parse_ascii <- function(files) {
             }
         )
         # always use lower-case column names
-        data.table::setnames(out, tolower)
-    }, list(file = files, id = ids), NULL)
-    list(datatable = data.table::setattr(data_list, "names", ids))
+        standardize_ascii(out, field = field, year = year, quarter = quarter)
+    }, list(file = files, field = fields), NULL)
+    data.table::setattr(data_list, "names", fields)
+    methods::new("FAERSascii",
+        datatable = data_list,
+        year = year, quarter = quarter
+    )
 }
 
-faers_ascii_files <- c("demo", "drug", "indi", "ther", "reac", "rpsr", "outc")
+faers_ascii_fields <- c("demo", "drug", "indi", "ther", "reac", "rpsr", "outc")
 read_ascii <- function(file, ...) {
     out <- data.table::fread(
         file = file,
@@ -177,7 +178,7 @@ read_lines <- function(file) {
 }
 
 # parse xml ----------------------------------------------
-parse_xml <- function(file) {
+parse_xml <- function(file, year, quarter) {
     xml_doc <- xml2::read_xml(file)
     full_content <- xml2::xml_contents(xml_doc)
     header <- xml2::as_list(full_content[[1L]])
@@ -211,7 +212,10 @@ parse_xml <- function(file) {
     )
     simplify_list_cols(datatable)
     data.table::setnames(datatable, tolower)
-    list(datatable = datatable, header = header)
+    methods::new("FAERSxml",
+        datatable = datatable, header = header,
+        year = year, quarter = quarter
+    )
 }
 
 list_flatten <- function(x, use.names = TRUE, sep = ".") {
