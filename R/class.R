@@ -11,7 +11,8 @@ methods::setClass(
     slots = list(
         year = "integer",
         quarter = "character",
-        datatable = "ANY"
+        datatable = "ANY",
+        type = "character"
     ),
     prototype = list(
         year = NA_integer_,
@@ -25,17 +26,21 @@ check_faers <- function(object) {
     if (length(object@year) != 1L) {
         return("`@year` must be a scalar integer")
     }
-    if (length(object@quarter) != 1L) {
-        return("`@quarter` must be a string")
-    }
-    if (!any(object@quarter == available_quarter)) {
+    if (!rlang::is_string(object@quarter, faers_quarter)) {
         return(sprintf(
-            "Only %s are available in `@quarter`",
-            oxford_comma(available_quarter)
+            "`@quarter` must be a string of %s",
+            oxford_comma(faers_quarter, final = "or")
+        ))
+    }
+    if (!rlang::is_string(object@type, faers_file_types)) {
+        return(sprintf(
+            "`@type` must be a string of %s",
+            oxford_comma(faers_file_types, final = "or")
         ))
     }
     TRUE
 }
+
 methods::setValidity("FAERS", check_faers)
 
 #' @aliases FAERSascii
@@ -43,7 +48,7 @@ methods::setValidity("FAERS", check_faers)
 methods::setClass(
     "FAERSascii",
     slots = list(datatable = "list"),
-    prototype = list(datatable = list()),
+    prototype = list(datatable = list(), type = "ascii"),
     contains = "FAERS"
 )
 methods::setValidity("FAERSascii", function(object) {
@@ -60,42 +65,12 @@ methods::setValidity("FAERSascii", function(object) {
 methods::setClass(
     "FAERSxml",
     slots = list(datatable = "data.table", header = "list"),
-    prototype = list(datatable = data.table::data.table(), header = list()),
+    prototype = list(
+        datatable = data.table::data.table(),
+        header = list(), type = "xml"
+    ),
     contains = "FAERS"
 )
-
-#######################################################
-#' @export 
-#' @aliases header
-#' @rdname FAERS-class
-methods::setGeneric("header", function(object) {
-    methods::makeStandardGeneric("header")
-})
-
-#' @export
-#' @aliases header<-
-#' @rdname FAERS-class
-methods::setGeneric("header<-", function(object, value) {
-    methods::makeStandardGeneric("header<-")
-})
-
-#' @export
-#' @method header FAERSxml
-#' @aliases header
-#' @rdname FAERS-class
-methods::setMethod("header", "FAERSxml", function(object) {
-    object@header
-})
-
-#' @export
-#' @method header<- FAERSxml
-#' @aliases header<-
-#' @rdname FAERS-class
-methods::setMethod("header<-", "FAERSxml", function(object, value) {
-    object@year <- as.integer(value)
-    methods::validObject(object)
-    invisible(object)
-})
 
 ######################################################
 #' @param object A [FAERS] object.
@@ -107,8 +82,8 @@ methods::setMethod("header<-", "FAERSxml", function(object, value) {
 #' @rdname FAERS-class
 methods::setMethod("show", "FAERS", function(object) {
     cat(sprintf(
-        "FDA Adverse Event Reporting System Quarterly Data of %s",
-        paste0(object@year, object@quarter)
+        "FAERS Quarterly %s Data of %s",
+        object@type, paste0(object@year, object@quarter)
     ), sep = "\n")
 })
 
@@ -206,6 +181,39 @@ methods::setMethod("datatable", "FAERS", function(object) {
 #' @rdname FAERS-class
 methods::setMethod("datatable<-", "FAERS", function(object, value) {
     object@datatable <- value
+    methods::validObject(object)
+    invisible(object)
+})
+
+#######################################################
+#' @export
+#' @aliases header
+#' @rdname FAERS-class
+methods::setGeneric("header", function(object) {
+    methods::makeStandardGeneric("header")
+})
+
+#' @export
+#' @aliases header<-
+#' @rdname FAERS-class
+methods::setGeneric("header<-", function(object, value) {
+    methods::makeStandardGeneric("header<-")
+})
+
+#' @export
+#' @method header FAERSxml
+#' @aliases header
+#' @rdname FAERS-class
+methods::setMethod("header", "FAERSxml", function(object) {
+    object@header
+})
+
+#' @export
+#' @method header<- FAERSxml
+#' @aliases header<-
+#' @rdname FAERS-class
+methods::setMethod("header<-", "FAERSxml", function(object, value) {
+    object@year <- as.integer(value)
     methods::validObject(object)
     invisible(object)
 })

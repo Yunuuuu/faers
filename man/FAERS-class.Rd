@@ -8,10 +8,6 @@
 \alias{FAERSascii}
 \alias{FAERSxml-class}
 \alias{FAERSxml}
-\alias{header}
-\alias{header<-}
-\alias{header,FAERSxml-method}
-\alias{header<-,FAERSxml-method}
 \alias{show,FAERS-method}
 \alias{year}
 \alias{year<-}
@@ -25,16 +21,12 @@
 \alias{datatable<-}
 \alias{datatable,FAERS-method}
 \alias{datatable<-,FAERS-method}
+\alias{header}
+\alias{header<-}
+\alias{header,FAERSxml-method}
+\alias{header<-,FAERSxml-method}
 \title{FAERS classes}
 \usage{
-header(object)
-
-header(object) <- value
-
-\S4method{header}{FAERSxml}(object)
-
-\S4method{header}{FAERSxml}(object) <- value
-
 \S4method{show}{FAERS}(object)
 
 year(object)
@@ -60,6 +52,14 @@ datatable(object) <- value
 \S4method{datatable}{FAERS}(object)
 
 \S4method{datatable}{FAERS}(object) <- value
+
+header(object)
+
+header(object) <- value
+
+\S4method{header}{FAERSxml}(object)
+
+\S4method{header}{FAERSxml}(object) <- value
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
