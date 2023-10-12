@@ -43,7 +43,7 @@ use_names_to_integer_indices <- function(use, names, arg = rlang::caller_arg(use
     }
     if (anyNA(use)) {
         rlang::abort(
-            sprintf("%s cannot contain `NA`", format_arg(arg)),
+            sprintf("%s cannot contain `NA`", style_arg(arg)),
             call = call
         )
     }
@@ -51,20 +51,20 @@ use_names_to_integer_indices <- function(use, names, arg = rlang::caller_arg(use
         use <- match(use, names)
         if (anyNA(use)) {
             rlang::abort(sprintf(
-                "%s contains invalid values", format_arg(arg)
+                "%s contains invalid values", style_arg(arg)
             ), call = call)
         }
     } else if (is.numeric(use)) {
         if (any(use < 1L) || any(use > length(names))) {
             rlang::abort(sprintf(
-                "%s contains out-of-bounds indices", format_arg(arg)
+                "%s contains out-of-bounds indices", style_arg(arg)
             ), call = call)
         }
     } else {
         rlang::abort(
             sprintf(
                 "%s must be an atomic numeic/character or `NULL`",
-                format_arg(arg)
+                style_arg(arg)
             ),
             call = call
         )

@@ -50,14 +50,14 @@ stop_input_type <- function(
     arg = rlang::caller_arg(x),
     call = rlang::caller_env()) {
     if (null_ok) {
-        what <- c(what, format_code("NULL"))
+        what <- c(what, style_code("NULL"))
     }
     if (length(what)) {
         what <- oxford_comma(what, final = "or")
     }
     msg <- sprintf(
         "%s must be %s, not %s.",
-        format_arg(arg),
+        style_arg(arg),
         what,
         obj_type_friendly(x, value = show_value, length = show_length)
     )
@@ -72,14 +72,14 @@ assert_pkg <- function(pkg, version = NULL, fun = NULL, call = rlang::caller_env
             fun_call <- rlang::frame_call(frame = call)
             fun <- rlang::as_label(fun_call[[1L]])
         }
-        pkg <- format_pkg(pkg)
+        pkg <- style_pkg(pkg)
         if (!is.null(version)) {
             pkg <- sprintf("%s (>=%s)", pkg, version)
         }
         rlang::abort(
             sprintf(
                 "%s must be installed to use %s.",
-                pkg, format_fn(fun)
+                pkg, style_fn(fun)
             ),
             call = call
         )
@@ -94,11 +94,11 @@ assert_string <- function(
     what <- "a string"
     if (!empty_ok) {
         what <- paste0(what, sprintf(
-            "(empty %s is not allowed)", format_val("")
+            "(empty %s is not allowed)", style_val("")
         ))
     }
     if (na_ok) {
-        what <- c(what, format_code("NA"))
+        what <- c(what, style_code("NA"))
     }
     assert_(
         x = x,
@@ -130,7 +130,7 @@ assert_bool <- function(
     call = rlang::caller_env()) {
     what <- c("`TRUE`", "`FALSE`")
     if (na_ok) {
-        what <- c(what, format_code("NA"))
+        what <- c(what, style_code("NA"))
     }
     assert_(
         x = x,
@@ -187,10 +187,10 @@ assert_matrix <- function(
         what <- "a"
         fn <- NULL
     }
-    what <- paste(what, format_cls("matrix"))
+    what <- paste(what, style_cls("matrix"))
     if (!any_na) {
         what <- paste0(what, sprintf(
-            " (%s is not allowed)", format_code("NA")
+            " (%s is not allowed)", style_code("NA")
         ))
     }
     assert_(
@@ -247,7 +247,7 @@ assert_data_frame <- function(x, ..., arg = rlang::caller_arg(), call = rlang::c
 assert_data_frame_columns <- function(x, columns, ..., args = rlang::caller_arg(x), call = rlang::caller_env()) {
     missing_cols <- setdiff(columns, names(x))
     if (length(missing_cols)) {
-        args <- format_arg(args)
+        args <- style_arg(args)
         if (length(args) == 1L) {
             msg <- args
         } else {
@@ -265,6 +265,26 @@ assert_data_frame_columns <- function(x, columns, ..., args = rlang::caller_arg(
             call = call
         )
     }
+}
+
+# S4 object -------------------------------------
+assert_s4_class <- function(
+    x, is_class, what, ...,
+    arg = rlang::caller_arg(x),
+    call = rlang::caller_env()) {
+    if (rlang::is_string(is_class)) {
+        class <- is_class
+        is_class <- function(x) {
+            methods::is(x, class)
+        }
+        if (missing(what)) {
+            what <- class
+        }
+    }
+    assert_(
+        x = x, assert_fn = is_class, what = what,
+        ..., arg = arg, call = call
+    )
 }
 
 #' Report if an argument has specific length
@@ -294,23 +314,65 @@ stop_input_length <- function(
     call = rlang::caller_env()) {
     what <- NULL
     if (scalar_ok || length == 1L) {
-        what <- c(what, sprintf("a %s", format_field("scalar")))
+        what <- c(what, sprintf("a %s", style_field("scalar")))
     }
     if (length != 1L) {
-        what <- c(what, sprintf("of length %s", format_val(length)))
+        what <- c(what, sprintf("of length %s", style_val(length)))
     }
     if (null_ok) {
-        what <- c(what, format_code("NULL"))
+        what <- c(what, style_code("NULL"))
     }
     if (length(what)) {
         what <- paste0(what, collapse = " or ")
     }
     msg <- sprintf(
         "%s must be %s, not of length %s.",
-        format_arg(arg),
-        what, format_val(length(x))
+        style_arg(arg),
+        what, style_val(length(x))
     )
     rlang::abort(msg, ..., call = call)
+}
+
+
+# Other assert function ---------------------------------
+assert_data_frame_hierarchy <- function(x, parent_field, child_field = NULL, arg_children = rlang::caller_arg(child_field), ..., arg = rlang::caller_arg(x), call = rlang::caller_env()) {
+    id_parent <- style_code(sprintf("%s[[\"%s\"]]", arg, parent_field))
+    id_child <- child_field %|n|%
+        style_code(sprintf("%s[[\"%s\"]]", arg, child_field))
+    assert_hierarchy(
+        parents = x[[parent_field]],
+        children = child_field %|n|% x[[child_field]],
+        id_parent = id_parent, id_child = id_child, arg_children = arg_children,
+        ..., call = call
+    )
+}
+
+# assert hierarchy relationship, every child only has one parent
+assert_hierarchy <- function(parents, children = NULL, id_parent = rlang::caller_arg(parents), id_child = rlang::caller_arg(children), arg_children = rlang::caller_arg(children), ..., call = rlang::caller_env()) {
+    if (is.null(children)) {
+        n_unique <- length(unique(parents))
+        if (n_unique > 1L) {
+            rlang::abort(sprintf(
+                "Only a unique value of %s can be used as no %s provided",
+                id_parent, oxford_comma(style_arg(arg_children), final = "or")
+            ), ..., call = call)
+        }
+    } else {
+        n_unique <- vapply(
+            split(parents, children, drop = TRUE),
+            function(x) length(unique(x)), integer(1L)
+        )
+        failed_idx <- n_unique > 1L
+        if (any(failed_idx)) {
+            rlang::abort(c(
+                sprintf("Multiple %s found in %s", id_parent, id_child),
+                x = sprintf(
+                    "wrong %s: %s", id_child,
+                    oxford_comma(style_val(names(n_unique)[failed_idx]))
+                )
+            ), ..., call = call)
+        }
+    }
 }
 
 assert_inclusive <- function(x, y, arg = rlang::caller_arg(x), call = rlang::caller_env()) {
@@ -319,9 +381,9 @@ assert_inclusive <- function(x, y, arg = rlang::caller_arg(x), call = rlang::cal
         rlang::abort(
             sprintf(
                 "Only values (%s) are allowed in %s, not %s",
-                oxford_comma(format_val(y)),
-                format_arg(arg),
-                oxford_comma(format_val(missing_items))
+                oxford_comma(style_val(y)),
+                style_arg(arg),
+                oxford_comma(style_val(missing_items))
             ),
             call = call
         )
