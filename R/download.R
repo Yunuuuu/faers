@@ -3,19 +3,20 @@
 #' This function downloads the FAERS data for selected years and quarters.
 #'
 #' @inheritParams faers_available
-#' @param type File type to used, only "ascii" and "xml" are availabe.
+#' @param type File type to used, only "ascii" and "xml" are availabe. Default:
+#'  "ascii". 
 #' @param dir The destination directory for any downloads. Defaults to
 #'  current working dir.
 #' @param ... Extra handle options passed to each request
-#' [new_handle][curl::new_handle].
+#'  [new_handle][curl::new_handle].
 #' @return An atomic character for the path of downloaded files.
 #' @examples
 #' \dontrun{
-#' faers_download(year = 2018, quarter = "q4", dir = tempdir())
+#'  faers_download(year = 2018, quarter = "q4", dir = tempdir())
 #' }
 #' @export
-faers_download <- function(years, quarters, type = c("ascii", "xml"), dir = getwd(), ...) {
-    type <- match.arg(type)
+faers_download <- function(years, quarters, type = NULL, dir = getwd(), ...) {
+    type <- match.arg(type, faers_file_types)
     assert_string(dir, empty_ok = FALSE)
     data_available <- faers_available(years, quarters)
     if (!all(data_available)) {
@@ -114,3 +115,5 @@ is_faers <- function(years, quarters) {
 }
 
 fda_url <- "https://fis.fda.gov"
+faers_file_types <- c("ascii", "xml")
+faers_quarter <- c("q1", "q2", "q3", "q4")

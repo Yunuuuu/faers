@@ -16,14 +16,14 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
     assert_string(path, empty_ok = FALSE)
     if (is.null(type)) {
         type <- str_extract(basename(path), "xml|ascii", ignore.case = TRUE)
-        if (!any(type == c("xml", "ascii"))) {
+        if (!any(type == faers_file_types)) {
             cli::cli_abort(c(
                 "Cannot parse file type from {.arg path}",
                 i = "Try to set {.arg type} manually"
             ))
         }
     } else {
-        type <- match.arg(type, c("xml", "ascii"))
+        type <- match.arg(type, faers_file_types)
     }
     year <- year %||% str_extract(path, "20\\d+(?=q[1-4])")
     year <- as.integer(year)

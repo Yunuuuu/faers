@@ -9,7 +9,7 @@
 faers(
   years,
   quarters,
-  type = c("ascii", "xml"),
+  type = NULL,
   dir = getwd(),
   compress_dir = dir,
   handle_opts = list()
@@ -23,7 +23,8 @@ faers(
 \item{quarters}{An atomic character, only "q1", "q2", "q3", and "q4" are
 allowed.}
 
-\item{type}{File type to used, only "ascii" and "xml" are availabe.}
+\item{type}{File type to used, only "ascii" and "xml" are availabe. Default:
+"ascii".}
 
 \item{dir}{The destination directory for any downloads. Defaults to
 current working dir.}
