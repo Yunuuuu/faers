@@ -337,8 +337,11 @@ stop_input_length <- function(
 # Other assert function ---------------------------------
 assert_data_frame_hierarchy <- function(x, parent_field, child_field = NULL, arg_children = rlang::caller_arg(child_field), ..., arg = rlang::caller_arg(x), call = rlang::caller_env()) {
     id_parent <- style_code(sprintf("%s[[\"%s\"]]", arg, parent_field))
-    id_child <- child_field %|n|%
-        style_code(sprintf("%s[[\"%s\"]]", arg, child_field))
+    if (is.null(child_field)) {
+        id_child <- NULL
+    } else {
+        id_child <- style_code(sprintf("%s[[\"%s\"]]", arg, child_field))
+    }
     assert_hierarchy(
         parents = x[[parent_field]],
         children = child_field %|n|% x[[child_field]],
