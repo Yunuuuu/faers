@@ -258,12 +258,12 @@ build_ListOfFAERS_type <- function(x) {
 
 validate_ListOfFAERS <- function(x) {
     actual_type <- attr(x, "type")
-    if (rlang::is_string(actual_type, faers_file_types)) {
+    if (!rlang::is_string(actual_type, faers_file_types)) {
         cli::cli_abort(c(
             "Invalid {.cls ListOfFAERS} object",
             i = sprintf(
                 "{.filed type} attribute must be a string of %s",
-                format_val(oxford_comma(faers_file_types, final = "or"))
+                oxford_comma(style_val(faers_file_types), final = "or")
             )
         ))
     }
