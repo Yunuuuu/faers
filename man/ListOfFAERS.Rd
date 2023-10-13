@@ -5,17 +5,11 @@
 \alias{ListOfFAERS}
 \alias{ListOfFAERS-class}
 \alias{show,ListOfFAERS-method}
-\alias{[[.ListOfFAERS}
-\alias{[.ListOfFAERS}
-\title{Create ListOfFAERS class}
+\title{ListOfFAERS class}
 \usage{
 ListOfFAERS(x, type)
 
 \S4method{show}{ListOfFAERS}(object)
-
-\method{[[}{ListOfFAERS}(object, year = NULL, quarter = NULL, period = NULL)
-
-\method{[}{ListOfFAERS}(object, years = NULL, quarters = NULL, periods = NULL)
 }
 \arguments{
 \item{x}{A list of \link{FAERSascii} or \link{FAERSxml} objects. Only one of \code{x} or
@@ -25,16 +19,7 @@ object, just provide \code{type} argument.}
 \item{type}{File type to used, only "ascii" and "xml" are availabe. Default:
 "ascii".}
 
-\item{object}{A \link{ListOfFAERS} object.}
-
-\item{year, years}{A number or an atomic numeric coerced to integer indicates
-the years of FAERS data to used.}
-
-\item{quarter, quarters}{A string or an atomic character indicates the
-quarters of FAERS data to used.}
-
-\item{period, periods}{A string or an atomic character indicates the periods
-of FAERS data to used.}
+\item{object}{A \code{ListOfFAERS} object.}
 }
 \description{
 Packed all \link{FAERSascii} or \link{FAERSxml} objects into a single object
@@ -42,17 +27,17 @@ Packed all \link{FAERSascii} or \link{FAERSxml} objects into a single object
 \section{Slots}{
 
 \describe{
-\item{\code{container:}}{An list as the container to accommodate all
+\item{\code{container}}{A list as the container to accommodate all
 \link{FAERSascii} or \link{FAERSxml} objects.}
 
-\item{\code{type:}}{A string of "ascii" or "xml" indicates the file type used.}
+\item{\code{type}}{A string of "ascii" or "xml" indicates the file type used.}
 }}
 
 \note{
 For \code{ListOfFAERS} object, the type slot will determine the class of
 objects in \code{container} slot, and can only be set when create \code{ListOfFAERS}
 object using \link{ListOfFAERS}. You shouldn't change it manually with
-\link[methods:slot]{@}.
+\link[methods:slot]{slot<-}.
 }
 \seealso{
 \linkS4class{ListOfFAERS}

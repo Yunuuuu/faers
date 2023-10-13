@@ -11,8 +11,6 @@
 \alias{show,FAERS-method}
 \alias{faers_header}
 \alias{faers_header,FAERSxml-method}
-\alias{[[.FAERS}
-\alias{[.FAERS}
 \title{FAERS and ListOfFAERS class}
 \usage{
 \S4method{show}{FAERS}(object)
@@ -20,17 +18,9 @@
 faers_header(object)
 
 \S4method{faers_header}{FAERSxml}(object)
-
-\method{[[}{FAERS}(object, field)
-
-\method{[}{FAERS}(object, fields)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
-
-\item{field, fields}{A string or an atomic character indicates the FAERS
-fields to used. Only values "demo", "drug", "indi", "ther", "reac", "rpsr",
-and "outc" can be used.}
 }
 \description{
 FAERS and ListOfFAERS class
@@ -38,11 +28,11 @@ FAERS and ListOfFAERS class
 \section{Slots}{
 
 \describe{
-\item{\code{year:}}{An integer specifies the year information.}
+\item{\code{year}}{An integer specifies the year information.}
 
-\item{\code{quarter:}}{A string specifies the quarter information.}
+\item{\code{quarter}}{A string specifies the quarter information.}
 
-\item{\code{data:}}{For \code{FAERSxml}, a \link[data.table:data.table]{data.table}. For
+\item{\code{data}}{For \code{FAERSxml}, a \link[data.table:data.table]{data.table}. For
 \code{FAERSascii}, a list of \link[data.table:data.table]{data.table}.}
 
 \item{\code{type:}}{A string of "ascii" or "xml" indicates the file type used.}

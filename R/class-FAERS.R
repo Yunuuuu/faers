@@ -1,8 +1,8 @@
 #' FAERS and ListOfFAERS class
 #'
-#' @slot year: An integer specifies the year information.
-#' @slot quarter: A string specifies the quarter information.
-#' @slot data: For `FAERSxml`, a [data.table][data.table::data.table]. For
+#' @slot year An integer specifies the year information.
+#' @slot quarter A string specifies the quarter information.
+#' @slot data For `FAERSxml`, a [data.table][data.table::data.table]. For
 #' `FAERSascii`, a list of [data.table][data.table::data.table].
 #' @slot type: A string of "ascii" or "xml" indicates the file type used.
 #' @aliases FAERS
@@ -96,19 +96,3 @@ methods::setGeneric("faers_header", function(object) {
 methods::setMethod("faers_header", "FAERSxml", function(object) {
     object@header
 })
-
-##############################################################
-#' @param field,fields A string or an atomic character indicates the FAERS
-#' fields to used. Only values "demo", "drug", "indi", "ther", "reac", "rpsr",
-#' and "outc" can be used.
-#' @export
-#' @rdname FAERS-class
-`[[.FAERS` <- function(object, field) {
-    faers_field(object, field)
-}
-
-#' @export
-#' @rdname FAERS-class
-`[.FAERS` <- function(object, fields) {
-    faers_fields(object, fields)
-}

@@ -10,15 +10,21 @@
 \alias{faers_quarter,ListOfFAERS-method}
 \alias{faers_period}
 \alias{faers_period,FAERS-method}
+\alias{faers_period,ListOfFAERS-method}
 \alias{faers_data}
 \alias{faers_data,FAERS-method}
 \alias{faers_data,ListOfFAERS-method}
+\alias{[[.ListOfFAERS}
+\alias{[.ListOfFAERS}
+\alias{[[.FAERS}
+\alias{[.FAERS}
 \alias{faers_field}
 \alias{faers_field,FAERS-method}
 \alias{faers_field,ListOfFAERS-method}
 \alias{faers_fields}
 \alias{faers_fields,FAERS-method}
-\title{Extract data slot of a \link{FAERS} object}
+\alias{faers_fields,ListOfFAERS-method}
+\title{Extract elements from FAERS or ListOfFAERS objects}
 \usage{
 faers_year(object)
 
@@ -36,13 +42,21 @@ faers_period(object)
 
 \S4method{faers_period}{FAERS}(object)
 
-\S4method{faers_period}{FAERS}(object)
+\S4method{faers_period}{ListOfFAERS}(object)
 
 faers_data(object, ...)
 
 \S4method{faers_data}{FAERS}(object)
 
 \S4method{faers_data}{ListOfFAERS}(object, year = NULL, quarter = NULL, period = NULL)
+
+\method{[[}{ListOfFAERS}(object, year = NULL, quarter = NULL, period = NULL)
+
+\method{[}{ListOfFAERS}(object, years = NULL, quarters = NULL, periods = NULL)
+
+\method{[[}{FAERS}(object, field)
+
+\method{[}{FAERS}(object, fields)
 
 faers_field(object, ...)
 
@@ -53,15 +67,41 @@ faers_field(object, ...)
 faers_fields(object, ...)
 
 \S4method{faers_fields}{FAERS}(object, fields)
+
+\S4method{faers_fields}{ListOfFAERS}(object, fields, year = NULL, quarter = NULL, period = NULL)
 }
 \arguments{
-\item{object}{A \link{ListOfFAERS} object.}
+\item{object}{A \link{FAERS} or \link{ListOfFAERS} object.}
 
 \item{...}{Other arguments passed to specific methods.}
 
-\item{value}{For \link{faers_year}, a numeric coerced to integer, for
-\link{faers_quarter}, a string.}
+\item{year, years}{A number or an atomic numeric coerced to integer indicates
+the years of FAERS data to used.}
+
+\item{quarter, quarters}{A string or an atomic character indicates the
+quarters of FAERS data to used.}
+
+\item{period, periods}{A string or an atomic character indicates the periods
+of FAERS data to used.}
+
+\item{field, fields}{A string or an atomic character indicates the FAERS
+fields to used. Only values "demo", "drug", "indi", "ther", "reac", "rpsr",
+and "outc" can be used.}
 }
 \description{
-Extract data slot of a \link{FAERS} object
+\itemize{
+\item \code{faers_year}: Extract the year info, for \link{FAERS}, an integer, for
+\link{ListOfFAERS}, an atomic integer.
+\item \code{faers_quarter}: Extract the quarter info, for \link{FAERS}, a string, for
+\link{ListOfFAERS}, an atomic character.
+\item \code{faers_period}: Extract the period info (just Concatenate  the year and
+quarter info), for \link{FAERS}, a string, for \link{ListOfFAERS}, an atomic
+character.
+\item \code{faers_data}: Extract \code{data} slot from a \link{FAERS} object or a specific
+\link{FAERS} object of \link{ListOfFAERS} object.
+\item \code{[[} method: Extract a specific field from \link{FAERS} object or a specific
+\link{FAERS} object from \link{ListOfFAERS}.
+\item \code{[} method: Extract a list of fields from \link{FAERS} object or a subset of
+\link{FAERS} objects from \link{ListOfFAERS}.
+}
 }

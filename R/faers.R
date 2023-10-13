@@ -5,8 +5,8 @@
 #' [new_handle][curl::new_handle].
 #' @return A [ListOfFAERS] object if multiple `years` and `quarters` are
 #'  supplied, otherwise, a [FAERSxml] or [FAERSascii] object.
-#' @export
 #' @seealso [ListOfFAERS]
+#' @export
 faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
     type <- match.arg(type, faers_file_types)
     yq <- refine_length(years = years, quarters = quarters)
