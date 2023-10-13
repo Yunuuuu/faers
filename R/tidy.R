@@ -20,11 +20,7 @@ methods::setMethod("faers_tidy", "FAERSascii", function(object, field) {
 #' @method faers_tidy ListOfFAERS
 #' @rdname faers_tidy
 methods::setMethod("faers_tidy", "ListOfFAERS", function(object, field) {
-    data_list <- lapply(faers_ascii_file_fields, function(x) {
-        faers_field(object, field = x)
-    })
-    data.table::setattr(data_list, "names", faers_ascii_file_fields)
-    tidy_faers_ascii_list(data_list, field = field)
+    tidy_faers_ascii_list(faers_fields(object), field = field)
 })
 
 tidy_faers_ascii_list <- function(lst, field) {

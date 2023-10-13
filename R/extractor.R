@@ -175,27 +175,15 @@ methods::setGeneric("faers_field", function(object, ...) {
     methods::makeStandardGeneric("faers_field")
 })
 
-#' @param add_year,add_quarter whether to add year/quarter info into this field.
-#' With `faers_field` method, for [FAERS] object, must be length one, for
-#' [ListOfFAERS] object, length one or the same length of `object@@container`.
-#' With `faers_fields` method, for both [FAERS] and [ListOfFAERS] object, must
-#' be length one or the same length of `fields`.
 #' @export
 #' @method faers_field FAERS
 #' @aliases faers_field
 #' @rdname FAERS-extractor
-methods::setMethod("faers_field", "FAERS", function(object, field, add_year = TRUE, add_quarter = TRUE) {
-    assert_bool(add_year)
-    assert_bool(add_quarter)
+methods::setMethod("faers_field", "FAERS", function(object, field) {
     out <- object[[field]]
-    if (add_quarter) {
-        out$quarter <- faers_quarter(object)
-        data.table::setcolorder(out, "quarter", before = 1L)
-    }
-    if (add_year) {
-        out$year <- faers_year(object)
-        data.table::setcolorder(out, "year", before = 1L)
-    }
+    out$year <- faers_year(object)
+    out$quarter <- faers_quarter(object)
+    data.table::setcolorder(out, c("year", "quarter"), before = 1L)
     out
 })
 
@@ -205,18 +193,8 @@ methods::setMethod("faers_field", "FAERS", function(object, field, add_year = TR
 #' @method faers_field ListOfFAERS
 #' @aliases faers_field
 #' @rdname FAERS-extractor
-methods::setMethod("faers_field", "ListOfFAERS", function(object, field, add_year = TRUE, add_quarter = TRUE, combine = TRUE) {
-    arg_list <- recycle_scalar(add_year, add_quarter,
-        length = length(object@container),
-        args = c("object@container", "add_year", "add_quarter")
-    )
-    data.table::setattr(arg_list, "names", c(".add_year", ".add_quarter"))
-    out <- .mapply(function(obj, .add_year, .add_quarter) {
-        faers_field(obj, field,
-            add_year = .add_year,
-            add_quarter = .add_quarter
-        )
-    }, c(list(obj = object@container), arg_list), NULL)
+methods::setMethod("faers_field", "ListOfFAERS", function(object, field, combine = TRUE) {
+    out <- lapply(object@container, faers_field, field = field)
     if (isTRUE(combine)) {
         out <- data.table::rbindlist(out, fill = TRUE, use.names = TRUE)
     } else {
@@ -237,24 +215,14 @@ methods::setGeneric("faers_fields", function(object, ...) {
 #' @method faers_fields FAERS
 #' @aliases faers_field
 #' @rdname FAERS-extractor
-methods::setMethod("faers_fields", "FAERS", function(object, fields = NULL, add_year = TRUE, add_quarter = TRUE) {
+methods::setMethod("faers_fields", "FAERS", function(object, fields = NULL) {
     if (is.null(fields)) {
         fields <- faers_ascii_file_fields
     } else {
         assert_inclusive(fields, faers_ascii_file_fields)
         fields <- unique(fields)
     }
-    arg_list <- recycle_scalar(fields, add_year, add_quarter)
-    data.table::setattr(
-        arg_list, "names",
-        c("field", ".add_year", ".add_quarter")
-    )
-    out <- .mapply(function(field, .add_year, .add_quarter) {
-        faers_field(object, field,
-            add_year = .add_year,
-            add_quarter = .add_quarter
-        )
-    }, arg_list, NULL)
+    out <- lapply(fields, faers_field, object = object)
     data.table::setattr(out, "names", fields)
     out
 })
@@ -263,7 +231,7 @@ methods::setMethod("faers_fields", "FAERS", function(object, fields = NULL, add_
 #' @method faers_fields ListOfFAERS
 #' @aliases faers_fields
 #' @rdname FAERS-extractor
-methods::setMethod("faers_fields", "ListOfFAERS", function(object, fields = NULL, add_year = TRUE, add_quarter = TRUE, combine = TRUE) {
+methods::setMethod("faers_fields", "ListOfFAERS", function(object, fields = NULL, combine = TRUE) {
     if (isTRUE(combine)) {
         if (is.null(fields)) {
             fields <- faers_ascii_file_fields
@@ -271,17 +239,10 @@ methods::setMethod("faers_fields", "ListOfFAERS", function(object, fields = NULL
             assert_inclusive(fields, faers_ascii_file_fields)
             fields <- unique(fields)
         }
-        out <- lapply(fields, faers_field,
-            object = object, fields = fields,
-            add_year = add_year, add_quarter = add_quarter,
-            combine = combine
-        )
+        out <- lapply(fields, faers_field, object = object, combine = combine)
         data.table::setattr(out, "names", fields)[]
     } else {
-        lapply(object@container, faers_fields,
-            fields = fields,
-            add_year = add_year, add_quarter = add_quarter
-        )
+        lapply(object@container, faers_fields, fields = fields)
     }
 })
 

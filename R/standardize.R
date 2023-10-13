@@ -8,7 +8,8 @@ standardize_ascii <- function(data, field, year, quarter) {
     switch(field,
         demo = standardize_ascii_demo(data, year, quarter),
         ther = standardize_ascii_ther(data),
-        indi = standardize_ascii_indi(data)
+        indi = standardize_ascii_indi(data),
+        drug = standardize_ascii_drug(data)
     )
     data
 }
@@ -260,5 +261,8 @@ standardize_ascii_ther <- function(data) {
 standardize_ascii_indi <- function(data) {
     data.table::setnames(data, "drug_seq", "indi_drug_seq", skip_absent = TRUE)
 }
+standardize_ascii_drug <- function(data) {
+    data[, nda_num := trimws(as.character(nda_num), "both", "[\\h\\v]")]# nolint
+}
 
-utils::globalVariables(c("age_in_years", "age_cod", "age", "country_code", "reporter_country", "gender", "sex"))
+utils::globalVariables(c("age_in_years", "age_cod", "age", "country_code", "reporter_country", "gender", "sex", "nda_num"))
