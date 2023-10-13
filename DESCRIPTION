@@ -17,3 +17,20 @@ Imports:
     rvest,
     utils,
     xml2
+Collate: 
+    'available.R'
+    'class-FAERS.R'
+    'class-ListOfFAERS.R'
+    'download.R'
+    'extractor.R'
+    'faers-package.R'
+    'faers.R'
+    'import-standalone-assert.R'
+    'import-standalone-cli.R'
+    'import-standalone-obj-type.R'
+    'meta.R'
+    'parse.R'
+    'standardize.R'
+    'tidy.R'
+    'utils-str.R'
+    'utils.R'

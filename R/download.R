@@ -116,4 +116,5 @@ is_from_faers <- function(years, quarters) {
 
 fda_url <- "https://fis.fda.gov"
 faers_file_types <- c("ascii", "xml")
-faers_quarter <- c("q1", "q2", "q3", "q4")
+faers_file_quarters <- c("q1", "q2", "q3", "q4")
+faers_ascii_file_fields <- c("demo", "drug", "indi", "ther", "reac", "rpsr", "outc")

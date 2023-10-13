@@ -31,7 +31,7 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
     quarter <- as.character(quarter)
     if (dir.exists(path)) {
         path0 <- path
-        path <- faers_list_dir(path0, type)
+        path <- faers_list_zip_dir(path0, type)
         if (!dir.exists(path)) {
             cli::cli_abort("Cannot find {.path {type}} in {.path {path0}}")
         }
@@ -39,7 +39,7 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
         if (endsWith(path, ".zip")) {
             assert_string(compress_dir, empty_ok = FALSE)
             path0 <- faers_unzip(path, compress_dir)
-            path <- faers_list_dir(path0, type)
+            path <- faers_list_zip_dir(path0, type)
         } else {
             cli::cli_abort("Only compressed zip files from FAERS Quarterly Data can work")
         }
@@ -68,7 +68,7 @@ faers_unzip <- function(path, compress_dir) {
     compress_dir
 }
 
-faers_list_dir <- function(path, type) {
+faers_list_zip_dir <- function(path, type) {
     path <- list.dirs(path, recursive = FALSE)
     path[str_detect(basename(path), sprintf("^%s$", type), ignore.case = TRUE)]
 }
@@ -85,18 +85,16 @@ faers_list_files <- function(path, type) {
 parse_ascii <- function(files, year, quarter) {
     fields <- str_remove(basename(files), "\\d+q\\d\\.txt$", ignore.case = TRUE)
     fields <- tolower(fields)
-    idx <- match(faers_ascii_fields, fields)
+    idx <- match(faers_ascii_file_fields, fields)
     files <- files[idx]
     fields <- fields[idx]
     data_list <- .mapply(function(file, field) {
-        out <- tryCatch(
+        tryCatch(
             read_ascii(file, verbose = FALSE),
             warning = function(cnd) {
                 read_ascii_safe(file)
             }
         )
-        # always use lower-case column names
-        standardize_ascii(out, field = field, year = year, quarter = quarter)
     }, list(file = files, field = fields), NULL)
     data.table::setattr(data_list, "names", fields)
     methods::new("FAERSascii",
@@ -105,7 +103,6 @@ parse_ascii <- function(files, year, quarter) {
     )
 }
 
-faers_ascii_fields <- c("demo", "drug", "indi", "ther", "reac", "rpsr", "outc")
 read_ascii <- function(file, ...) {
     out <- data.table::fread(
         file = file,

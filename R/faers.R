@@ -20,7 +20,7 @@ faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = di
     if (length(out) == 1L) {
         out[[1L]]
     } else {
-        new_ListOfFAERS(out, type = type)
+        ListOfFAERS(out)
     }
 }
 

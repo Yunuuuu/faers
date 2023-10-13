@@ -342,9 +342,14 @@ assert_data_frame_hierarchy <- function(x, parent_field, child_field = NULL, arg
     } else {
         id_child <- style_code(sprintf("%s[[\"%s\"]]", arg, child_field))
     }
+    if (is.null(child_field)) {
+        children <- NULL
+    } else {
+        children <- x[[child_field]]
+    }
     assert_hierarchy(
         parents = x[[parent_field]],
-        children = child_field %|n|% x[[child_field]],
+        children = children,
         id_parent = id_parent, id_child = id_child, arg_children = arg_children,
         ..., call = call
     )
