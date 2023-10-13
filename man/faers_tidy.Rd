@@ -3,30 +3,28 @@
 \name{faers_tidy}
 \alias{faers_tidy}
 \alias{faers_tidy,FAERSascii-method}
-\alias{faers_tidy,FAERSxml-method}
 \alias{faers_tidy,ListOfFAERS-method}
-\title{Tidy up faers datatable}
+\alias{faers_tidy,FAERSxml-method}
+\title{Tidy up faers datatable with duplicate records removed}
 \usage{
 faers_tidy(object, ...)
 
-\S4method{faers_tidy}{FAERSascii}(object, use = NULL)
+\S4method{faers_tidy}{FAERSascii}(object, field)
+
+\S4method{faers_tidy}{ListOfFAERS}(object, field)
 
 \S4method{faers_tidy}{FAERSxml}(object)
-
-\S4method{faers_tidy}{ListOfFAERS}(object, use)
 }
 \arguments{
-\item{object}{A \link{FAERSascii} or \link{FAERSxml} object.}
+\item{object}{A \link{FAERSascii} or \link{ListOfFAERS} object.}
 
-\item{...}{Other arguments passed to specific methods. For \link{ListOfFAERS}
-method, other arguments passed to \link{FAERSascii} or \link{FAERSxml} method.}
+\item{...}{Other arguments passed to specific methods.}
 
-\item{use}{A character specifying the field to use. If \code{NULL}, the
-deduplicated data will be returned.}
+\item{field}{A string specifying the field to use.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.
 }
 \description{
-Tidy up faers datatable
+Tidy up faers datatable with duplicate records removed
 }

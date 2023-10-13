@@ -154,8 +154,7 @@ methods::setMethod("faers_data", "ListOfFAERS", function(object, year = NULL, qu
 #' @export
 #' @rdname FAERS-extractor
 `[[.FAERS` <- function(object, field) {
-    assert_string(field, empty_ok = FALSE, na_ok = FALSE)
-    assert_inclusive(field, faers_ascii_file_fields)
+    field <- match.arg(field, faers_ascii_file_fields)
     object@data[[field]]
 }
 
@@ -200,11 +199,13 @@ methods::setMethod("faers_field", "FAERS", function(object, field, add_year = TR
     out
 })
 
+#' @param combine If `TRUE`, will combine the final list into a
+#' [data.table][data.table::data.table].
 #' @export
 #' @method faers_field ListOfFAERS
 #' @aliases faers_field
 #' @rdname FAERS-extractor
-methods::setMethod("faers_field", "ListOfFAERS", function(object, field, add_year = TRUE, add_quarter = TRUE) {
+methods::setMethod("faers_field", "ListOfFAERS", function(object, field, add_year = TRUE, add_quarter = TRUE, combine = TRUE) {
     arg_list <- recycle_scalar(add_year, add_quarter,
         length = length(object@container),
         args = c("object@container", "add_year", "add_quarter")
@@ -216,7 +217,11 @@ methods::setMethod("faers_field", "ListOfFAERS", function(object, field, add_yea
             add_quarter = .add_quarter
         )
     }, c(list(obj = object@container), arg_list), NULL)
-    data.table::setattr(out, "names", faers_period(object))
+    if (isTRUE(combine)) {
+        out <- data.table::rbindlist(out, fill = TRUE, use.names = TRUE)
+    } else {
+        data.table::setattr(out, "names", faers_period(object))
+    }
     out
 })
 
@@ -258,11 +263,26 @@ methods::setMethod("faers_fields", "FAERS", function(object, fields = NULL, add_
 #' @method faers_fields ListOfFAERS
 #' @aliases faers_fields
 #' @rdname FAERS-extractor
-methods::setMethod("faers_fields", "ListOfFAERS", function(object, fields = NULL, add_year = TRUE, add_quarter = TRUE) {
-    lapply(object@container, faers_fields,
-        fields = fields,
-        add_year = add_year, add_quarter = add_quarter
-    )
+methods::setMethod("faers_fields", "ListOfFAERS", function(object, fields = NULL, add_year = TRUE, add_quarter = TRUE, combine = TRUE) {
+    if (isTRUE(combine)) {
+        if (is.null(fields)) {
+            fields <- faers_ascii_file_fields
+        } else {
+            assert_inclusive(fields, faers_ascii_file_fields)
+            fields <- unique(fields)
+        }
+        out <- lapply(fields, faers_field,
+            object = object, fields = fields,
+            add_year = add_year, add_quarter = add_quarter,
+            combine = combine
+        )
+        data.table::setattr(out, "names", fields)[]
+    } else {
+        lapply(object@container, faers_fields,
+            fields = fields,
+            add_year = add_year, add_quarter = add_quarter
+        )
+    }
 })
 
 build_periods <- function(

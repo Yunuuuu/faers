@@ -29,6 +29,6 @@ This function downloads the FAERS data for selected years and quarters.
 }
 \examples{
 \dontrun{
- faers_download(year = 2018, quarter = "q4", dir = tempdir())
+faers_download(year = 2018, quarter = "q4", dir = tempdir())
 }
 }

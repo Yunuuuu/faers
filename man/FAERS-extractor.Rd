@@ -62,13 +62,19 @@ faers_field(object, ...)
 
 \S4method{faers_field}{FAERS}(object, field, add_year = TRUE, add_quarter = TRUE)
 
-\S4method{faers_field}{ListOfFAERS}(object, field, add_year = TRUE, add_quarter = TRUE)
+\S4method{faers_field}{ListOfFAERS}(object, field, add_year = TRUE, add_quarter = TRUE, combine = TRUE)
 
 faers_fields(object, ...)
 
 \S4method{faers_fields}{FAERS}(object, fields = NULL, add_year = TRUE, add_quarter = TRUE)
 
-\S4method{faers_fields}{ListOfFAERS}(object, fields = NULL, add_year = TRUE, add_quarter = TRUE)
+\S4method{faers_fields}{ListOfFAERS}(
+  object,
+  fields = NULL,
+  add_year = TRUE,
+  add_quarter = TRUE,
+  combine = TRUE
+)
 }
 \arguments{
 \item{object}{A \link{FAERS} or \link{ListOfFAERS} object.}
@@ -93,6 +99,9 @@ With \code{faers_field} method, for \link{FAERS} object, must be length one, for
 \link{ListOfFAERS} object, length one or the same length of \code{object@container}.
 With \code{faers_fields} method, for both \link{FAERS} and \link{ListOfFAERS} object, must
 be length one or the same length of \code{fields}.}
+
+\item{combine}{If \code{TRUE}, will combine the final list into a
+\link[data.table:data.table]{data.table}.}
 }
 \description{
 \itemize{
