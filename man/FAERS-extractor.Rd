@@ -60,15 +60,15 @@ faers_data(object, ...)
 
 faers_field(object, ...)
 
-\S4method{faers_field}{FAERS}(object, field)
+\S4method{faers_field}{FAERS}(object, field, add_year = TRUE, add_quarter = TRUE)
 
-\S4method{faers_field}{ListOfFAERS}(object, field, year = NULL, quarter = NULL, period = NULL)
+\S4method{faers_field}{ListOfFAERS}(object, field, add_year = TRUE, add_quarter = TRUE)
 
 faers_fields(object, ...)
 
-\S4method{faers_fields}{FAERS}(object, fields)
+\S4method{faers_fields}{FAERS}(object, fields = NULL, add_year = TRUE, add_quarter = TRUE)
 
-\S4method{faers_fields}{ListOfFAERS}(object, fields, year = NULL, quarter = NULL, period = NULL)
+\S4method{faers_fields}{ListOfFAERS}(object, fields = NULL, add_year = TRUE, add_quarter = TRUE)
 }
 \arguments{
 \item{object}{A \link{FAERS} or \link{ListOfFAERS} object.}
@@ -87,6 +87,12 @@ of FAERS data to used.}
 \item{field, fields}{A string or an atomic character indicates the FAERS
 fields to used. Only values "demo", "drug", "indi", "ther", "reac", "rpsr",
 and "outc" can be used.}
+
+\item{add_year, add_quarter}{whether to add year/quarter info into this field.
+With \code{faers_field} method, for \link{FAERS} object, must be length one, for
+\link{ListOfFAERS} object, length one or the same length of \code{object@container}.
+With \code{faers_fields} method, for both \link{FAERS} and \link{ListOfFAERS} object, must
+be length one or the same length of \code{fields}.}
 }
 \description{
 \itemize{
@@ -99,6 +105,10 @@ quarter info), for \link{FAERS}, a string, for \link{ListOfFAERS}, an atomic
 character.
 \item \code{faers_data}: Extract \code{data} slot from a \link{FAERS} object or a specific
 \link{FAERS} object of \link{ListOfFAERS} object.
+\item \code{faers_field}: Extract a FAERS data field from \link{FAERS} or \link{ListOfFAERS}
+object.
+\item \code{faers_fields}: Extract multiple FAERS data fields from \link{FAERS} or
+\link{ListOfFAERS} object.
 \item \code{[[} method: Extract a specific field from \link{FAERS} object or a specific
 \link{FAERS} object from \link{ListOfFAERS}.
 \item \code{[} method: Extract a list of fields from \link{FAERS} object or a subset of

@@ -9,7 +9,7 @@
 #' @export
 faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
     type <- match.arg(type, faers_file_types)
-    yq <- refine_length(years = years, quarters = quarters)
+    yq <- recycle_scalar(years = years, quarters = quarters)
     faers_files <- do.call(faers_download, c(
         yq, list(type = type, dir = dir), handle_opts
     ))
@@ -24,18 +24,18 @@ faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = di
     }
 }
 
-refine_length <- function(..., args = NULL) {
+recycle_scalar <- function(..., length = NULL, args = NULL) {
     args <- args %||% unlist(lapply(substitute(...()), as.character),
         use.names = FALSE
     )
     lst <- list(...)
     l <- lengths(lst)
-    ml <- max(l)
-    if (!all(l == 1L | l == ml)) {
+    expected_len <- length %||% max(l)
+    if (!all(l == 1L | l == expected_len)) {
         cli::cli_abort(c(
             "{.arg {args}} must have compatible sizes",
             i = "Only values of size one are recycled."
         ))
     }
-    lapply(lst, rep_len, length.out = ml)
+    lapply(lst, rep_len, length.out = expected_len)
 }

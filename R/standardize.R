@@ -1,5 +1,6 @@
 standardize_ascii <- function(data, field, year, quarter) {
     data.table::setnames(data, tolower)
+
     data.table::setnames(data, c("isr", "case"),
         c("primaryid", "caseid"),
         skip_absent = TRUE
@@ -17,9 +18,10 @@ standardize_ascii_demo <- function(data, year, quarter) {
     if (!is_from_faers(year, quarter)) {
         data[, caseversion := 0L]
     }
+    data[, age := as.numeric(age)]
     # AGE FILED TO YEARS
     data[, age_in_years := data.table::fcase(
-        age_cod == "DEC", age * 12,
+        age_cod == "DEC", age * 12L,
         age_cod == "YR" | age_cod == "YEAR", as.double(age),
         age_cod == "MON", age / 12L,
         age_cod == "WK" | age_cod == "WEEK", age / 52L,
@@ -253,3 +255,5 @@ standardize_ascii_ther <- function(data) {
 standardize_ascii_indi <- function(data) {
     data.table::setnames(data, "drug_seq", "indi_drug_seq", skip_absent = TRUE)
 }
+
+utils::globalVariables(c("age_in_years", "age_cod", "age", "country_code", "reporter_country", "gender", "sex"))

@@ -9,11 +9,11 @@
 \usage{
 faers_tidy(object, ...)
 
-\S4method{faers_tidy}{FAERSascii}(object, use = NULL, all = NULL)
+\S4method{faers_tidy}{FAERSascii}(object, use = NULL)
 
 \S4method{faers_tidy}{FAERSxml}(object)
 
-\S4method{faers_tidy}{ListOfFAERS}(object, ...)
+\S4method{faers_tidy}{ListOfFAERS}(object, use)
 }
 \arguments{
 \item{object}{A \link{FAERSascii} or \link{FAERSxml} object.}
@@ -21,12 +21,8 @@ faers_tidy(object, ...)
 \item{...}{Other arguments passed to specific methods. For \link{ListOfFAERS}
 method, other arguments passed to \link{FAERSascii} or \link{FAERSxml} method.}
 
-\item{use}{A character specifying the fields to use. If \code{NULL}, all fields
-will be used. Note: use all fields will consume a lot of memory.}
-
-\item{all}{A scalar logical. If \code{TRUE} rows from all fields specified in
-\code{use} will be included, if \code{FALSE}, no matching row with other fields will be
-excluded. See \link[data.table:merge]{merge} for details.}
+\item{use}{A character specifying the field to use. If \code{NULL}, the
+deduplicated data will be returned.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.

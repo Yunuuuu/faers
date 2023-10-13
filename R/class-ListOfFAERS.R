@@ -56,15 +56,18 @@ methods::setValidity("ListOfFAERS", function(object) {
     }
     nms <- names(object@container)
     if (length(nms)) {
-        mismatch_idx <- nms != vapply(x, faers_period, character(1L))
+        mismatch_idx <- nms != vapply(
+            object@container,
+            faers_period, character(1L)
+        )
         if (any(mismatch_idx)) {
             return(sprintf(
                 "the names of `@container` must match the corresponded `period`, please check items %s",
                 oxford_comma(nms[mismatch_idx])
             ))
         }
-        if (!all(isMatchedFAERS(object@containers, type = object@type))) {
-            return(sprintf("all elements in `@containers` must be of `FAERS%s`", object@type))
+        if (!all(isMatchedFAERS(object@container, type = object@type))) {
+            return(sprintf("all elements in `@container` must be of `FAERS%s`", object@type))
         }
     }
     TRUE

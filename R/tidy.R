@@ -9,68 +9,15 @@ methods::setGeneric("faers_tidy", function(object, ...) {
     methods::makeStandardGeneric("faers_tidy")
 })
 
-#' @param use A character or integer vector specifying the fields to use. If
-#' `NULL`, all fields will be used. Note: use all fields will consume a lot of
-#' memory.
-#' @param all A scalar logical. If `TRUE` rows from all fields specified in
-#' `use` will be included, if `FALSE`, no matching row with other fields will be
-#' excluded. See [merge][data.table::merge] for details.
+#' @param use A character specifying the field to use. If `NULL`, the
+#' deduplicated data will be returned.
 #' @export
 #' @method faers_tidy FAERSascii
 #' @rdname faers_tidy
-methods::setMethod("faers_tidy", "FAERSascii", function(object, use = NULL, all = TRUE) {
-    use <- use_names_to_integer_indices(use, names(object@datatable))
-    lst <- object@datatable[use]
-    old_names <- c("isr", "case")
-    new_names <- c("primaryid", "caseid")
-    # check if drug_seq should be matched
-    if (sum(names(lst) %in% c("indi", "ther", "drug")) >= 2L) {
-        old_names <- c(old_names, c("indi_drug_seq", "dsg_drug_seq"))
-        new_names <- c(new_names, c("drug_seq", "drug_seq"))
-    }
-    lapply(lst, function(x) {
-        data.table::setnames(x, old_names, new_names, skip_absent = TRUE)
-    })
-    Reduce(function(x, y) {
-        #  This defaults to the shared key columns between x and y 
-        merge(x, y, allow.cartesian = TRUE, all = all)
-    }, lst)
+methods::setMethod("faers_tidy", "FAERSascii", function(object, use = NULL) {
+    data_list <- faers_fields(object)
+    faers_tidy_faers_ascii(data_list, use = use)
 })
-
-use_names_to_integer_indices <- function(use, names, arg = rlang::caller_arg(use), call = rlang::caller_env()) {
-    if (is.null(use)) {
-        return(seq_along(names))
-    }
-    if (anyNA(use)) {
-        rlang::abort(
-            sprintf("%s cannot contain `NA`", style_arg(arg)),
-            call = call
-        )
-    }
-    if (is.character(use)) {
-        use <- match(use, names)
-        if (anyNA(use)) {
-            rlang::abort(sprintf(
-                "%s contains invalid values", style_arg(arg)
-            ), call = call)
-        }
-    } else if (is.numeric(use)) {
-        if (any(use < 1L) || any(use > length(names))) {
-            rlang::abort(sprintf(
-                "%s contains out-of-bounds indices", style_arg(arg)
-            ), call = call)
-        }
-    } else {
-        rlang::abort(
-            sprintf(
-                "%s must be an atomic numeic/character or `NULL`",
-                style_arg(arg)
-            ),
-            call = call
-        )
-    }
-    use
-}
 
 # define_common_by <- function(x) {
 #     out <- NULL
@@ -88,20 +35,92 @@ use_names_to_integer_indices <- function(use, names, arg = rlang::caller_arg(use
 #     cli::cli_abort("One of {.val {choices}} must exist")
 # }
 
+# Combine data from various source tables
+# demo
+# drug
+# indi
+# ther
+# reac
+# Perform string aggregation operations
+
+faers_dedup_ascii <- function(demo, drug, indi, ther, reac) {
+    # nolint start
+    out <- drug[order(drug_seq),
+        list(aligned_drugs = paste0(drugname, collapse = "/")),
+        by = "primaryid"
+    ][demo, on = "primaryid"]
+    # meddra_code: indi_pt
+    # [!meddra_code %in% c(10070592L, 10057097L)]
+    out <- indi[
+        order(indi_pt, indi_drug_seq),
+        list(aligned_indi = paste0(indi_pt, collapse = "/")),
+        by = "primaryid"
+    ][out, on = "primaryid"]
+    out <- ther[order(start_dt, dsg_drug_seq),
+        list(aligned_start_dt = paste0(start_dt, collapse = "/")),
+        by = "primaryid"
+    ][out, on = "primaryid"]
+    # meddra_code: pt
+    out <- reac[order(pt),
+        list(aligned_reac = paste0(pt, collapse = "/")),
+        by = "primaryid"
+    ][out, on = "primaryid"]
+    out <- out[
+        order(
+            -primaryid, -year, -quarter,
+            -caseversion, -fda_dt, -i_f_cod, -event_dt
+        ), .SD[1L],
+        by = "caseid"
+    ]
+    can_be_ignored_columns <- c(
+        "event_dt", "age_in_years", "gender", "country_code",
+        "aligned_start_dt", "aligned_indi"
+    )
+    must_matched_columns <- c("aligned_drugs", "aligned_reac")
+    for (i in seq_along(can_be_ignored_columns)) {
+        out <- out[
+            order(
+                -primaryid, -year, -quarter,
+            ), .SD[1L],
+            by = c(must_matched_columns, can_be_ignored_columns[-i])
+        ]
+    }
+    # nolint end
+    out
+}
+
 #' @export
 #' @method faers_tidy FAERSxml
 #' @rdname faers_tidy
 methods::setMethod("faers_tidy", "FAERSxml", function(object) {
-    object@datatable
+    object@data
 })
 
-methods::setOldClass("ListOfFAERS")
 #' @export
 #' @method faers_tidy ListOfFAERS
 #' @rdname faers_tidy
-methods::setMethod("faers_tidy", "ListOfFAERS", function(object, ...) {
-    validate_ListOfFAERS(object)
-    data.table::rbindlist(lapply(object, faers_tidy, ...),
-        use.names = TRUE, fill = TRUE
-    )
+methods::setMethod("faers_tidy", "ListOfFAERS", function(object, use) {
+    data_list <- lapply(faers_ascii_file_fields, function(field) {
+        data.table::rbindlist(faers_field(object, field),
+            fill = TRUE, use.names = TRUE
+        )
+    })
+    data.table::setattr(data_list, "names", faers_ascii_file_fields)
+    faers_tidy_faers_ascii(data_list, use = use)
 })
+
+faers_tidy_faers_ascii <- function(lst, use) {
+    dedup_out <- do.call(
+        faers_dedup_ascii,
+        lst[c("demo", "drug", "indi", "ther", "reac")]
+    )
+    if (is.null(use)) {
+        dedup_out
+    } else {
+        assert_inclusive(use, faers_ascii_file_fields)
+        match_id <- dedup_out[, "primaryid"]
+        lst[[use]][match_id, on = "primaryid"]
+    }
+}
+
+utils::globalVariables(c("drug_seq", "drugname", "indi_pt", "start_dt", "indi_drug_seq", "dsg_drug_seq", "pt", "primaryid", "caseversion", "fda_dt", "i_f_cod", "event_dt", "year"))

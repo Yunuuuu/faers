@@ -93,9 +93,7 @@ assert_string <- function(
     call = rlang::caller_env()) {
     what <- "a string"
     if (!empty_ok) {
-        what <- paste0(what, sprintf(
-            "(empty %s is not allowed)", style_val("")
-        ))
+        what <- paste0(what, " (empty \"\" is not allowed )")
     }
     if (na_ok) {
         what <- c(what, style_code("NA"))

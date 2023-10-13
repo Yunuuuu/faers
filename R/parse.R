@@ -89,18 +89,16 @@ parse_ascii <- function(files, year, quarter) {
     files <- files[idx]
     fields <- fields[idx]
     data_list <- .mapply(function(file, field) {
-        tryCatch(
+        out <- tryCatch(
             read_ascii(file, verbose = FALSE),
             warning = function(cnd) {
                 read_ascii_safe(file)
             }
         )
+        standardize_ascii(out, field = field, year = year, quarter = quarter)
     }, list(file = files, field = fields), NULL)
     data.table::setattr(data_list, "names", fields)
-    methods::new("FAERSascii",
-        datatable = data_list,
-        year = year, quarter = quarter
-    )
+    methods::new("FAERSascii", data = data_list, year = year, quarter = quarter)
 }
 
 read_ascii <- function(file, ...) {
@@ -204,13 +202,13 @@ parse_xml <- function(file, year, quarter) {
         cli::cli_progress_update(id = bar_id)
         data.table::setDT(report)
     })
-    datatable <- data.table::rbindlist(reports_list,
+    data <- data.table::rbindlist(reports_list,
         use.names = TRUE, fill = TRUE
     )
-    simplify_list_cols(datatable)
-    data.table::setnames(datatable, tolower)
+    simplify_list_cols(data)
+    data.table::setnames(data, tolower)
     methods::new("FAERSxml",
-        datatable = datatable, header = header,
+        datat = data, header = header,
         year = year, quarter = quarter
     )
 }

@@ -1,7 +1,7 @@
 #######################################################
 #' Extract elements from FAERS or ListOfFAERS objects
-#' 
-#' @description 
+#'
+#' @description
 #'  - `faers_year`: Extract the year info, for [FAERS], an integer, for
 #'    [ListOfFAERS], an atomic integer.
 #'  - `faers_quarter`: Extract the quarter info, for [FAERS], a string, for
@@ -11,9 +11,13 @@
 #'    character.
 #'  - `faers_data`: Extract `data` slot from a [FAERS] object or a specific
 #'    [FAERS] object of [ListOfFAERS] object.
+#'  - `faers_field`: Extract a FAERS data field from [FAERS] or [ListOfFAERS]
+#'    object.
+#'  - `faers_fields`: Extract multiple FAERS data fields from [FAERS] or
+#'    [ListOfFAERS] object.
 #'  - `[[` method: Extract a specific field from [FAERS] object or a specific
 #'    [FAERS] object from [ListOfFAERS].
-#'  - `[` method: Extract a list of fields from [FAERS] object or a subset of 
+#'  - `[` method: Extract a list of fields from [FAERS] object or a subset of
 #'    [FAERS] objects from [ListOfFAERS].
 #' @param object A [FAERS] or [ListOfFAERS] object.
 #' @export
@@ -172,23 +176,48 @@ methods::setGeneric("faers_field", function(object, ...) {
     methods::makeStandardGeneric("faers_field")
 })
 
+#' @param add_year,add_quarter whether to add year/quarter info into this field.
+#' With `faers_field` method, for [FAERS] object, must be length one, for
+#' [ListOfFAERS] object, length one or the same length of `object@@container`.
+#' With `faers_fields` method, for both [FAERS] and [ListOfFAERS] object, must
+#' be length one or the same length of `fields`.
 #' @export
 #' @method faers_field FAERS
 #' @aliases faers_field
 #' @rdname FAERS-extractor
-methods::setMethod("faers_field", "FAERS", function(object, field) {
-    object[[field]]
+methods::setMethod("faers_field", "FAERS", function(object, field, add_year = TRUE, add_quarter = TRUE) {
+    assert_bool(add_year)
+    assert_bool(add_quarter)
+    out <- object[[field]]
+    if (add_quarter) {
+        out$quarter <- faers_quarter(object)
+        data.table::setcolorder(out, "quarter", before = 1L)
+    }
+    if (add_year) {
+        out$year <- faers_year(object)
+        data.table::setcolorder(out, "year", before = 1L)
+    }
+    out
 })
 
 #' @export
 #' @method faers_field ListOfFAERS
 #' @aliases faers_field
 #' @rdname FAERS-extractor
-methods::setMethod("faers_field", "ListOfFAERS", function(object, field, year = NULL, quarter = NULL, period = NULL) {
-    faers_field(faers_data(
-        object,
-        year = year, quarter = quarter, period = period
-    ), field)
+methods::setMethod("faers_field", "ListOfFAERS", function(object, field, add_year = TRUE, add_quarter = TRUE) {
+    arg_list <- recycle_scalar(add_year, add_quarter,
+        length = length(object@container),
+        args = c("object@container", "add_year", "add_quarter")
+    )
+    data.table::setattr(arg_list, "names", c(".add_year", ".add_quarter"))
+    out <- .mapply(function(obj, .add_year, .add_quarter) {
+        faers_field(obj, field,
+            add_year = .add_year,
+            add_quarter = .add_quarter
+        )
+    }, c(list(obj = object@container), arg_list), NULL)
+    data.table::setattr(out, "names", faers_period(object))
+    out
 })
 
 #################################################################
@@ -203,19 +232,37 @@ methods::setGeneric("faers_fields", function(object, ...) {
 #' @method faers_fields FAERS
 #' @aliases faers_field
 #' @rdname FAERS-extractor
-methods::setMethod("faers_fields", "FAERS", function(object, fields) {
-    object[fields]
+methods::setMethod("faers_fields", "FAERS", function(object, fields = NULL, add_year = TRUE, add_quarter = TRUE) {
+    if (is.null(fields)) {
+        fields <- faers_ascii_file_fields
+    } else {
+        assert_inclusive(fields, faers_ascii_file_fields)
+        fields <- unique(fields)
+    }
+    arg_list <- recycle_scalar(fields, add_year, add_quarter)
+    data.table::setattr(
+        arg_list, "names",
+        c("field", ".add_year", ".add_quarter")
+    )
+    out <- .mapply(function(field, .add_year, .add_quarter) {
+        faers_field(object, field,
+            add_year = .add_year,
+            add_quarter = .add_quarter
+        )
+    }, arg_list, NULL)
+    data.table::setattr(out, "names", fields)
+    out
 })
 
 #' @export
 #' @method faers_fields ListOfFAERS
 #' @aliases faers_fields
 #' @rdname FAERS-extractor
-methods::setMethod("faers_fields", "ListOfFAERS", function(object, fields, year = NULL, quarter = NULL, period = NULL) {
-    faers_fields(faers_data(
-        object,
-        year = year, quarter = quarter, period = period
-    ), fields)
+methods::setMethod("faers_fields", "ListOfFAERS", function(object, fields = NULL, add_year = TRUE, add_quarter = TRUE) {
+    lapply(object@container, faers_fields,
+        fields = fields,
+        add_year = add_year, add_quarter = add_quarter
+    )
 })
 
 build_periods <- function(
