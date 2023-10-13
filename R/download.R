@@ -4,7 +4,7 @@
 #'
 #' @inheritParams faers_available
 #' @param type File type to used, only "ascii" and "xml" are availabe. Default:
-#'  "ascii". 
+#'  "ascii".
 #' @param dir The destination directory for any downloads. Defaults to
 #'  current working dir.
 #' @param ... Extra handle options passed to each request
@@ -12,7 +12,7 @@
 #' @return An atomic character for the path of downloaded files.
 #' @examples
 #' \dontrun{
-#'  faers_download(year = 2018, quarter = "q4", dir = tempdir())
+#' faers_download(year = 2018, quarter = "q4", dir = tempdir())
 #' }
 #' @export
 faers_download <- function(years, quarters, type = NULL, dir = getwd(), ...) {
@@ -30,7 +30,7 @@ faers_download <- function(years, quarters, type = NULL, dir = getwd(), ...) {
     }
     if (type == "xml") {
         # only faers database has xml data files
-        is_aers_pairs <- !is_from_faers(years, quarters)
+        is_aers_pairs <- is_from_laers(years, quarters)
         if (any(is_aers_pairs)) {
             aers_pairs <- paste(years, quarters, sep = ":")[ # nolint
                 is_aers_pairs
@@ -100,21 +100,12 @@ is_download_success <- function(status, successful_code = c(200L, 206L, 416L)) {
 }
 
 build_faers_url <- function(type, years, quarters) {
-    faers_period <- is_from_faers(years, quarters)
+    laers_period <- is_from_laers(years, quarters)
     sprintf(
         "%s/content/Exports/%s_%s_%s%s.zip",
         fda_url,
-        ifelse(faers_period, "faers", "aers"),
-        ifelse(type == "ascii" | faers_period, type, "sgml"),
+        ifelse(laers_period, "aers", "faers"),
+        ifelse(type == "ascii" | !laers_period, type, "sgml"),
         years, quarters
     )
 }
-
-is_from_faers <- function(years, quarters) {
-    years > 2012L | (years == 2012L & quarters == "q4")
-}
-
-fda_url <- "https://fis.fda.gov"
-faers_file_types <- c("ascii", "xml")
-faers_file_quarters <- c("q1", "q2", "q3", "q4")
-faers_ascii_file_fields <- c("demo", "drug", "indi", "ther", "reac", "rpsr", "outc")

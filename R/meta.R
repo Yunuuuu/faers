@@ -37,6 +37,11 @@ faers_meta_doc <- function() {
     }
     get(".faers_meta_doc", pos = faers_cache, inherits = FALSE)
 }
+
+#' Used by `is_installed` and `faers_meta_doc`
+#' @noRd 
+faers_cache <- new.env()
+
 utils::globalVariables(c("period", "quarter"))
 
 parse_year_xml_table <- function(year_xml) {

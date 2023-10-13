@@ -83,9 +83,18 @@ faers_list_files <- function(path, type) {
 
 # parse ascii files -----------------------------------
 parse_ascii <- function(files, year, quarter) {
-    fields <- str_remove(basename(files), "\\d+q\\d\\.txt$", ignore.case = TRUE)
+    # for 2018q1 demo file, there exists a suffix "_new"
+    fields <- str_remove(basename(files), "\\d+q\\d(_new)?\\.txt$",
+        ignore.case = TRUE
+    )
     fields <- tolower(fields)
     idx <- match(faers_ascii_file_fields, fields)
+    if (anyNA(idx)) {
+        cli::cli_abort(sprintf(
+            "Cannot find %s",
+            oxford_comma(style_file(faers_ascii_file_fields[is.na(idx)]))
+        ))
+    }
     files <- files[idx]
     fields <- fields[idx]
     data_list <- .mapply(function(file, field) {
