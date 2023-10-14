@@ -136,7 +136,11 @@ read_ascii_deleted_cases <- function(path, year, quarter) {
             faers_locate_dir(path, "deleted"), NULL
         )
         deleted_cases <- lapply(deleted_cases_files, function(file) {
-            data.table::fread(file = file)[[1L]]
+            data.table::fread(
+                file = file,
+                header = FALSE,
+                blank.lines.skip = TRUE
+            )[[1L]]
         })
         data.table::setattr(deleted_cases, "names", tolower(
             str_remove(basename(deleted_cases_files),
