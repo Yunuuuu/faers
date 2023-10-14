@@ -86,3 +86,20 @@ methods::setMethod("show", "ListOfFAERS", function(object) {
         l, object@type, if (l > 1L) "s" else ""
     ), sep = "\n")
 })
+
+#######################################################
+#' @param i Indices specifying elements to extract.
+#' @export
+#' @rdname ListOfFAERS
+`[[.ListOfFAERS` <- function(object, i) {
+    object@container[[use_indices(i, names(object@container))]]
+}
+
+#' @export
+#' @rdname ListOfFAERS
+`[.ListOfFAERS` <- function(object, i) {
+    methods::new("ListOfFAERS",
+        container = object@container[use_indices(i, names(object@container))],
+        type = object@type
+    )
+}

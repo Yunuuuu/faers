@@ -96,3 +96,17 @@ methods::setGeneric("faers_header", function(object) {
 methods::setMethod("faers_header", "FAERSxml", function(object) {
     object@header
 })
+
+#######################################################
+#' @param i Indices specifying elements to extract.
+#' @export
+#' @rdname FAERS-class
+`[[.FAERS` <- function(object, i) {
+    object@data[[use_indices(i, names(object@data))]]
+}
+
+#' @export
+#' @rdname FAERS-class
+`[.FAERS` <- function(object, i) {
+    object@data[use_indices(i, names(object@data))]
+}

@@ -15,10 +15,11 @@
 #'    object.
 #'  - `faers_fields`: Extract multiple FAERS data fields from [FAERS] or
 #'    [ListOfFAERS] object.
-#'  - `[[` method: Extract a specific field from [FAERS] object or a specific
-#'    [FAERS] object from [ListOfFAERS].
-#'  - `[` method: Extract a list of fields from [FAERS] object or a subset of
-#'    [FAERS] objects from [ListOfFAERS].
+#'  - `faers_get`: Extract a specific [data.table][data.table::data.table] field
+#'    from [FAERS] object or a specific [FAERS] object from [ListOfFAERS].
+#'  - `faers_subset`: Extract a list of [data.table][data.table::data.table]
+#'    fields from [FAERS] object or a subset of [ListOfFAERS] object by keeping
+#'    selected [FAERS] objects.
 #' @param object A [FAERS] or [ListOfFAERS] object.
 #' @export
 #' @aliases faers_year
@@ -116,6 +117,23 @@ methods::setMethod("faers_data", "ListOfFAERS", function(object, year = NULL, qu
 })
 
 ##############################################################
+#' @export
+#' @rdname FAERS-extractor
+methods::setGeneric("faers_get", function(object, ...) {
+    methods::makeStandardGeneric("faers_get")
+})
+
+#' @param field,fields A string or an atomic character indicates the FAERS
+#' fields to used. Only values "demo", "drug", "indi", "ther", "reac", "rpsr",
+#' and "outc" can be used.
+#' @export
+#' @method faers_get FAERS
+#' @rdname FAERS-extractor
+methods::setMethod("faers_get", "FAERS", function(object, field) {
+    field <- match.arg(field, faers_ascii_file_fields)
+    object@data[[field]]
+})
+
 #' @param year,years A number or an atomic numeric coerced to integer indicates
 #' the years of FAERS data to used.
 #' @param quarter,quarters A string or an atomic character indicates the
@@ -123,8 +141,9 @@ methods::setMethod("faers_data", "ListOfFAERS", function(object, year = NULL, qu
 #' @param period,periods A string or an atomic character indicates the periods
 #' of FAERS data to used.
 #' @export
+#' @method faers_get ListOfFAERS
 #' @rdname FAERS-extractor
-`[[.ListOfFAERS` <- function(object, year = NULL, quarter = NULL, period = NULL) {
+methods::setMethod("faers_get", "ListOfFAERS", function(object, year = NULL, quarter = NULL, period = NULL) {
     assert_length(year, 1L)
     assert_string(quarter, empty_ok = FALSE, null_ok = TRUE)
     assert_string(period, empty_ok = FALSE, null_ok = TRUE)
@@ -133,11 +152,27 @@ methods::setMethod("faers_data", "ListOfFAERS", function(object, year = NULL, qu
         cli::cli_abort("Cannot find {period}")
     }
     object@container[[period]]
-}
+})
 
+#############################################################
 #' @export
 #' @rdname FAERS-extractor
-`[.ListOfFAERS` <- function(object, years = NULL, quarters = NULL, periods = NULL) {
+methods::setGeneric("faers_subset", function(object, ...) {
+    methods::makeStandardGeneric("faers_subset")
+})
+
+#' @export
+#' @method faers_subset FAERS
+#' @rdname FAERS-extractor
+methods::setMethod("faers_subset", "FAERS", function(object, fields) {
+    assert_inclusive(fields, faers_ascii_file_fields)
+    object@data[fields]
+})
+
+#' @export
+#' @method faers_subset ListOfFAERS
+#' @rdname FAERS-extractor
+methods::setMethod("faers_subset", "ListOfFAERS", function(object, years = NULL, quarters = NULL, periods = NULL) {
     periods <- build_periods(periods, years, quarters)
     missed_periods <- setdiff(periods, faers_period(object))
     if (length(missed_periods)) {
@@ -146,24 +181,7 @@ methods::setMethod("faers_data", "ListOfFAERS", function(object, year = NULL, qu
     methods::new("ListOfFAERS",
         container = object@container[periods], type = object@type
     )
-}
-
-#' @param field,fields A string or an atomic character indicates the FAERS
-#' fields to used. Only values "demo", "drug", "indi", "ther", "reac", "rpsr",
-#' and "outc" can be used.
-#' @export
-#' @rdname FAERS-extractor
-`[[.FAERS` <- function(object, field) {
-    field <- match.arg(field, faers_ascii_file_fields)
-    object@data[[field]]
-}
-
-#' @export
-#' @rdname FAERS-extractor
-`[.FAERS` <- function(object, fields) {
-    assert_inclusive(fields, faers_ascii_file_fields)
-    object@data[fields]
-}
+})
 
 
 #################################################################
@@ -180,7 +198,7 @@ methods::setGeneric("faers_field", function(object, ...) {
 #' @aliases faers_field
 #' @rdname FAERS-extractor
 methods::setMethod("faers_field", "FAERS", function(object, field) {
-    out <- object[[field]]
+    out <- faers_get(object, field)
     out$year <- faers_year(object)
     out$quarter <- faers_quarter(object)
     data.table::setcolorder(out, c("year", "quarter"), before = 1L)

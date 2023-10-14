@@ -5,11 +5,17 @@
 \alias{ListOfFAERS}
 \alias{ListOfFAERS-class}
 \alias{show,ListOfFAERS-method}
+\alias{[[.ListOfFAERS}
+\alias{[.ListOfFAERS}
 \title{ListOfFAERS class}
 \usage{
 ListOfFAERS(x, type)
 
 \S4method{show}{ListOfFAERS}(object)
+
+\method{[[}{ListOfFAERS}(object, i)
+
+\method{[}{ListOfFAERS}(object, i)
 }
 \arguments{
 \item{x}{A list of \link{FAERSascii} or \link{FAERSxml} objects. Only one of \code{x} or
@@ -20,6 +26,8 @@ object, just provide \code{type} argument.}
 "ascii".}
 
 \item{object}{A \code{ListOfFAERS} object.}
+
+\item{i}{Indices specifying elements to extract.}
 }
 \description{
 Packed all \link{FAERSascii} or \link{FAERSxml} objects into a single object

@@ -14,10 +14,12 @@
 \alias{faers_data}
 \alias{faers_data,FAERS-method}
 \alias{faers_data,ListOfFAERS-method}
-\alias{[[.ListOfFAERS}
-\alias{[.ListOfFAERS}
-\alias{[[.FAERS}
-\alias{[.FAERS}
+\alias{faers_get}
+\alias{faers_get,FAERS-method}
+\alias{faers_get,ListOfFAERS-method}
+\alias{faers_subset}
+\alias{faers_subset,FAERS-method}
+\alias{faers_subset,ListOfFAERS-method}
 \alias{faers_field}
 \alias{faers_field,FAERS-method}
 \alias{faers_field,ListOfFAERS-method}
@@ -50,13 +52,17 @@ faers_data(object, ...)
 
 \S4method{faers_data}{ListOfFAERS}(object, year = NULL, quarter = NULL, period = NULL)
 
-\method{[[}{ListOfFAERS}(object, year = NULL, quarter = NULL, period = NULL)
+faers_get(object, ...)
 
-\method{[}{ListOfFAERS}(object, years = NULL, quarters = NULL, periods = NULL)
+\S4method{faers_get}{FAERS}(object, field)
 
-\method{[[}{FAERS}(object, field)
+\S4method{faers_get}{ListOfFAERS}(object, year = NULL, quarter = NULL, period = NULL)
 
-\method{[}{FAERS}(object, fields)
+faers_subset(object, ...)
+
+\S4method{faers_subset}{FAERS}(object, fields)
+
+\S4method{faers_subset}{ListOfFAERS}(object, years = NULL, quarters = NULL, periods = NULL)
 
 faers_field(object, ...)
 
@@ -106,9 +112,10 @@ character.
 object.
 \item \code{faers_fields}: Extract multiple FAERS data fields from \link{FAERS} or
 \link{ListOfFAERS} object.
-\item \code{[[} method: Extract a specific field from \link{FAERS} object or a specific
-\link{FAERS} object from \link{ListOfFAERS}.
-\item \code{[} method: Extract a list of fields from \link{FAERS} object or a subset of
-\link{FAERS} objects from \link{ListOfFAERS}.
+\item \code{faers_get}: Extract a specific \link[data.table:data.table]{data.table} field
+from \link{FAERS} object or a specific \link{FAERS} object from \link{ListOfFAERS}.
+\item \code{faers_subset}: Extract a list of \link[data.table:data.table]{data.table}
+fields from \link{FAERS} object or a subset of \link{ListOfFAERS} object by keeping
+selected \link{FAERS} objects.
 }
 }

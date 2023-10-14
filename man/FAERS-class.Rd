@@ -11,6 +11,8 @@
 \alias{show,FAERS-method}
 \alias{faers_header}
 \alias{faers_header,FAERSxml-method}
+\alias{[[.FAERS}
+\alias{[.FAERS}
 \title{FAERS and ListOfFAERS class}
 \usage{
 \S4method{show}{FAERS}(object)
@@ -18,9 +20,15 @@
 faers_header(object)
 
 \S4method{faers_header}{FAERSxml}(object)
+
+\method{[[}{FAERS}(object, i)
+
+\method{[}{FAERS}(object, i)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
+
+\item{i}{Indices specifying elements to extract.}
 }
 \description{
 FAERS and ListOfFAERS class
