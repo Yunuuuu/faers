@@ -8,18 +8,19 @@ methods::setGeneric("faers_tidy", function(object, ...) {
     methods::makeStandardGeneric("faers_tidy")
 })
 
-#' @param fields An atomic characters specifying the fields to use.
+#' @param fields An atomic characters specifying the fields to use. If `NULL`,
+#' the de-duplicated dataset will be returned.
 #' @export
 #' @method faers_tidy FAERSascii
 #' @rdname faers_tidy
-methods::setMethod("faers_tidy", "FAERSascii", function(object, fields) {
+methods::setMethod("faers_tidy", "FAERSascii", function(object, fields = NULL) {
     tidy_faers_ascii_list(faers_fields(object), fields = fields)
 })
 
 #' @export
 #' @method faers_tidy ListOfFAERS
 #' @rdname faers_tidy
-methods::setMethod("faers_tidy", "ListOfFAERS", function(object, fields) {
+methods::setMethod("faers_tidy", "ListOfFAERS", function(object, fields = NULL) {
     tidy_faers_ascii_list(faers_fields(object), fields = fields)
 })
 
@@ -29,6 +30,9 @@ tidy_faers_ascii_list <- function(lst, fields) {
         dedup_faers_ascii,
         lst[c("demo", "drug", "indi", "ther", "reac")]
     )
+    if (is.null(fields)) {
+        return(dedup_out)
+    }
     match_id <- dedup_out[, "primaryid"]
     out <- lapply(lst[fields], function(data) {
         data[match_id, on = "primaryid"]
@@ -45,6 +49,10 @@ tidy_faers_ascii_list <- function(lst, fields) {
 #' @rdname faers_tidy
 methods::setMethod("faers_tidy", "FAERSxml", function(object) {
     cli::cli_abort("Don't implement currently")
+})
+
+methods::setMethod("faers_tidy", "ANY", function(object) {
+    cli::cli_abort("Only {.cls FAERSascii}, and {.cls ListOfFAERS} can work")
 })
 
 # define_common_by <- function(x) {
@@ -72,19 +80,33 @@ methods::setMethod("faers_tidy", "FAERSxml", function(object) {
 # Perform string aggregation operations
 
 dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
+    # As recommended by the FDA, a deduplication step was performed to retain
+    # the most recent report for each case with the same case identifier
     # nolint start
+    cli::cli_alert_info("deduplication from the same source by retain the most recent report")
+    out <- demo[
+        order(
+            -primaryid, -year, -quarter,
+            -caseversion, -fda_dt, -i_f_cod, -event_dt
+        ), .SD[1L],
+        by = "caseid"
+    ]
+    # collapse all used drugs, indi, ther states, use it as a whole to identify
+    # same cases.
+    # match drug, indi, and ther data.
+    cli::cli_alert_info("merging drug, indi, ther, and reac data")
     out <- drug[order(drug_seq),
         list(aligned_drugs = paste0(drugname, collapse = "/")),
         by = "primaryid"
-    ][demo, on = "primaryid"]
+    ][out, on = "primaryid"]
     # meddra_code: indi_pt
     # [!meddra_code %in% c(10070592L, 10057097L)]
     out <- indi[
-        order(indi_pt, indi_drug_seq),
+        order(indi_drug_seq, indi_pt),
         list(aligned_indi = paste0(indi_pt, collapse = "/")),
         by = "primaryid"
     ][out, on = "primaryid"]
-    out <- ther[order(start_dt, dsg_drug_seq),
+    out <- ther[order(dsg_drug_seq, start_dt),
         list(aligned_start_dt = paste0(start_dt, collapse = "/")),
         by = "primaryid"
     ][out, on = "primaryid"]
@@ -93,28 +115,41 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
         list(aligned_reac = paste0(pt, collapse = "/")),
         by = "primaryid"
     ][out, on = "primaryid"]
-    out <- out[
-        order(
-            -primaryid, -year, -quarter,
-            -caseversion, -fda_dt, -i_f_cod, -event_dt
-        ), .SD[1L],
-        by = "caseid"
-    ]
+
+    #  consider two cases to be the same if they had a complete match of the
+    #  eight criteria which are gender, age, reporting country, event date,
+    #  start date, drug indications, drugs administered, and adverse reactions.
+    #  Two records were also considered duplicated if they mismatch in only one
+    #  of the gender, age, reporting country, event date, start date, or drug
+    #  indications fields, but not the drug or adverse event fields.
+
+    # Notes: always remember NA value in data.table, will be regarded as equal.
+    # but they won't really be the same, so we should convert NA value in
+    # columns used into other differentiated values, like ..__na_null__..1,
+    # ..__na_null__..2, and so on.
+    cli::cli_alert_info("deduplication from multiple sources by matching gender, age, reporting country, event date, start date, drug indications, drugs administered, and adverse reactions")
     can_be_ignored_columns <- c(
         "event_dt", "age_in_years", "gender", "country_code",
         "aligned_start_dt", "aligned_indi"
     )
     must_matched_columns <- c("aligned_drugs", "aligned_reac")
+    all_columns <- c(must_matched_columns, can_be_ignored_columns)
+    out[, (all_columns) := lapply(.SD, function(x) {
+        # above `paste0` will coerced NA into "NA"
+        idx <- is.na(x) | x == "NA"
+        x[idx] <- paste0("..__na_null__..", seq_len(sum(idx)))
+        x
+    }), .SDcols = all_columns]
     for (i in seq_along(can_be_ignored_columns)) {
-        out <- out[
-            order(
-                -primaryid, -year, -quarter,
-            ), .SD[1L],
+        out <- out[order(-primaryid, -year, -quarter), .SD[1L],
             by = c(must_matched_columns, can_be_ignored_columns[-i])
         ]
     }
     # nolint end
-    out
+    out[, (all_columns) := lapply(.SD, function(x) {
+        x[startsWith(x, "..__na_null__..")] <- NA
+        x
+    }), .SDcols = all_columns][]
 }
 
 utils::globalVariables(c(
