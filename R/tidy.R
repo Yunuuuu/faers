@@ -10,30 +10,45 @@ methods::setGeneric("faers_tidy", function(object, ...) {
 
 #' @param fields An atomic characters specifying the fields to use. If `NULL`,
 #' the de-duplicated dataset will be returned.
+#' @param remove_deleted_cases If `TRUE`, will remove all
+#' [deletedCases][FAERS-class] from the final result.
 #' @export
 #' @method faers_tidy FAERSascii
 #' @rdname faers_tidy
-methods::setMethod("faers_tidy", "FAERSascii", function(object, fields = NULL) {
-    tidy_faers_ascii_list(faers_fields(object), fields = fields)
+methods::setMethod("faers_tidy", "FAERSascii", function(object, fields = NULL, remove_deleted_cases = TRUE) {
+    tidy_faers_ascii_list(object,
+        fields = fields,
+        remove_deleted_cases = remove_deleted_cases
+    )
 })
 
 #' @export
 #' @method faers_tidy ListOfFAERS
 #' @rdname faers_tidy
-methods::setMethod("faers_tidy", "ListOfFAERS", function(object, fields = NULL) {
-    tidy_faers_ascii_list(faers_fields(object), fields = fields)
+methods::setMethod("faers_tidy", "ListOfFAERS", function(object, fields = NULL, remove_deleted_cases = TRUE) {
+    tidy_faers_ascii_list(object,
+        fields = fields,
+        remove_deleted_cases = remove_deleted_cases
+    )
 })
 
-tidy_faers_ascii_list <- function(lst, fields) {
-    assert_inclusive(fields, faers_ascii_file_fields)
-    dedup_out <- do.call(
+tidy_faers_ascii_list <- function(object, fields, remove_deleted_cases) {
+    assert_inclusive(fields, faers_ascii_file_fields, null_ok = TRUE)
+    lst <- faers_fields(object)
+    out <- do.call(
         dedup_faers_ascii,
         lst[c("demo", "drug", "indi", "ther", "reac")]
     )
-    if (is.null(fields)) {
-        return(dedup_out)
+    if (isTRUE(remove_deleted_cases)) {
+        deleted_cases <- faers_deleted_cases(object)
+        if (length(deleted_cases)) {
+            out <- out[!caseid %in% deleted_cases]
+        }
     }
-    match_id <- dedup_out[, "primaryid"]
+    if (is.null(fields)) {
+        return(out)
+    }
+    match_id <- out[, "primaryid"]
     out <- lapply(lst[fields], function(data) {
         data[match_id, on = "primaryid"]
     })
@@ -51,6 +66,8 @@ methods::setMethod("faers_tidy", "FAERSxml", function(object) {
     cli::cli_abort("Don't implement currently")
 })
 
+#' @method faers_tidy ANY
+#' @rdname faers_tidy
 methods::setMethod("faers_tidy", "ANY", function(object) {
     cli::cli_abort("Only {.cls FAERSascii}, and {.cls ListOfFAERS} can work")
 })
@@ -87,14 +104,14 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     out <- demo[
         order(
             -primaryid, -year, -quarter,
-            -caseversion, -fda_dt, -i_f_cod, -event_dt
+            -caseversion, -fda_dt, -i_f_code, -event_dt
         ), .SD[1L],
         by = "caseid"
     ]
     # collapse all used drugs, indi, ther states, use it as a whole to identify
     # same cases.
     # match drug, indi, and ther data.
-    cli::cli_alert_info("merging drug, indi, ther, and reac data")
+    cli::cli_alert_info("merging `drug`, `indi`, `ther`, and `reac` data")
     out <- drug[order(drug_seq),
         list(aligned_drugs = paste0(drugname, collapse = "/")),
         by = "primaryid"
@@ -154,5 +171,5 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
 
 utils::globalVariables(c(
     "drug_seq", "drugname", "indi_pt", "start_dt",
-    "indi_drug_seq", "dsg_drug_seq", "pt", "primaryid", "caseversion", "fda_dt", "i_f_cod", "event_dt", "year"
+    "indi_drug_seq", "dsg_drug_seq", "pt", "primaryid", "caseversion", "fda_dt", "i_f_code", "event_dt", "year", "caseid"
 ))

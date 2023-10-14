@@ -44,5 +44,8 @@ FAERS and ListOfFAERS class
 \code{FAERSascii}, a list of \link[data.table:data.table]{data.table}.}
 
 \item{\code{type:}}{A string of "ascii" or "xml" indicates the file type used.}
+
+\item{\code{deletedCases:}}{A list of integers, as of 2019 Quarter one there are new
+files that lists deleted cases.}
 }}
 

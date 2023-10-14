@@ -5,6 +5,8 @@
 #' @slot data For `FAERSxml`, a [data.table][data.table::data.table]. For
 #' `FAERSascii`, a list of [data.table][data.table::data.table].
 #' @slot type: A string of "ascii" or "xml" indicates the file type used.
+#' @slot deletedCases: A list of integers, as of 2019 Quarter one there are new
+#' files that lists deleted cases.  
 #' @aliases FAERS
 #' @name FAERS-class
 methods::setClass(

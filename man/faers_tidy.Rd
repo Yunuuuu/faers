@@ -5,15 +5,18 @@
 \alias{faers_tidy,FAERSascii-method}
 \alias{faers_tidy,ListOfFAERS-method}
 \alias{faers_tidy,FAERSxml-method}
+\alias{faers_tidy,ANY-method}
 \title{Tidy up faers datatable with duplicate records removed}
 \usage{
 faers_tidy(object, ...)
 
-\S4method{faers_tidy}{FAERSascii}(object, fields = NULL)
+\S4method{faers_tidy}{FAERSascii}(object, fields = NULL, remove_deleted_cases = TRUE)
 
-\S4method{faers_tidy}{ListOfFAERS}(object, fields = NULL)
+\S4method{faers_tidy}{ListOfFAERS}(object, fields = NULL, remove_deleted_cases = TRUE)
 
 \S4method{faers_tidy}{FAERSxml}(object)
+
+\S4method{faers_tidy}{ANY}(object)
 }
 \arguments{
 \item{object}{A \link{FAERSascii} or \link{ListOfFAERS} object.}
@@ -22,6 +25,9 @@ faers_tidy(object, ...)
 
 \item{fields}{An atomic characters specifying the fields to use. If \code{NULL},
 the de-duplicated dataset will be returned.}
+
+\item{remove_deleted_cases}{If \code{TRUE}, will remove all
+\link[=FAERS-class]{deletedCases} from the final result.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.

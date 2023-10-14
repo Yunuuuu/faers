@@ -16,7 +16,10 @@ standardize_ascii_demo <- function(data, year, quarter) {
         data.table::setnames(data, "gndr_cod", "sex")
     }
     if (is_from_laers(year, quarter)) {
-        data.table::setnames(data, "case", "caseid")
+        data.table::setnames(
+            data, c("case", "i_f_cod"),
+            c("caseid", "i_f_code")
+        )
         # nolint start
         data[, caseversion := 0L]
     }
@@ -251,7 +254,7 @@ standardize_ascii_demo <- function(data, year, quarter) {
         missed_reporter_country <- data[is.na(country_code)][
             !is.na(reporter_country) &
                 !reporter_country %in% c("COUNTRY NOT SPECIFIED", ""),
-                unique(reporter_country)
+            unique(reporter_country)
         ]
         if (length(missed_reporter_country)) {
             cli::cli_warn("Cannot map {.val {missed_reporter_country}} into country_code")

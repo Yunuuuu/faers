@@ -381,7 +381,16 @@ assert_hierarchy <- function(parents, children = NULL, id_parent = rlang::caller
     }
 }
 
-assert_inclusive <- function(x, y, arg = rlang::caller_arg(x), call = rlang::caller_env()) {
+assert_inclusive <- function(x, y, null_ok = FALSE, arg = rlang::caller_arg(x), call = rlang::caller_env()) {
+    if (!null_ok && is.null(x)) {
+        rlang::abort(
+            sprintf(
+                "%s cannot be %s",
+                style_arg(arg), style_code("NULL")
+            ),
+            call = call
+        )
+    }
     missing_items <- setdiff(x, y)
     if (length(missing_items)) {
         rlang::abort(
