@@ -3,3 +3,4 @@
 ^LICENSE\.md$
 ^\.radian_history$
 ^Scratch\.RConsole$
+^data-raw$

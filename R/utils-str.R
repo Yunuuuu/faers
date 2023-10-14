@@ -126,3 +126,7 @@ str_count <- function(string, pattern, ..., fixed = FALSE) {
     )
     vapply(loc, function(x) sum(x > 0L), integer(1L))
 }
+
+str_trim <- function(string, which = "both") {
+    trimws(string, which = which, whitespace = "[\\h\\v]")
+}

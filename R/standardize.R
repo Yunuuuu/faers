@@ -1,26 +1,27 @@
 standardize_ascii <- function(data, field, year, quarter) {
     data.table::setnames(data, tolower)
-
-    data.table::setnames(data, c("isr", "case"),
-        c("primaryid", "caseid"),
-        skip_absent = TRUE
-    )
+    if (is_from_laers(year, quarter)) {
+        data.table::setnames(data, "isr", "primaryid")
+    }
     switch(field,
         demo = standardize_ascii_demo(data, year, quarter),
-        ther = standardize_ascii_ther(data),
-        indi = standardize_ascii_indi(data),
-        drug = standardize_ascii_drug(data)
+        ther = standardize_ascii_ther(data, year, quarter),
+        indi = standardize_ascii_indi(data, year, quarter),
+        drug = standardize_ascii_drug(data, year, quarter)
     )
     data
 }
 standardize_ascii_demo <- function(data, year, quarter) {
-    data.table::setnames(data, "gndr_cod", "sex", skip_absent = TRUE)
-    # nolint start
+    if (is_before_period(year, quarter, 2014L, "q2")) {
+        data.table::setnames(data, "gndr_cod", "sex")
+    }
     if (is_from_laers(year, quarter)) {
+        data.table::setnames(data, "case", "caseid")
+        # nolint start
         data[, caseversion := 0L]
     }
-    data[, age := as.numeric(age)]
     # AGE FILED TO YEARS
+    data[, age := as.numeric(age)]
     data[, age_in_years := data.table::fcase(
         age_cod == "DEC", age * 12L,
         age_cod == "YR" | age_cod == "YEAR", as.double(age),
@@ -28,10 +29,12 @@ standardize_ascii_demo <- function(data, year, quarter) {
         age_cod == "WK" | age_cod == "WEEK", age / 52L,
         age_cod == "DY" | age_cod == "DAY", age / 365L,
         age_cod == "HR" | age_cod == "HOUR", age / 8760L,
-        rep_len(TRUE, .N), as.double(age)
+        rep_len(TRUE, .N), age
     )]
     # before 05q2, there is not a reporter_country column
-    if (!is_before_period(year, quarter, 2005L, "q2")) {
+    if (is_before_period(year, quarter, 2005L, "q2")) {
+        data[, country_code := NA_character_]
+    } else {
         # COUNTRY CODE
         data[, country_code := data.table::fcase(
             nchar(reporter_country) == 2L, reporter_country,
@@ -245,8 +248,14 @@ standardize_ascii_demo <- function(data, year, quarter) {
             reporter_country == "ZAMBIA", "ZM",
             reporter_country == "ZIMBABWE", "ZW"
         )]
-    } else {
-        data[, country_code := NA_character_]
+        missed_reporter_country <- data[is.na(country_code)][
+            !is.na(reporter_country) &
+                !reporter_country %in% c("COUNTRY NOT SPECIFIED", ""),
+                unique(reporter_country)
+        ]
+        if (length(missed_reporter_country)) {
+            cli::cli_warn("Cannot map {.val {missed_reporter_country}} into country_code")
+        }
     }
     # Adding a new column gender
     data[, gender := data.table::fifelse(
@@ -255,14 +264,25 @@ standardize_ascii_demo <- function(data, year, quarter) {
     # nolint end
 }
 
-standardize_ascii_ther <- function(data) {
-    data.table::setnames(data, "drug_seq", "dsg_drug_seq", skip_absent = TRUE)
-}
-standardize_ascii_indi <- function(data) {
-    data.table::setnames(data, "drug_seq", "indi_drug_seq", skip_absent = TRUE)
-}
-standardize_ascii_drug <- function(data) {
-    data[, nda_num := trimws(as.character(nda_num), "both", "[\\h\\v]")]# nolint
+standardize_ascii_drug <- function(data, year, quarter) {
+    # Always use character to store nda_num
+    # As data.table will parse nda_num as integer64 or character,
+    # preventing the rbindlist from working.
+    data[, nda_num := str_trim(as.character(nda_num))] # nolint
 }
 
-utils::globalVariables(c("age_in_years", "age_cod", "age", "country_code", "reporter_country", "gender", "sex", "nda_num"))
+standardize_ascii_ther <- function(data, year, quarter) {
+    if (is_from_laers(year, quarter)) {
+        data.table::setnames(data, "drug_seq", "dsg_drug_seq")
+    }
+}
+standardize_ascii_indi <- function(data, year, quarter) {
+    if (is_from_laers(year, quarter)) {
+        data.table::setnames(data, "drug_seq", "indi_drug_seq")
+    }
+}
+utils::globalVariables(c(
+    "age_in_years", "age_cod", "age",
+    "country_code", "reporter_country",
+    "gender", "sex", "nda_num"
+))
