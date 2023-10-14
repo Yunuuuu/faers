@@ -44,10 +44,15 @@ methods::setValidity("FAERS", validate_faers)
 #' @rdname FAERS-class
 methods::setClass(
     "FAERSascii",
-    slots = list(data = "list"),
-    prototype = list(data = list(), type = "ascii"),
+    slots = list(data = "list", deletedCases = "list"),
+    prototype = list(
+        data = list(),
+        deletedCases = list(),
+        type = "ascii"
+    ),
     contains = "FAERS"
 )
+
 methods::setValidity("FAERSascii", function(object) {
     cur_data <- object@data
     if (length(cur_data) &&

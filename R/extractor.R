@@ -205,8 +205,7 @@ methods::setMethod("faers_field", "FAERS", function(object, field) {
     out
 })
 
-#' @param combine If `TRUE`, will combine the final list into a
-#' [data.table][data.table::data.table].
+#' @param combine If `TRUE`, will combine every data results.
 #' @export
 #' @method faers_field ListOfFAERS
 #' @aliases faers_field
@@ -223,7 +222,7 @@ methods::setMethod("faers_field", "ListOfFAERS", function(object, field, combine
 
 #################################################################
 #' @export
-#' @aliases faers_field
+#' @aliases faers_fields
 #' @rdname FAERS-extractor
 methods::setGeneric("faers_fields", function(object, ...) {
     methods::makeStandardGeneric("faers_fields")
@@ -288,3 +287,38 @@ build_periods <- function(
     }
     cli::cli_abort("both {.arg {arg_years}} and {.arg {arg_quarters}} should be set", call = call)
 }
+
+#################################################################
+#' @export
+#' @aliases faers_deleted_cases
+#' @rdname FAERS-extractor
+methods::setGeneric("faers_deleted_cases", function(object, ...) {
+    methods::makeStandardGeneric("faers_deleted_cases")
+})
+
+#' @param flatten If `TRUE`, will flatten the `deletedCases` list.
+#' @export
+#' @method faers_deleted_cases FAERS
+#' @aliases faers_field
+#' @rdname FAERS-extractor
+methods::setMethod("faers_deleted_cases", "FAERS", function(object, flatten = TRUE) {
+    out <- object@deletedCases
+    if (isTRUE(flatten)) {
+        unique(unlist(out, recursive = FALSE, use.names = FALSE))
+    } else {
+        out
+    }
+})
+
+#' @export
+#' @method faers_deleted_cases ListOfFAERS
+#' @aliases faers_deleted_cases
+#' @rdname FAERS-extractor
+methods::setMethod("faers_deleted_cases", "ListOfFAERS", function(object, flatten = TRUE, combine = TRUE) {
+    out <- lapply(object@container, faers_deleted_cases, flatten = flatten)
+    if (isTRUE(combine)) {
+        unique(unlist(out, recursive = FALSE, use.names = FALSE))
+    } else {
+        out
+    }
+})

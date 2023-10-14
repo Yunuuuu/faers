@@ -5,6 +5,7 @@
 \alias{ListOfFAERS}
 \alias{ListOfFAERS-class}
 \alias{show,ListOfFAERS-method}
+\alias{faers_container,ListOfFAERS-method}
 \alias{[[.ListOfFAERS}
 \alias{[.ListOfFAERS}
 \title{ListOfFAERS class}
@@ -12,6 +13,8 @@
 ListOfFAERS(x, type)
 
 \S4method{show}{ListOfFAERS}(object)
+
+\S4method{faers_container}{ListOfFAERS}(object)
 
 \method{[[}{ListOfFAERS}(object, i)
 

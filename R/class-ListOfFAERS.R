@@ -87,6 +87,22 @@ methods::setMethod("show", "ListOfFAERS", function(object) {
     ), sep = "\n")
 })
 
+######################################################
+#' @export
+#' @aliases faers_container
+#' @rdname FAERS-extractor
+methods::setGeneric("faers_container", function(object, ...) {
+    methods::makeStandardGeneric("faers_container")
+})
+
+#' @param object A `ListOfFAERS` object.
+#' @export
+#' @method faers_container ListOfFAERS
+#' @rdname ListOfFAERS
+methods::setMethod("faers_container", "ListOfFAERS", function(object) {
+    object@container
+})
+
 #######################################################
 #' @param i Indices specifying elements to extract.
 #' @export

@@ -29,28 +29,29 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
     year <- as.integer(year)
     quarter <- quarter %||% str_extract(path, "(?<=20\\d{2})(q[1-4])")
     quarter <- as.character(quarter)
+    path <- chech_path(path, compress_dir = compress_dir)
+    switch(type,
+        xml = parse_xml(path, year, quarter),
+        ascii = parse_ascii(path, year, quarter)
+    )
+}
+
+chech_path <- function(path, compress_dir) {
     if (dir.exists(path)) {
-        path0 <- path
-        path <- faers_list_zip_dir(path0, type)
-        if (!dir.exists(path)) {
-            cli::cli_abort("Cannot find {.path {type}} in {.path {path0}}")
-        }
+        return(path)
     } else if (file.exists(path)) {
-        if (endsWith(path, ".zip")) {
+        if (str_detect(path, "20\\d{2}q[1-4]\\.zip$")) {
             assert_string(compress_dir, empty_ok = FALSE)
-            path0 <- faers_unzip(path, compress_dir)
-            path <- faers_list_zip_dir(path0, type)
+            return(faers_unzip(path, compress_dir))
         } else {
-            cli::cli_abort("Only compressed zip files from FAERS Quarterly Data can work")
+            cli::cli_abort(c(
+                "Only compressed zip files from FAERS Quarterly Data can work",
+                i = "with pattern: \"20\\\\d{{2}}q[1-4]\\\\.zip\""
+            ))
         }
     } else {
         cli::cli_abort("{.path {path}} doesn't exist")
     }
-    raw_files <- faers_list_files(path, type)
-    switch(type,
-        xml = parse_xml(raw_files, year, quarter),
-        ascii = parse_ascii(raw_files, year, quarter)
-    )
 }
 
 faers_unzip <- function(path, compress_dir) {
@@ -68,21 +69,34 @@ faers_unzip <- function(path, compress_dir) {
     compress_dir
 }
 
-faers_list_zip_dir <- function(path, type) {
+faers_locate_dir <- function(path, pattern) {
     path <- list.dirs(path, recursive = FALSE)
-    path[str_detect(basename(path), sprintf("^%s$", type), ignore.case = TRUE)]
+    path <- path[str_detect(basename(path), sprintf("^%s$", pattern),
+        ignore.case = TRUE
+    )]
+    if (!dir.exists(path)) {
+        cli::cli_abort("Cannot locate {.field {pattern}} directory in {.path {path}}")
+    }
+    path
 }
 
-faers_list_files <- function(path, type) {
-    pattern <- switch(type,
-        xml = "\\.xml$",
-        ascii = "\\.txt$"
+faers_locate_files <- function(path, pattern, ignore.case = TRUE) {
+    files <- list.files(path,
+        pattern = pattern,
+        full.names = TRUE,
+        ignore.case = ignore.case
     )
-    list.files(path, pattern = pattern, full.names = TRUE, ignore.case = TRUE)
+    if (!length(files)) {
+        cli::cli_abort("Cannot locate {.field {pattern}} file in {.path {path}}")
+    }
+    files
 }
 
 # parse ascii files -----------------------------------
-parse_ascii <- function(files, year, quarter) {
+parse_ascii <- function(path, year, quarter) {
+    files <- faers_locate_files(
+        faers_locate_dir(path, "ascii"), "\\.txt$"
+    )
     # for 2018q1 demo file, there exists a suffix "_new"
     fields <- str_remove(basename(files), "\\d+q\\d(_new)?\\.txt$",
         ignore.case = TRUE
@@ -97,17 +111,42 @@ parse_ascii <- function(files, year, quarter) {
     }
     files <- files[idx]
     fields <- fields[idx]
+    deleted_cases <- read_ascii_deleted_cases(path, year, quarter)
     data_list <- .mapply(function(file, field) {
         out <- tryCatch(
             read_ascii(file, verbose = FALSE),
             warning = function(cnd) {
-                read_ascii_safe(file)
+                safely_read_ascii(file)
             }
         )
         standardize_ascii(out, field = field, year = year, quarter = quarter)
     }, list(file = files, field = fields), NULL)
     data.table::setattr(data_list, "names", fields)
-    methods::new("FAERSascii", data = data_list, year = year, quarter = quarter)
+    methods::new("FAERSascii",
+        data = data_list,
+        year = year, quarter = quarter,
+        deletedCases = deleted_cases
+    )
+}
+
+read_ascii_deleted_cases <- function(path, year, quarter) {
+    # As of 2019 Quarter one there is a new text file that lists deleted files
+    if (!is_before_period(year, quarter, 2018L, "q4")) {
+        deleted_cases_files <- faers_locate_files(
+            faers_locate_dir(path, "deleted"), NULL
+        )
+        deleted_cases <- lapply(deleted_cases_files, function(file) {
+            data.table::fread(file = file)[[1L]]
+        })
+        data.table::setattr(deleted_cases, "names", tolower(
+            str_remove(basename(deleted_cases_files),
+                "\\.txt$",
+                ignore.case = TRUE
+            )
+        ))
+    } else {
+        list()
+    }
 }
 
 read_ascii <- function(file, ...) {
@@ -127,7 +166,7 @@ read_ascii <- function(file, ...) {
     }), .SDcols = vcolumns]
 }
 
-read_ascii_safe <- function(file) {
+safely_read_ascii <- function(file) {
     # data.table will stop early for some files
     # leave a lot of rows not read in
     # this is mainly due to the presence of collapsed lines (two, or more lines
@@ -182,7 +221,8 @@ read_lines <- function(file) {
 }
 
 # parse xml ----------------------------------------------
-parse_xml <- function(file, year, quarter) {
+parse_xml <- function(path, year, quarter) {
+    file <- faers_locate_files(faers_locate_dir(path, "xml"), "\\.xml$")
     xml_doc <- xml2::read_xml(file)
     full_content <- xml2::xml_contents(xml_doc)
     header <- xml2::as_list(full_content[[1L]])
