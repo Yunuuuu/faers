@@ -30,8 +30,8 @@ tidy_faers_ascii_list <- function(lst, fields) {
         lst[c("demo", "drug", "indi", "ther", "reac")]
     )
     match_id <- dedup_out[, "primaryid"]
-    out <- lapply(lst[fields], function(field) {
-        lst[[field]][match_id, on = "primaryid"]
+    out <- lapply(lst[fields], function(data) {
+        data[match_id, on = "primaryid"]
     })
     if (length(out) == 1L) {
         out[[1L]]
