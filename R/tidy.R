@@ -8,29 +8,36 @@ methods::setGeneric("faers_tidy", function(object, ...) {
     methods::makeStandardGeneric("faers_tidy")
 })
 
-#' @param field A string specifying the field to use.
+#' @param fields An atomic characters specifying the fields to use.
 #' @export
 #' @method faers_tidy FAERSascii
 #' @rdname faers_tidy
-methods::setMethod("faers_tidy", "FAERSascii", function(object, field) {
-    tidy_faers_ascii_list(faers_fields(object), field = field)
+methods::setMethod("faers_tidy", "FAERSascii", function(object, fields) {
+    tidy_faers_ascii_list(faers_fields(object), fields = fields)
 })
 
 #' @export
 #' @method faers_tidy ListOfFAERS
 #' @rdname faers_tidy
-methods::setMethod("faers_tidy", "ListOfFAERS", function(object, field) {
-    tidy_faers_ascii_list(faers_fields(object), field = field)
+methods::setMethod("faers_tidy", "ListOfFAERS", function(object, fields) {
+    tidy_faers_ascii_list(faers_fields(object), fields = fields)
 })
 
-tidy_faers_ascii_list <- function(lst, field) {
-    field <- match.arg(field, faers_ascii_file_fields)
+tidy_faers_ascii_list <- function(lst, fields) {
+    assert_inclusive(fields, faers_ascii_file_fields)
     dedup_out <- do.call(
         dedup_faers_ascii,
         lst[c("demo", "drug", "indi", "ther", "reac")]
     )
     match_id <- dedup_out[, "primaryid"]
-    lst[[field]][match_id, on = "primaryid"]
+    out <- lapply(lst[fields], function(field) {
+        lst[[field]][match_id, on = "primaryid"]
+    })
+    if (length(out) == 1L) {
+        out[[1L]]
+    } else {
+        out
+    }
 }
 
 #' @export

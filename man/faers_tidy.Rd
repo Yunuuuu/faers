@@ -9,9 +9,9 @@
 \usage{
 faers_tidy(object, ...)
 
-\S4method{faers_tidy}{FAERSascii}(object, field)
+\S4method{faers_tidy}{FAERSascii}(object, fields)
 
-\S4method{faers_tidy}{ListOfFAERS}(object, field)
+\S4method{faers_tidy}{ListOfFAERS}(object, fields)
 
 \S4method{faers_tidy}{FAERSxml}(object)
 }
@@ -20,7 +20,7 @@ faers_tidy(object, ...)
 
 \item{...}{Other arguments passed to specific methods.}
 
-\item{field}{A string specifying the field to use.}
+\item{fields}{An atomic characters specifying the fields to use.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.
