@@ -29,7 +29,7 @@ standardize_ascii_demo <- function(data, year, quarter) {
     data[, age := as.numeric(age)]
     data[, age_in_years := data.table::fcase(
         age_cod == "DEC", age * 12L,
-        age_cod == "YR" | age_cod == "YEAR", as.double(age),
+        age_cod == "YR" | age_cod == "YEAR", age,
         age_cod == "MON", age / 12L,
         age_cod == "WK" | age_cod == "WEEK", age / 52L,
         age_cod == "DY" | age_cod == "DAY", age / 365L,
