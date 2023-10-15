@@ -45,8 +45,8 @@ combine_faers_ascii <- function(x) {
     data.table::setattr(out, "names", faers_ascii_file_fields)
     methods::new("FAERSascii",
         data = out,
-        year = vapply(x, faers_year, integer(1L)),
-        quarter = vapply(x, faers_quarter, character(1L)),
+        year = unlist(lapply(x, faers_year), use.names = FALSE),
+        quarter = unlist(lapply(x, faers_quarter), use.names = FALSE),
         deletedCases = list_flatten(
             lapply(x, faers_deleted_cases, flatten = FALSE)
         )
@@ -59,8 +59,8 @@ combine_faers_xml <- function(x) {
             lapply(x, function(obj) obj@data),
             fill = TRUE, use.names = TRUE
         ),
-        year = vapply(x, faers_year, integer(1L)),
-        quarter = vapply(x, faers_quarter, character(1L)),
+        year = unlist(lapply(x, faers_year), use.names = FALSE),
+        quarter = unlist(lapply(x, faers_quarter), use.names = FALSE),
         deletedCases = list_flatten(lapply(x,
             faers_deleted_cases,
             flatten = FALSE
