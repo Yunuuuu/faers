@@ -144,24 +144,29 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # but they won't really be the same, so we should convert NA value in
     # columns used into other differentiated values, like ..__na_null__..1,
     # ..__na_null__..2, and so on.
+    # round age_in_years to prevent minimal differences in age
+    out[, age_in_years_round := round(age_in_years, 2L)]
     cli::cli_alert_info("deduplication from multiple sources by matching gender, age, reporting country, event date, start date, drug indications, drugs administered, and adverse reactions")
     can_be_ignored_columns <- c(
-        "event_dt", "age_in_years", "gender", "country_code",
+        "event_dt", "gender", "country_code",
         "aligned_start_dt", "aligned_indi"
     )
     must_matched_columns <- c("aligned_drugs", "aligned_reac")
     all_columns <- c(must_matched_columns, can_be_ignored_columns)
-    out[, (all_columns) := lapply(.SD, function(x) {
+    out[, c(all_columns, "age_in_years_round") := lapply(.SD, function(x) {
         # above `paste0` will coerced NA into "NA"
         idx <- is.na(x) | x == "NA"
-        x[idx] <- paste0("..__na_null__..", seq_len(sum(idx)))
+        if (any(idx)) {
+            x[idx] <- paste0("..__na_null__..", seq_len(sum(idx)))
+        }
         x
-    }), .SDcols = all_columns]
+    }), .SDcols = c(all_columns, "age_in_years_round")]
     for (i in seq_along(can_be_ignored_columns)) {
         out <- out[order(-primaryid, -year, -quarter), .SD[1L],
             by = c(must_matched_columns, can_be_ignored_columns[-i])
         ]
     }
+    out[, age_in_years_round := NULL]
     # nolint end
     out[, (all_columns) := lapply(.SD, function(x) {
         x[startsWith(x, "..__na_null__..")] <- NA
@@ -171,5 +176,5 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
 
 utils::globalVariables(c(
     "drug_seq", "drugname", "indi_pt", "start_dt",
-    "indi_drug_seq", "dsg_drug_seq", "pt", "primaryid", "caseversion", "fda_dt", "i_f_code", "event_dt", "year", "caseid"
+    "indi_drug_seq", "dsg_drug_seq", "pt", "primaryid", "caseversion", "fda_dt", "i_f_code", "event_dt", "year", "caseid", "age_in_years_round"
 ))
