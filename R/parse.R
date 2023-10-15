@@ -116,7 +116,7 @@ parse_ascii <- function(path, year, quarter) {
         out <- tryCatch(
             read_ascii(file, verbose = FALSE),
             warning = function(cnd) {
-                safely_read_ascii(file)
+                safely_read_ascii(file, year, quarter)
             }
         )
         standardize_ascii(out, field = field, year = year, quarter = quarter)
@@ -140,7 +140,8 @@ read_ascii_deleted_cases <- function(path, year, quarter) {
                 file = file,
                 header = FALSE,
                 na.strings = na_string,
-                blank.lines.skip = TRUE
+                blank.lines.skip = TRUE,
+                keepLeadingZeros = TRUE
             )[[1L]]
         })
         ids <- str_remove_all(
@@ -159,6 +160,7 @@ read_ascii <- function(file, ...) {
         sep = "$", quote = "", fill = TRUE,
         blank.lines.skip = TRUE,
         na.strings = na_string,
+        keepLeadingZeros = TRUE,
         ...
     )
     # the last columns often messed by the presence OF '$'.
@@ -170,15 +172,33 @@ read_ascii <- function(file, ...) {
     }), .SDcols = vcolumns]
 }
 
-safely_read_ascii <- function(file) {
+safely_read_ascii <- function(file, year, quarter) {
     # data.table will stop early for some files
     # leave a lot of rows not read in
     # this is mainly due to the presence of collapsed lines (two, or more lines
     # collapsed as one line)
-    file_text <- read_lines(file)
+    file_text <- brio::read_lines(file)
+    # fix for 2011q4 drug file, there exists a \177 field in line 729342
+    # which induce fread stop early, we just remove this string.
+    if (year == 2011L && quarter == "q4") {
+        file_text <- str_replace(
+            file_text, "LANOXIN (DIGOXIN\177",
+            "LANOXIN (DIGOXIN",
+            fixed = TRUE
+        )
+    }
+    # for 2012q1 demo data:
+    # JP-CUBIST-$E2B0000000182, the "$" should be removed
+    if (year == 2012L && quarter == "q1") {
+        file_text <- str_replace(
+            file_text, "JP-CUBIST-$",
+            "JP-CUBIST-",
+            fixed = TRUE
+        )
+    }
+
     n_seps <- str_count(file_text, "$", fixed = TRUE)
     collapsed_lines <- floor(n_seps / n_seps[2L]) > 1L
-    # collapsed_lines <- collapsed_lines[collapsed_lines > 1L]
     if (any(collapsed_lines)) {
         cli::cli_warn("omiting collapsed lines: {which(collapsed_lines)}")
         file_text <- file_text[!collapsed_lines]
@@ -211,16 +231,21 @@ read_text <- function(text, ...) {
     data.table::fread(
         file = file, ...,
         na.strings = na_string,
-        showProgress = FALSE
+        showProgress = FALSE,
+        keepLeadingZeros = TRUE
     )
 }
 na_string <- c("NA", "")
+
+# fix for 2011q4 drug file, there exists a \177 field in line 729342
+# which induce fread stop early, so I just don't use this function.
 read_lines <- function(file) {
     data.table::fread(
         file = file, sep = "", header = FALSE,
         blank.lines.skip = TRUE,
         colClasses = "character",
-        showProgress = FALSE
+        showProgress = FALSE,
+        keepLeadingZeros = TRUE
     )[[1L]]
 }
 
