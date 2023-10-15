@@ -3,9 +3,7 @@
 #' @inheritParams faers_parse
 #' @param handle_opts Extra handle options passed to each request
 #' [new_handle][curl::new_handle].
-#' @return A [ListOfFAERS] object if multiple `years` and `quarters` are
-#'  supplied, otherwise, a [FAERSxml] or [FAERSascii] object.
-#' @seealso [ListOfFAERS]
+#' @return A [FAERSxml] or [FAERSascii] object.
 #' @export
 faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
     type <- match.arg(type, faers_file_types)
@@ -33,11 +31,7 @@ faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = di
         list(path = faers_files, year = yq$years, quarter = yq$quarters),
         MoreArgs = list(type = type, compress_dir = compress_dir)
     )
-    if (length(out) == 1L) {
-        out[[1L]]
-    } else {
-        ListOfFAERS(out)
-    }
+    faers_combine(out)
 }
 
 recycle_scalar <- function(..., length = NULL, args = NULL) {

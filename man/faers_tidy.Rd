@@ -3,7 +3,6 @@
 \name{faers_tidy}
 \alias{faers_tidy}
 \alias{faers_tidy,FAERSascii-method}
-\alias{faers_tidy,ListOfFAERS-method}
 \alias{faers_tidy,FAERSxml-method}
 \alias{faers_tidy,ANY-method}
 \title{Tidy up faers datatable with duplicate records removed}
@@ -12,14 +11,12 @@ faers_tidy(object, ...)
 
 \S4method{faers_tidy}{FAERSascii}(object, fields = NULL, remove_deleted_cases = TRUE)
 
-\S4method{faers_tidy}{ListOfFAERS}(object, fields = NULL, remove_deleted_cases = TRUE)
-
 \S4method{faers_tidy}{FAERSxml}(object)
 
 \S4method{faers_tidy}{ANY}(object)
 }
 \arguments{
-\item{object}{A \link{FAERSascii} or \link{ListOfFAERS} object.}
+\item{object}{A \link{FAERSascii} object.}
 
 \item{...}{Other arguments passed to specific methods.}
 

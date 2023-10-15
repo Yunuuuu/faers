@@ -9,6 +9,8 @@ standardize_ascii <- function(data, field, year, quarter) {
         indi = standardize_ascii_indi(data, year, quarter),
         drug = standardize_ascii_drug(data, year, quarter)
     )
+    data[, c("year", "quarter") := list(year, quarter)]
+    data.table::setcolorder(data, c("year", "quarter"), before = 1L)
     data
 }
 standardize_ascii_demo <- function(data, year, quarter) {

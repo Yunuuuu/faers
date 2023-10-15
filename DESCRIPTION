@@ -20,9 +20,8 @@ Imports:
 Collate: 
     'available.R'
     'class-FAERS.R'
-    'class-ListOfFAERS.R'
+    'combine.R'
     'download.R'
-    'extractor.R'
     'faers-package.R'
     'faers.R'
     'import-standalone-assert.R'

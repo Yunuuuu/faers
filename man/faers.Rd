@@ -32,12 +32,8 @@ will be created if necessary.}
 \link[curl:handle]{new_handle}.}
 }
 \value{
-A \link{ListOfFAERS} object if multiple \code{years} and \code{quarters} are
-supplied, otherwise, a \link{FAERSxml} or \link{FAERSascii} object.
+A \link{FAERSxml} or \link{FAERSascii} object.
 }
 \description{
 Download and parse FAERS Quarterly Data files
-}
-\seealso{
-\link{ListOfFAERS}
 }

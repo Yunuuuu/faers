@@ -143,12 +143,11 @@ read_ascii_deleted_cases <- function(path, year, quarter) {
                 blank.lines.skip = TRUE
             )[[1L]]
         })
-        data.table::setattr(deleted_cases, "names", tolower(
-            str_remove(basename(deleted_cases_files),
-                "\\.txt$",
-                ignore.case = TRUE
-            )
-        ))
+        ids <- str_remove_all(
+            tolower(basename(deleted_cases_files)),
+            "^(delete|adr)|(deletedcases)?\\.txt$"
+        )
+        data.table::setattr(deleted_cases, "names", ids)
     } else {
         list()
     }

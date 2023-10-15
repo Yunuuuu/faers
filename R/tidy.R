@@ -1,5 +1,5 @@
 #' Tidy up faers datatable with duplicate records removed
-#' @param object A [FAERSascii] or [ListOfFAERS] object.
+#' @param object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods.
 #' @return A [data.table][data.table::data.table] object.
 #' @export
@@ -16,25 +16,8 @@ methods::setGeneric("faers_tidy", function(object, ...) {
 #' @method faers_tidy FAERSascii
 #' @rdname faers_tidy
 methods::setMethod("faers_tidy", "FAERSascii", function(object, fields = NULL, remove_deleted_cases = TRUE) {
-    tidy_faers_ascii_list(object,
-        fields = fields,
-        remove_deleted_cases = remove_deleted_cases
-    )
-})
-
-#' @export
-#' @method faers_tidy ListOfFAERS
-#' @rdname faers_tidy
-methods::setMethod("faers_tidy", "ListOfFAERS", function(object, fields = NULL, remove_deleted_cases = TRUE) {
-    tidy_faers_ascii_list(object,
-        fields = fields,
-        remove_deleted_cases = remove_deleted_cases
-    )
-})
-
-tidy_faers_ascii_list <- function(object, fields, remove_deleted_cases) {
     assert_inclusive(fields, faers_ascii_file_fields, null_ok = TRUE)
-    lst <- faers_fields(object)
+    lst <- faers_data(object)
     out <- do.call(
         dedup_faers_ascii,
         lst[c("demo", "drug", "indi", "ther", "reac")]
@@ -57,7 +40,7 @@ tidy_faers_ascii_list <- function(object, fields, remove_deleted_cases) {
     } else {
         out
     }
-}
+})
 
 #' @export
 #' @method faers_tidy FAERSxml
@@ -100,7 +83,7 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # As recommended by the FDA, a deduplication step was performed to retain
     # the most recent report for each case with the same case identifier
     # nolint start
-    cli::cli_alert_info("deduplication from the same source by retain the most recent report")
+    cli::cli_alert("deduplication from the same source by retain the most recent report")
     out <- demo[
         order(
             -primaryid, -year, -quarter,
@@ -111,7 +94,7 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # collapse all used drugs, indi, ther states, use it as a whole to identify
     # same cases.
     # match drug, indi, and ther data.
-    cli::cli_alert_info("merging `drug`, `indi`, `ther`, and `reac` data")
+    cli::cli_alert("merging `drug`, `indi`, `ther`, and `reac` data")
     out <- drug[order(drug_seq),
         list(aligned_drugs = paste0(drugname, collapse = "/")),
         by = "primaryid"
@@ -145,8 +128,8 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # columns used into other differentiated values, like ..__na_null__..1,
     # ..__na_null__..2, and so on.
     # round age_in_years to prevent minimal differences in age
+    cli::cli_alert("deduplication from multiple sources by matching gender, age, reporting country, event date, start date, drug indications, drugs administered, and adverse reactions")
     out[, age_in_years_round := round(age_in_years, 2L)]
-    cli::cli_alert_info("deduplication from multiple sources by matching gender, age, reporting country, event date, start date, drug indications, drugs administered, and adverse reactions")
     can_be_ignored_columns <- c(
         "event_dt", "gender", "country_code",
         "aligned_start_dt", "aligned_indi"

@@ -13,7 +13,24 @@
 \alias{faers_header,FAERSxml-method}
 \alias{[[.FAERS}
 \alias{[.FAERS}
-\title{FAERS and ListOfFAERS class}
+\alias{faers_data}
+\alias{faers_data,FAERS-method}
+\alias{faers_year}
+\alias{faers_year,FAERS-method}
+\alias{faers_quarter}
+\alias{faers_quarter,FAERS-method}
+\alias{faers_period}
+\alias{faers_period,FAERS-method}
+\alias{faers_deleted_cases}
+\alias{faers_deleted_cases,FAERS-method}
+\alias{faers_field}
+\alias{faers_get}
+\alias{faers_get,FAERS-method}
+\alias{faers_keep}
+\alias{faers_keep,FAERS-method}
+\alias{faers_filter}
+\alias{faers_filter,FAERS-method}
+\title{FAERS class}
 \usage{
 \S4method{show}{FAERS}(object)
 
@@ -24,14 +41,92 @@ faers_header(object)
 \method{[[}{FAERS}(object, i)
 
 \method{[}{FAERS}(object, i)
+
+faers_data(object, ...)
+
+\S4method{faers_data}{FAERS}(object)
+
+faers_year(object)
+
+\S4method{faers_year}{FAERS}(object)
+
+faers_quarter(object)
+
+\S4method{faers_quarter}{FAERS}(object)
+
+faers_period(object)
+
+\S4method{faers_period}{FAERS}(object)
+
+faers_deleted_cases(object, ...)
+
+\S4method{faers_deleted_cases}{FAERS}(object, flatten = TRUE)
+
+faers_get(object, ...)
+
+\S4method{faers_get}{FAERS}(object, field)
+
+faers_keep(object, ...)
+
+\S4method{faers_keep}{FAERS}(object, primaryid = NULL)
+
+faers_filter(object, ...)
+
+\S4method{faers_filter}{FAERS}(object, field, .fn, ...)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
 
 \item{i}{Indices specifying elements to extract.}
+
+\item{...}{Other arguments passed to specific methods. For \code{faers_filter}
+Other arguments passed to \code{.fn}.}
+
+\item{flatten}{If \code{TRUE}, will flatten the \code{deletedCases} list.}
+
+\item{field}{A string indicates the FAERS fields data applied with \code{.fn} to
+extract primaryid. Only values "demo", "drug", "indi", "ther", "reac",
+"rpsr", and "outc" can be used.}
+
+\item{primaryid}{An atomic character or integer specifies the reports to
+keep. If \code{NULL}, will do nothing.}
+
+\item{.fn}{A function or formula.
+
+If a \strong{function}, it is used as is.
+
+If a \strong{formula}, e.g. \code{~ .x + 2}, it is converted to a function with up to
+two arguments: \code{.x} (single argument) or \code{.x} and \code{.y} (two arguments). The
+\code{.} placeholder can be used instead of \code{.x}.  This allows you to create
+very compact anonymous functions (lambdas) with up to two inputs. Functions
+created from formulas have a special class. Use \code{is_lambda()} to test for
+it.
+
+If a \strong{string}, the function is looked up in \code{env}. Note that
+this interface is strictly for user convenience because of the
+scoping issues involved. Package developers should avoid
+supplying functions by name and instead supply them by value.}
 }
 \description{
-FAERS and ListOfFAERS class
+Provide a container for FAERS Quarterly Data file
+}
+\details{
+\itemize{
+\item \code{faers_data}: Extract the \code{data} slot.
+\item \code{faers_year}: Extract the \code{year} slot.
+\item \code{faers_quarter}: Extract the \code{quarter} slot.
+\item \code{faers_period}: Extract the \code{period} slot (just Concatenate the year and
+quarter slot).
+\item \code{faers_deleted_cases}: Extract the \code{deletedCases} slot.
+\item \code{faers_get}: Extract a specific \link[data.table:data.table]{data.table} field
+from \link{FAERS} object.
+\item \code{faers_keep}: only keep data from specified \code{primaryid}. Note: \code{year},
+\code{quarter}, \code{deletedCases} will be kept as the original. So make sure you
+didn't filter a whole period FAERS quarterly data, in this way, it's much
+better to run \link[=FAERS]{faers}.
+\item \code{faers_filter}: apply a function to extract wanted \code{primaryid}, then use
+\code{faers_keep} to filter.
+}
 }
 \section{Slots}{
 
