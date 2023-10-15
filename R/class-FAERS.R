@@ -99,7 +99,7 @@ methods::setClass(
 #' @method show FAERS
 #' @rdname FAERS-class
 methods::setMethod("show", "FAERS", function(object) {
-    l <- length(faers_quarter(object))
+    l <- length(faers_period(object))
     cat(sprintf(
         "A total of %s FAERS Quarterly %s Data file%s",
         l, object@type, if (l > 1L) "s" else ""
@@ -214,7 +214,7 @@ methods::setGeneric("faers_deleted_cases", function(object, ...) {
 #' @method faers_deleted_cases FAERS
 #' @aliases faers_field
 #' @rdname FAERS-class
-methods::setMethod("faers_deleted_cases", "FAERS", function(object, flatten = TRUE) {
+methods::setMethod("faers_deleted_cases", "FAERSascii", function(object, flatten = TRUE) {
     out <- object@deletedCases
     if (isTRUE(flatten)) {
         unique(unlist(out, recursive = FALSE, use.names = FALSE))
@@ -233,9 +233,9 @@ methods::setGeneric("faers_get", function(object, ...) {
 #' @param field A string indicates the FAERS fields to used. Only values "demo",
 #' "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.
 #' @export
-#' @method faers_get FAERS
+#' @method faers_get FAERSascii
 #' @rdname FAERS-class
-methods::setMethod("faers_get", "FAERS", function(object, field) {
+methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     field <- match.arg(field, faers_ascii_file_fields)
     object@data[[field]]
 })
@@ -247,11 +247,12 @@ methods::setGeneric("faers_keep", function(object, ...) {
     methods::makeStandardGeneric("faers_keep")
 })
 
+#' @export
 #' @param primaryid An atomic character or integer specifies the reports to
 #' keep. If `NULL`, will do nothing.
-#' @method faers_keep FAERS
+#' @method faers_keep FAERSascii
 #' @rdname FAERS-class
-methods::setMethod("faers_keep", "FAERS", function(object, primaryid = NULL) {
+methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL) {
     if (is.null(primaryid)) {
         return(object)
     }
@@ -261,6 +262,7 @@ methods::setMethod("faers_keep", "FAERS", function(object, primaryid = NULL) {
 
 ##############################################################
 #' @export
+#' @method faers_keep FAERSascii
 #' @rdname FAERS-class
 methods::setGeneric("faers_filter", function(object, ...) {
     methods::makeStandardGeneric("faers_filter")
@@ -285,9 +287,9 @@ methods::setGeneric("faers_filter", function(object, ...) {
 #'   scoping issues involved. Package developers should avoid
 #'   supplying functions by name and instead supply them by value.
 #' @export
-#' @method faers_filter FAERS
+#' @method faers_filter FAERSascii
 #' @rdname FAERS-class
-methods::setMethod("faers_filter", "FAERS", function(object, field, .fn, ...) {
+methods::setMethod("faers_filter", "FAERSascii", function(object, field, .fn, ...) {
     data <- faers_get(object, field = field)
     ids <- rlang::as_function(.fn)(data, ...)
     if (!(is.numeric(ids) || is.character(ids))) {

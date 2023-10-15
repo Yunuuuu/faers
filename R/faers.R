@@ -14,7 +14,7 @@ faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = di
     bar_id <- cli::cli_progress_bar(sprintf("Parsing FAERS %s file", type),
         type = "iterator", total = length(faers_files),
         format_done = sprintf(
-            "Parsing {.val {cli::pb_total}} %s period file{?s} in {cli::pb_elapsed}",
+            "Parsing {.val {cli::pb_total}} %s Quarterly Data file{?s} in {cli::pb_elapsed}",
             type
         ),
         clear = FALSE

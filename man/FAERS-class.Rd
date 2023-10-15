@@ -22,14 +22,14 @@
 \alias{faers_period}
 \alias{faers_period,FAERS-method}
 \alias{faers_deleted_cases}
-\alias{faers_deleted_cases,FAERS-method}
+\alias{faers_deleted_cases,FAERSascii-method}
 \alias{faers_field}
 \alias{faers_get}
-\alias{faers_get,FAERS-method}
+\alias{faers_get,FAERSascii-method}
 \alias{faers_keep}
-\alias{faers_keep,FAERS-method}
+\alias{faers_keep,FAERSascii-method}
 \alias{faers_filter}
-\alias{faers_filter,FAERS-method}
+\alias{faers_filter,FAERSascii-method}
 \title{FAERS class}
 \usage{
 \S4method{show}{FAERS}(object)
@@ -60,19 +60,19 @@ faers_period(object)
 
 faers_deleted_cases(object, ...)
 
-\S4method{faers_deleted_cases}{FAERS}(object, flatten = TRUE)
+\S4method{faers_deleted_cases}{FAERSascii}(object, flatten = TRUE)
 
 faers_get(object, ...)
 
-\S4method{faers_get}{FAERS}(object, field)
+\S4method{faers_get}{FAERSascii}(object, field)
 
 faers_keep(object, ...)
 
-\S4method{faers_keep}{FAERS}(object, primaryid = NULL)
+\S4method{faers_keep}{FAERSascii}(object, primaryid = NULL)
 
 faers_filter(object, ...)
 
-\S4method{faers_filter}{FAERS}(object, field, .fn, ...)
+\S4method{faers_filter}{FAERSascii}(object, field, .fn, ...)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
