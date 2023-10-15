@@ -253,7 +253,7 @@ standardize_ascii_demo <- function(data, year, quarter) {
         )]
         missed_reporter_country <- data[is.na(country_code)][
             !is.na(reporter_country) &
-                !reporter_country %in% c("COUNTRY NOT SPECIFIED", ""),
+                !reporter_country == "COUNTRY NOT SPECIFIED",
             unique(reporter_country)
         ]
         if (length(missed_reporter_country)) {
@@ -283,6 +283,9 @@ standardize_ascii_indi <- function(data, year, quarter) {
     if (is_from_laers(year, quarter)) {
         data.table::setnames(data, "drug_seq", "indi_drug_seq")
     }
+}
+standardize_ascii_reac <- function(data, year, quarter) {
+
 }
 utils::globalVariables(c(
     "age_in_years", "age_cod", "age",

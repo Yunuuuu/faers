@@ -139,6 +139,7 @@ read_ascii_deleted_cases <- function(path, year, quarter) {
             data.table::fread(
                 file = file,
                 header = FALSE,
+                na.strings = na_string,
                 blank.lines.skip = TRUE
             )[[1L]]
         })
@@ -214,7 +215,7 @@ read_text <- function(text, ...) {
         showProgress = FALSE
     )
 }
-na_string <- c("NA", "null", "NULL", "Null")
+na_string <- c("NA", "")
 read_lines <- function(file) {
     data.table::fread(
         file = file, sep = "", header = FALSE,
