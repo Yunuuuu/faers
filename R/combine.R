@@ -54,16 +54,12 @@ combine_faers_ascii <- function(x) {
 }
 
 combine_faers_xml <- function(x) {
-    methods::new("FAERSascii",
+    methods::new("FAERSxml",
         data = data.table::rbindlist(
             lapply(x, function(obj) obj@data),
             fill = TRUE, use.names = TRUE
         ),
         year = unlist(lapply(x, faers_year), use.names = FALSE),
-        quarter = unlist(lapply(x, faers_quarter), use.names = FALSE),
-        deletedCases = list_flatten(lapply(x,
-            faers_deleted_cases,
-            flatten = FALSE
-        ))
+        quarter = unlist(lapply(x, faers_quarter), use.names = FALSE)
     )
 }
