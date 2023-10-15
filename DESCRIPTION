@@ -9,6 +9,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
+    brio,
     cli,
     curl,
     data.table,
@@ -29,6 +30,7 @@ Collate:
     'import-standalone-obj-type.R'
     'meta.R'
     'parse.R'
+    'rxnorm.R'
     'standardize.R'
     'tidy.R'
     'utils-str.R'
