@@ -50,14 +50,14 @@ drug_normalize_by_athena <- function(terms, path = NULL, force = FALSE) {
         concept_id %in% data$concept$concept_id # nolint
     ]
     mapped_concept_ids <- c(
-        data$concept_synonym$concept_id,
-        data$concept$concept_id
+        data$concept$concept_id,
+        data$concept_synonym$concept_id
     )
     ..__mapped_concept_ids__.. <- mapped_concept_ids[data.table::chmatch(
-        tolower(terms), tolower(c(
-            data$concept_synonym$concept_synonym_name,
-            data$concept$concept_name
-        ))
+        str_trim(tolower(terms)), str_trim(tolower(c(
+            data$concept$concept_name,
+            data$concept_synonym$concept_synonym_name
+        )))
     )]
     out <- data$concept[match(..__mapped_concept_ids__.., concept_id)] # nolint
     out[, drug_names := terms] # nolint
