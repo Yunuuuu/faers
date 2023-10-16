@@ -12,29 +12,48 @@ is_before_period <- function(years, quarters, y, q) {
     years < y | (years == y & quarters <= q)
 }
 
-dir_or_unzip <- function(path, compress_dir, pattern, msg) {
+# file or path utils function --------------
+faers_cache_dir <- function(name) {
+    path <- file.path(faers_user_cache_dir(), name)
+    if (!dir.exists(path)) {
+        dir.create(path)
+    }
+    path
+}
+
+faers_user_cache_dir <- function() {
+    path <- rappdirs::user_cache_dir("faers")
+    if (!dir.exists(path)) {
+        dir.create(path)
+    }
+    path
+}
+
+dir_or_unzip <- function(path, compress_dir, pattern, none_msg, ignore.case = TRUE) {
     if (dir.exists(path)) {
         return(path)
     } else if (file.exists(path)) {
-        if (str_detect(path, pattern, ignore.case = TRUE)) {
+        if (str_detect(path, pattern, ignore.case = ignore.case)) {
             assert_string(compress_dir, empty_ok = FALSE)
-            return(unzip2(path, compress_dir))
+            return(unzip2(path, compress_dir, ignore.case = ignore.case))
         } else {
-            cli::cli_abort(msg)
+            cli::cli_abort(none_msg)
         }
     } else {
         cli::cli_abort("{.path {path}} doesn't exist")
     }
 }
 
-unzip2 <- function(path, compress_dir) {
+#' @noRd 
+#' Will always add the basename into the compress_dir
+unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
     if (!dir.exists(compress_dir)) {
         dir.create(compress_dir)
     }
-    compress_dir <- file.path(
-        compress_dir,
-        str_remove(basename(path), "\\.zip$", ignore.case = TRUE)
-    )
+    compress_dir <- file.path(compress_dir, str_remove(
+        basename(path), "\\.zip$",
+        ignore.case = ignore.case
+    ))
     if (!dir.exists(compress_dir)) {
         dir.create(compress_dir)
     }
@@ -62,7 +81,7 @@ locate_files <- function(path, pattern, ignore.case = TRUE) {
     files
 }
 
-fda_url <- "https://fis.fda.gov"
+fda_host <- "https://fis.fda.gov"
 faers_file_types <- c("ascii", "xml")
 faers_file_quarters <- c("q1", "q2", "q3", "q4")
 faers_ascii_file_fields <- c("demo", "drug", "indi", "ther", "reac", "rpsr", "outc")

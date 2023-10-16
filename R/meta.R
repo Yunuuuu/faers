@@ -28,19 +28,19 @@ faers_meta <- function() {
 }
 
 faers_meta_doc <- function() {
-    if (!exists(".faers_meta_doc", where = faers_cache, inherits = FALSE)) {
+    if (!exists(".faers_meta_doc", where = faers_cache_env, inherits = FALSE)) {
         url <- sprintf(
-            "%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_url
+            "%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_host
         )
         cli::cli_alert_info("Reading html: {.url {url}}")
-        faers_cache[[".faers_meta_doc"]] <- xml2::read_html(url)
+        faers_cache_env[[".faers_meta_doc"]] <- xml2::read_html(url)
     }
-    get(".faers_meta_doc", pos = faers_cache, inherits = FALSE)
+    get(".faers_meta_doc", pos = faers_cache_env, inherits = FALSE)
 }
 
 #' Used by `is_installed` and `faers_meta_doc`
 #' @noRd 
-faers_cache <- new.env()
+faers_cache_env <- new.env()
 
 utils::globalVariables(c("period", "quarter"))
 

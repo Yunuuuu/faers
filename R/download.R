@@ -103,7 +103,7 @@ build_faers_url <- function(type, years, quarters) {
     laers_period <- is_from_laers(years, quarters)
     sprintf(
         "%s/content/Exports/%s_%s_%s%s.zip",
-        fda_url,
+        fda_host,
         ifelse(laers_period, "aers", "faers"),
         ifelse(type == "ascii" | !laers_period, type, "sgml"),
         years, quarters

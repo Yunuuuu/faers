@@ -32,7 +32,7 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
     path <- dir_or_unzip(path,
         compress_dir = compress_dir,
         pattern = "20\\d{2}q[1-4]\\.zip$",
-        msg = c(
+        none_msg = c(
             "Only compressed zip files from FAERS Quarterly Data can work",
             i = "with pattern: \"20\\\\d{{2}}q[1-4]\\\\.zip\""
         )
