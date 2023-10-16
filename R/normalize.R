@@ -60,7 +60,7 @@ drug_normalize_by_athena <- function(terms, path = NULL, force = FALSE) {
         )))
     )]
     out <- data$concept[match(..__mapped_concept_ids__.., concept_id)] # nolint
-    out[, drug_names := terms] # nolint
-    data.table::setcolorder(out, "drug_names", before = 1L)
+    out[, athena_drug_names := terms] # nolint
+    data.table::setcolorder(out, "athena_drug_names", before = 1L)
 }
-utils::globalVariables(c("domain_id", "concept_id"))
+utils::globalVariables(c("domain_id", "concept_id", "athena_drug_names"))

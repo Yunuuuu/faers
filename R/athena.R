@@ -2,7 +2,7 @@
 #' "concept", "domain", "concept_class", "concept_relationship",
 #' "concept_ancestor", "concept_synonym", "drug_strength", "relationship",
 #' "vocabulary".
-#' @noRd 
+#' @noRd
 athena_parse <- function(use = NULL, path = NULL, dir = faers_cache_dir("athena"), force = FALSE) {
     path <- path %||% "https://athena.ohdsi.org/api/v1/vocabularies/zip/1ff93442-eb50-4dac-a38c-a374ac383da7"
     if (startsWith(path, "https")) {
@@ -26,7 +26,7 @@ athena_parse <- function(use = NULL, path = NULL, dir = faers_cache_dir("athena"
     files <- files[idx]
     ids <- ids[idx]
     data_list <- lapply(files, function(file) {
-        data.table::fread(file = file)
+        data.table::fread(file = file, quote = "")
     })
     data.table::setattr(data_list, "names", ids)
     data_list
