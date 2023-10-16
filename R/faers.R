@@ -11,8 +11,10 @@ faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = di
     faers_files <- do.call(faers_download, c(
         yq, list(type = type, dir = dir), handle_opts
     ))
-    bar_id <- cli::cli_progress_bar(sprintf("Parsing FAERS %s file", type),
+    bar_id <- cli::cli_progress_bar(
+        "Parsing FAER",
         type = "iterator", total = length(faers_files),
+        format = "{cli::pb_bar} {cli::pb_current}/{cli::pb_total} | ETA: {cli::pb_eta}",
         format_done = sprintf(
             "Parsing {.val {cli::pb_total}} %s Quarterly Data file{?s} in {cli::pb_elapsed}",
             type
@@ -21,12 +23,13 @@ faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = di
     )
     out <- .mapply(
         function(path, year, quarter, type, compress_dir) {
-            cli::cli_progress_update(id = bar_id)
-            faers_parse(
+            out <- faers_parse(
                 path = path,
                 type = type, year = year, quarter = quarter,
                 compress_dir = compress_dir
             )
+            cli::cli_progress_update(id = bar_id)
+            out
         },
         list(path = faers_files, year = yq$years, quarter = yq$quarters),
         MoreArgs = list(type = type, compress_dir = compress_dir)
