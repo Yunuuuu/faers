@@ -33,7 +33,7 @@ Collate:
     'normalize.R'
     'parse.R'
     'rxnorm.R'
-    'standardize.R'
     'tidy.R'
+    'unify.R'
     'utils-str.R'
     'utils.R'
