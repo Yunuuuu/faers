@@ -14,9 +14,13 @@ is_before_period <- function(years, quarters, y, q) {
 
 # file or path utils function --------------
 faers_cache_dir <- function(name) {
-    path <- file.path(faers_user_cache_dir(), name)
-    if (!dir.exists(path)) {
-        dir.create(path)
+    path <- faers_cache_env[[name]]
+    if (is.null(path)) {
+        path <- file.path(faers_user_cache_dir(), name)
+        if (!dir.exists(path)) {
+            dir.create(path)
+        }
+        faers_cache_env[[name]] <- path
     }
     path
 }
@@ -28,6 +32,11 @@ faers_user_cache_dir <- function() {
     }
     path
 }
+
+#' Used by `is_installed` and `faers_meta_doc`
+#' @noRd 
+faers_cache_env <- new.env()
+
 
 dir_or_unzip <- function(path, compress_dir, pattern, none_msg, ignore.case = TRUE) {
     if (dir.exists(path)) {
@@ -45,7 +54,7 @@ dir_or_unzip <- function(path, compress_dir, pattern, none_msg, ignore.case = TR
 }
 
 #' Will always add the basename into the compress_dir
-#' @noRd 
+#' @noRd
 unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
     if (!dir.exists(compress_dir)) {
         dir.create(compress_dir)

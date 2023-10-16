@@ -30,7 +30,12 @@ rxnorm_perform <- function(path, ..., type = "xml") {
 rxnorm_api <- function(path, ..., type = "xml") {
     req <- httr2::request(rxnorm_host)
     req <- httr2::req_url_path(req, sprintf("REST/%s.%s", path, type))
-    httr2::req_url_query(req, ...)
+    req <- httr2::req_url_query(req, ...)
+    # https://lhncbc.nlm.nih.gov/RxNav/TermsofService.html
+    req <- httr2::req_headers(req, `max-age` = 43200L)
+    httr2::req_cache(httr2::req_throttle(req, rate = 20L),
+        path = faers_cache_dir("rxnorm")
+    )
 }
 rxnorm_host <- "https://rxnav.nlm.nih.gov"
 
