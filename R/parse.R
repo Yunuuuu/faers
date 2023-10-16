@@ -29,74 +29,23 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
     year <- as.integer(year)
     quarter <- quarter %||% str_extract(path, "(?<=20\\d{2})(q[1-4])")
     quarter <- as.character(quarter)
-    path <- chech_path(path, compress_dir = compress_dir)
+    path <- dir_or_unzip(path,
+        compress_dir = compress_dir,
+        pattern = "20\\d{2}q[1-4]\\.zip$",
+        msg = c(
+            "Only compressed zip files from FAERS Quarterly Data can work",
+            i = "with pattern: \"20\\\\d{{2}}q[1-4]\\\\.zip\""
+        )
+    )
     switch(type,
         xml = parse_xml(path, year, quarter),
         ascii = parse_ascii(path, year, quarter)
     )
 }
 
-chech_path <- function(path, compress_dir) {
-    if (dir.exists(path)) {
-        return(path)
-    } else if (file.exists(path)) {
-        if (str_detect(path, "20\\d{2}q[1-4]\\.zip$")) {
-            assert_string(compress_dir, empty_ok = FALSE)
-            return(faers_unzip(path, compress_dir))
-        } else {
-            cli::cli_abort(c(
-                "Only compressed zip files from FAERS Quarterly Data can work",
-                i = "with pattern: \"20\\\\d{{2}}q[1-4]\\\\.zip\""
-            ))
-        }
-    } else {
-        cli::cli_abort("{.path {path}} doesn't exist")
-    }
-}
-
-faers_unzip <- function(path, compress_dir) {
-    if (!dir.exists(compress_dir)) {
-        dir.create(compress_dir)
-    }
-    compress_dir <- file.path(
-        compress_dir,
-        str_remove(basename(path), "\\.zip$", ignore.case = TRUE)
-    )
-    if (!dir.exists(compress_dir)) {
-        dir.create(compress_dir)
-    }
-    utils::unzip(path, exdir = compress_dir, overwrite = TRUE)
-    compress_dir
-}
-
-faers_locate_dir <- function(path, pattern) {
-    path <- list.dirs(path, recursive = FALSE)
-    path <- path[str_detect(basename(path), sprintf("^%s$", pattern),
-        ignore.case = TRUE
-    )]
-    if (!dir.exists(path)) {
-        cli::cli_abort("Cannot locate {.field {pattern}} directory in {.path {path}}")
-    }
-    path
-}
-
-faers_locate_files <- function(path, pattern, ignore.case = TRUE) {
-    files <- list.files(path,
-        pattern = pattern,
-        full.names = TRUE,
-        ignore.case = ignore.case
-    )
-    if (!length(files)) {
-        cli::cli_abort("Cannot locate {.field {pattern}} file in {.path {path}}")
-    }
-    files
-}
-
 # parse ascii files -----------------------------------
 parse_ascii <- function(path, year, quarter) {
-    files <- faers_locate_files(
-        faers_locate_dir(path, "ascii"), "\\.txt$"
-    )
+    files <- locate_files(locate_dir(path, "^ascii$"), "\\.txt$")
     # for 2018q1 demo file, there exists a suffix "_new"
     fields <- str_remove(basename(files), "\\d+q\\d(_new)?\\.txt$",
         ignore.case = TRUE
@@ -132,9 +81,7 @@ parse_ascii <- function(path, year, quarter) {
 read_ascii_deleted_cases <- function(path, year, quarter) {
     # As of 2019 Quarter one there is a new text file that lists deleted files
     if (!is_before_period(year, quarter, 2018L, "q4")) {
-        deleted_cases_files <- faers_locate_files(
-            faers_locate_dir(path, "deleted"), NULL
-        )
+        deleted_cases_files <- locate_files(locate_dir(path, "^deleted$"), NULL)
         deleted_cases <- lapply(deleted_cases_files, function(file) {
             data.table::fread(
                 file = file,
@@ -251,7 +198,7 @@ read_lines <- function(file) {
 
 # parse xml ----------------------------------------------
 parse_xml <- function(path, year, quarter) {
-    file <- faers_locate_files(faers_locate_dir(path, "xml"), "\\.xml$")
+    file <- locate_files(locate_dir(path, "^xml$"), "\\.xml$")
     xml_doc <- xml2::read_xml(file)
     full_content <- xml2::xml_contents(xml_doc)
     header <- xml2::as_list(full_content[[1L]])
