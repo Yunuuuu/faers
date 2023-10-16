@@ -347,7 +347,7 @@ use_indices <- function(i, names, arg = rlang::caller_arg(i), call = rlang::call
         }
     } else {
         cli::cli_abort(sprintf(
-            "%s must be an atomic numeic/character",
+            "%s must be an atomic numeric or character",
             style_arg(arg)
         ), call = call)
     }
