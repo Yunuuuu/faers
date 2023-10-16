@@ -5,9 +5,7 @@ faers_drug_normalize <- function(terms, exact = TRUE, approximate = TRUE, search
         cli::cli_progress_along(terms,
             name = "Parsing CUI",
             format = "{cli::pb_bar} {cli::pb_current}/{cli::pb_total} | ETA: {cli::pb_eta}",
-            format_done = sprintf(
-                "Parsing {.val {cli::pb_total}} term{?s} in {cli::pb_elapsed}"
-            ),
+            format_done = "Parsing {.val {cli::pb_total}} term{?s} in {cli::pb_elapsed}",
             clear = FALSE
         ),
         function(i) {
