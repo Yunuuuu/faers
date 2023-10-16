@@ -11,11 +11,11 @@ rxnorm_approximate_map <- function(term, max_entries = NULL, option = NULL) {
 #' @param allsrc 0: Active concepts; 1: Current concepts. Active: concepts in
 #' the current RxNorm data set that have an atom with SAB=RXNORM and SUPPRESS=N;
 #' Current: concepts in the current RxNorm data set that have an atom with
-#' SUPPRESS=N. 
+#' SUPPRESS=N.
 #' @param srclist Source vocabularies to search (if allsrc=1)
 #' @param search 0: Exact match only; 1: Normalized match; 2: Best match (exact
-#' or normalized) 
-#' @noRd 
+#' or normalized)
+#' @noRd
 rxnorm_exact_map <- function(term, allsrc = NULL, srclist = NULL, search = NULL) {
     rxnorm_perform("rxcui",
         name = term, allsrc = allsrc,
