@@ -34,7 +34,7 @@ faers_user_cache_dir <- function() {
 }
 
 #' Used by `is_installed` and `faers_meta_doc`
-#' @noRd 
+#' @noRd
 faers_cache_env <- new.env()
 
 

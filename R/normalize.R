@@ -2,40 +2,34 @@ faers_drug_normalize <- function(terms, athena = NULL, force = FALSE, exact = TR
     drug_normalize_by_athena(terms = terms, path = athena, force = force)
 }
 
-drug_normalize_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, search = 2) {
+drug_normalize_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, search = 2, pool = 20L) {
     assert_bool(exact)
     assert_bool(approximate)
-    vapply(
-        cli::cli_progress_along(terms,
-            name = "Parsing CUI",
-            format = "{cli::pb_bar} {cli::pb_current}/{cli::pb_total} | ETA: {cli::pb_eta}",
-            format_done = "Parsing {.val {cli::pb_total}} term{?s} in {cli::pb_elapsed}",
-            clear = FALSE
-        ),
-        function(i) {
-            rxnorm_map_to_rxcui(terms[[i]],
-                exact = exact, approximate = approximate,
-                search = search
-            )
-        }, character(1L),
-        USE.NAMES = FALSE
+    rxnorm_map_to_rxcui(terms,
+        exact = exact, approximate = approximate,
+        search = search, pool = pool
     )
     # get other drug details from rxnorm
 }
 
-rxnorm_map_to_rxcui <- function(term, exact = TRUE, approximate = TRUE, allsrc = NULL, srclist = NULL, search = NULL) {
+rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc = NULL, srclist = NULL, search = NULL, pool = 20L) {
     if (exact) {
-        out <- rxnorm_exact_map(term,
+        out <- rxnorm_exact_map(terms,
             allsrc = allsrc,
-            srclist = srclist, search = search
+            srclist = srclist, search = search,
+            pool = pool
         )
-        out <- get_rxnorm_item(out, "//rxnormId")
+        out <- vapply(out, get_rxnorm_item, character(1L), xpath = "//rxnormId")
     } else {
-        out <- NA_character_
+        out <- rep_len(NA_character_, length(terms))
     }
-    if (is.na(out) && approximate) {
-        out <- rxnorm_approximate_map(term, max_entries = 1L)
-        out <- get_rxnorm_item(out, "//rxcui")
+    if (anyNA(out) && approximate) {
+        out2 <- rxnorm_approximate_map(terms[is.na(out)],
+            max_entries = 1L, pool = pool
+        )
+        out[is.na(out)] <- vapply(out2, get_rxnorm_item, character(1L),
+            xpath = "//rxcui"
+        )
     }
     out
 }
