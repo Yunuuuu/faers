@@ -44,8 +44,8 @@ dir_or_unzip <- function(path, compress_dir, pattern, none_msg, ignore.case = TR
     }
 }
 
-#' @noRd 
 #' Will always add the basename into the compress_dir
+#' @noRd 
 unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
     if (!dir.exists(compress_dir)) {
         dir.create(compress_dir)
