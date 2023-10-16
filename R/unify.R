@@ -1,19 +1,22 @@
-standardize_ascii <- function(data, field, year, quarter) {
+#' Used in internal function, unify data
+#' @noRd 
+unify_ascii <- function(data, field, year, quarter) {
     data.table::setnames(data, tolower)
     if (is_from_laers(year, quarter)) {
         data.table::setnames(data, "isr", "primaryid")
     }
     switch(field,
-        demo = standardize_ascii_demo(data, year, quarter),
-        ther = standardize_ascii_ther(data, year, quarter),
-        indi = standardize_ascii_indi(data, year, quarter),
-        drug = standardize_ascii_drug(data, year, quarter)
+        demo = unify_ascii_demo(data, year, quarter),
+        ther = unify_ascii_ther(data, year, quarter),
+        indi = unify_ascii_indi(data, year, quarter),
+        drug = unify_ascii_drug(data, year, quarter)
     )
     data[, c("year", "quarter") := list(year, quarter)]
     data.table::setcolorder(data, c("year", "quarter"), before = 1L)
     data
 }
-standardize_ascii_demo <- function(data, year, quarter) {
+
+unify_ascii_demo <- function(data, year, quarter) {
     if (is_before_period(year, quarter, 2014L, "q2")) {
         data.table::setnames(data, "gndr_cod", "sex")
     }
@@ -269,24 +272,24 @@ standardize_ascii_demo <- function(data, year, quarter) {
     # nolint end
 }
 
-standardize_ascii_drug <- function(data, year, quarter) {
+unify_ascii_drug <- function(data, year, quarter) {
     # Always use character to store nda_num
     # As data.table will parse nda_num as integer64 or character,
     # preventing the rbindlist from working.
     data[, nda_num := str_trim(as.character(nda_num))] # nolint
 }
 
-standardize_ascii_ther <- function(data, year, quarter) {
+unify_ascii_ther <- function(data, year, quarter) {
     if (is_from_laers(year, quarter)) {
         data.table::setnames(data, "drug_seq", "dsg_drug_seq")
     }
 }
-standardize_ascii_indi <- function(data, year, quarter) {
+unify_ascii_indi <- function(data, year, quarter) {
     if (is_from_laers(year, quarter)) {
         data.table::setnames(data, "drug_seq", "indi_drug_seq")
     }
 }
-standardize_ascii_reac <- function(data, year, quarter) {
+unify_ascii_reac <- function(data, year, quarter) {
 
 }
 utils::globalVariables(c(

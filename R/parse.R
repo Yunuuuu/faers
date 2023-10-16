@@ -119,7 +119,7 @@ parse_ascii <- function(path, year, quarter) {
                 safely_read_ascii(file, year, quarter)
             }
         )
-        standardize_ascii(out, field = field, year = year, quarter = quarter)
+        unify_ascii(out, field = field, year = year, quarter = quarter)
     }, list(file = files, field = fields), NULL)
     data.table::setattr(data_list, "names", fields)
     methods::new("FAERSascii",

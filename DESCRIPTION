@@ -13,6 +13,7 @@ Imports:
     cli,
     curl,
     data.table,
+    httr2,
     methods,
     rlang (>= 1.1.0),
     rvest,
@@ -29,6 +30,7 @@ Collate:
     'import-standalone-cli.R'
     'import-standalone-obj-type.R'
     'meta.R'
+    'normalize.R'
     'parse.R'
     'rxnorm.R'
     'standardize.R'
