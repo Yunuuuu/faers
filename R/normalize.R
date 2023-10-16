@@ -2,7 +2,7 @@ faers_drug_normalize <- function(terms, athena = NULL, force = FALSE, exact = TR
     drug_normalize_by_athena(terms = terms, path = athena, force = force)
 }
 
-drug_normalize_by_rxnorm <- function(terms, exact, approximate, search) {
+drug_normalize_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, search = 2) {
     assert_bool(exact)
     assert_bool(approximate)
     vapply(
