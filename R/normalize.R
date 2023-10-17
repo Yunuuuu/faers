@@ -14,22 +14,28 @@ drug_normalize_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, se
 
 rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc = NULL, srclist = NULL, search = NULL, pool = 20L) {
     if (exact) {
-        out <- rxnorm_exact_map(terms,
+        cli::cli_alert("Running Exact Match")
+        out <- rxnorm_findRxcuiByString(terms,
             allsrc = allsrc,
             srclist = srclist, search = search,
             pool = pool
         )
-        out <- vapply(out, get_rxnorm_item, character(1L), xpath = "//rxnormId")
     } else {
         out <- rep_len(NA_character_, length(terms))
     }
     if (anyNA(out) && approximate) {
-        out2 <- rxnorm_approximate_map(terms[is.na(out)],
+        cli::cli_alert("Running Approximate Match")
+        out2 <- rxnorm_getApproximateMatch(terms[is.na(out)],
             max_entries = 1L, pool = pool
         )
-        out[is.na(out)] <- vapply(out2, get_rxnorm_item, character(1L),
-            xpath = "//rxcui"
-        )
+        out[is.na(out)] <- vapply(out2, function(x) {
+            if (is.null(x)) {
+                NA_character_
+            } else {
+                out <- x$rxcui[[1L]]
+                out %||% NA_character_
+            }
+        }, character(1L))
     }
     out
 }
