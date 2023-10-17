@@ -66,7 +66,7 @@ rxnorm_parse_dt <- function(resp, xpath) {
 #' all values in dots should be named.
 #' @return A list of resp objects
 #' @noRd
-rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 20L, retry = 3L, type = "xml") {
+rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3L, type = "xml") {
     pool <- max(1L, min(pool, 20L))
     resps <- vector("list", length(terms))
     groups <- seq_along(resps)
@@ -98,7 +98,8 @@ rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 20L, retry = 3
                 path = path,
                 query_api_id = query_api_id,
                 terms = terms[fail],
-                ..., pool = pool, retry = retry - 1L
+                ..., pool = pool, retry = retry - 1L,
+                type = type
             )
         }
     }
