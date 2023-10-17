@@ -20,22 +20,3 @@ Imports:
     rvest,
     utils,
     xml2
-Collate: 
-    'athena.R'
-    'available.R'
-    'class-FAERS.R'
-    'combine.R'
-    'download.R'
-    'faers-package.R'
-    'faers.R'
-    'import-standalone-assert.R'
-    'import-standalone-cli.R'
-    'import-standalone-obj-type.R'
-    'meta.R'
-    'normalize.R'
-    'parse.R'
-    'rxnorm.R'
-    'tidy.R'
-    'unify.R'
-    'utils-str.R'
-    'utils.R'

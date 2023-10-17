@@ -30,10 +30,10 @@ methods::setClass(
     slots = list(
         year = "integer",
         quarter = "character",
-        data = "ANY",
+        data = "ANY", dedup = "ANY",
         type = "character"
     ),
-    prototype = list(data = NULL)
+    prototype = list(data = NULL, dedup = NULL)
 )
 
 ## Validator for FAERS
@@ -181,15 +181,14 @@ methods::setMethod("faers_data", "FAERS", function(object) {
 })
 
 #' @export
+#' @aliases faers_year
 #' @rdname FAERS-class
 methods::setGeneric("faers_year", function(object) {
     methods::makeStandardGeneric("faers_year")
 })
 
 #' @export
-#' @include class-FAERS.R
 #' @method faers_year FAERS
-#' @aliases faers_year
 #' @rdname FAERS-class
 methods::setMethod("faers_year", "FAERS", function(object) {
     object@year
@@ -293,7 +292,6 @@ methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL
 
 ##############################################################
 #' @export
-#' @method faers_keep FAERSascii
 #' @rdname FAERS-class
 methods::setGeneric("faers_filter", function(object, ...) {
     methods::makeStandardGeneric("faers_filter")

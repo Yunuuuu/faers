@@ -1,58 +1,46 @@
-#' Tidy up faers datatable with duplicate records removed
+#' Tidy up FAERS Quarterly Data with duplicate records removed
 #' @param object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods.
 #' @return A [data.table][data.table::data.table] object.
 #' @export
-#' @name faers_tidy
-methods::setGeneric("faers_tidy", function(object, ...) {
-    methods::makeStandardGeneric("faers_tidy")
+#' @name faers_dedup
+methods::setGeneric("faers_dedup", function(object, ...) {
+    methods::makeStandardGeneric("faers_dedup")
 })
 
-#' @param fields An atomic characters specifying the fields to use. If `NULL`,
-#' the de-duplicated dataset will be returned.
 #' @param remove_deleted_cases If `TRUE`, will remove all
 #' [deletedCases][FAERS-class] from the final result.
 #' @export
-#' @method faers_tidy FAERSascii
-#' @rdname faers_tidy
-methods::setMethod("faers_tidy", "FAERSascii", function(object, fields = NULL, remove_deleted_cases = TRUE) {
-    assert_inclusive(fields, faers_ascii_file_fields, null_ok = TRUE)
-    lst <- faers_data(object)
-    out <- do.call(
+#' @method faers_dedup FAERSascii
+#' @rdname faers_dedup
+methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_cases = TRUE) {
+    if (!is.null(object@dedup)) {
+        cli::cli_abort("You must not run `faers_dedup` twice")
+    }
+    object@dedup <- do.call(
         dedup_faers_ascii,
-        lst[c("demo", "drug", "indi", "ther", "reac")]
+        faers_data(object)[c("demo", "drug", "indi", "ther", "reac")]
     )
     if (isTRUE(remove_deleted_cases)) {
         deleted_cases <- faers_deleted_cases(object)
         if (length(deleted_cases)) {
-            out <- out[!caseid %in% deleted_cases]
+            object@dedup <- object@dedup[!caseid %in% deleted_cases]
         }
     }
-    if (is.null(fields)) {
-        return(out)
-    }
-    match_id <- out[, "primaryid"]
-    out <- lapply(lst[fields], function(data) {
-        data[match_id, on = "primaryid"]
-    })
-    if (length(out) == 1L) {
-        out[[1L]]
-    } else {
-        out
-    }
+    faers_keep(object, primaryid = object@dedup$primaryid)
 })
 
 #' @export
-#' @method faers_tidy FAERSxml
-#' @rdname faers_tidy
-methods::setMethod("faers_tidy", "FAERSxml", function(object) {
+#' @method faers_dedup FAERSxml
+#' @rdname faers_dedup
+methods::setMethod("faers_dedup", "FAERSxml", function(object) {
     cli::cli_abort("Don't implement currently")
 })
 
-#' @method faers_tidy ANY
-#' @rdname faers_tidy
-methods::setMethod("faers_tidy", "ANY", function(object) {
-    cli::cli_abort("Only {.cls FAERSascii}, and {.cls ListOfFAERS} can work")
+#' @method faers_dedup ANY
+#' @rdname faers_dedup
+methods::setMethod("faers_dedup", "ANY", function(object) {
+    cli::cli_abort("Only {.cls FAERSascii} can work")
 })
 
 # define_common_by <- function(x) {
@@ -154,7 +142,13 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     out[, (all_columns) := lapply(.SD, function(x) {
         x[startsWith(x, "..__na_null__..")] <- NA
         x
-    }), .SDcols = all_columns][]
+    }), .SDcols = all_columns]
+    out[, c(
+        "year", "quarter", "primaryid",
+        "caseid", "caseversion", "fda_dt", "i_f_code",
+        "event_dt", "gender", "age_in_years", "country_code",
+        "aligned_drugs", "aligned_reac", "aligned_start_dt", "aligned_indi"
+    )]
 }
 
 utils::globalVariables(c(
