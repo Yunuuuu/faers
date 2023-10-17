@@ -17,20 +17,13 @@ faers_cache_dir <- function(name) {
     path <- faers_cache_env[[name]]
     if (is.null(path)) {
         path <- file.path(faers_user_cache_dir(), name)
-        if (!dir.exists(path)) {
-            dir.create(path)
-        }
-        faers_cache_env[[name]] <- path
+        faers_cache_env[[name]] <- dir_create2(path)
     }
     path
 }
 
 faers_user_cache_dir <- function() {
-    path <- rappdirs::user_cache_dir("faers")
-    if (!dir.exists(path)) {
-        dir.create(path)
-    }
-    path
+    dir_create2(rappdirs::user_cache_dir("faers"))
 }
 
 #' Used by `is_installed` and `faers_meta_doc`
@@ -56,17 +49,11 @@ dir_or_unzip <- function(path, compress_dir, pattern, none_msg, ignore.case = TR
 #' Will always add the basename into the compress_dir
 #' @noRd
 unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
-    if (!dir.exists(compress_dir)) {
-        dir.create(compress_dir)
-    }
-    compress_dir <- file.path(compress_dir, str_remove(
+    compress_dir <- file.path(dir_create2(compress_dir), str_remove(
         basename(path), "\\.zip$",
         ignore.case = ignore.case
     ))
-    if (!dir.exists(compress_dir)) {
-        dir.create(compress_dir)
-    }
-    utils::unzip(path, exdir = compress_dir, overwrite = TRUE)
+    utils::unzip(path, exdir = dir_create2(compress_dir), overwrite = TRUE)
     compress_dir
 }
 
@@ -88,6 +75,15 @@ locate_files <- function(path, pattern, ignore.case = TRUE) {
         cli::cli_abort("Cannot locate {.field {pattern}} file in {.path {path}}")
     }
     files
+}
+
+dir_create2 <- function(dir) {
+    if (!dir.exists(dir)) {
+        if (!dir.create(dir, showWarnings = FALSE)) {
+            cli::cli_abort("Cannot create directory {.path {dir}}")
+        }
+    }
+    dir
 }
 
 fda_host <- "https://fis.fda.gov"

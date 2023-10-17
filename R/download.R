@@ -42,10 +42,7 @@ faers_download <- function(years, quarters, format = NULL, dir = getwd(), ...) {
         }
     }
     urls <- build_faers_url(format, years, quarters)
-    if (!dir.exists(dir)) {
-        dir.create(dir)
-    }
-    dest_files <- file.path(dir, basename(urls))
+    dest_files <- file.path(dir_create2(dir), basename(urls))
     download_inform(urls, dest_files, handle_opts = list(...))
 }
 
