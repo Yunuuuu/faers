@@ -5,11 +5,11 @@
 #' [new_handle][curl::new_handle].
 #' @return A [FAERSxml] or [FAERSascii] object.
 #' @export
-faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
-    type <- match.arg(type, faers_file_types)
+faers <- function(years, quarters, format = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
+    format <- match.arg(format, faers_file_format)
     yq <- recycle_scalar(years = years, quarters = quarters)
     faers_files <- do.call(faers_download, c(
-        yq, list(type = type, dir = dir), handle_opts
+        yq, list(format = format, dir = dir), handle_opts
     ))
     bar_id <- cli::cli_progress_bar(
         "Parsing FAER",
@@ -17,22 +17,22 @@ faers <- function(years, quarters, type = NULL, dir = getwd(), compress_dir = di
         format = "{cli::pb_bar} {cli::pb_current}/{cli::pb_total} | ETA: {cli::pb_eta}",
         format_done = sprintf(
             "Parsing {.val {cli::pb_total}} %s Quarterly Data file{?s} in {cli::pb_elapsed}",
-            type
+            format
         ),
         clear = FALSE
     )
     out <- .mapply(
-        function(path, year, quarter, type, compress_dir) {
+        function(path, year, quarter, format, compress_dir) {
             out <- faers_parse(
                 path = path,
-                type = type, year = year, quarter = quarter,
+                format = format, year = year, quarter = quarter,
                 compress_dir = compress_dir
             )
             cli::cli_progress_update(id = bar_id)
             out
         },
         list(path = faers_files, year = yq$years, quarter = yq$quarters),
-        MoreArgs = list(type = type, compress_dir = compress_dir)
+        MoreArgs = list(format = format, compress_dir = compress_dir)
     )
     faers_combine(out)
 }

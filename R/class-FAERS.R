@@ -5,7 +5,7 @@
 #' @slot quarter A string specifies the quarter information.
 #' @slot data For `FAERSxml`, a [data.table][data.table::data.table]. For
 #' `FAERSascii`, a list of [data.table][data.table::data.table].
-#' @slot type: A string of "ascii" or "xml" indicates the file type used.
+#' @slot format: A string of "ascii" or "xml" indicates the file format used.
 #' @slot deletedCases: A list of integers, as of 2019 Quarter one there are new
 #' files that lists deleted cases.
 #' @details
@@ -31,7 +31,7 @@ methods::setClass(
         year = "integer",
         quarter = "character",
         data = "ANY", dedup = "ANY",
-        type = "character"
+        format = "character"
     ),
     prototype = list(data = NULL, dedup = NULL)
 )
@@ -64,10 +64,10 @@ validate_faers <- function(object) {
     if (anyDuplicated(faers_period(object))) {
         return("the period combined from `@year` and `@quarter` must be unique, you cannot import duplicated FAERS Quarterly Data file")
     }
-    if (!rlang::is_string(object@type, faers_file_types)) {
+    if (!rlang::is_string(object@format, faers_file_format)) {
         return(sprintf(
-            "`@type` must be a string of %s",
-            oxford_comma(faers_file_types, final = "or")
+            "`@format` must be a string of %s",
+            oxford_comma(faers_file_format, final = "or")
         ))
     }
     ### Also, we check if year-quarter in @data slot contain all data from
@@ -89,7 +89,7 @@ methods::setClass(
     prototype = list(
         data = list(),
         deletedCases = list(),
-        type = "ascii"
+        format = "ascii"
     ),
     contains = "FAERS"
 )
@@ -114,7 +114,7 @@ methods::setClass(
     slots = list(data = "data.table", header = "list"),
     prototype = list(
         data = data.table::data.table(),
-        header = list(), type = "xml"
+        header = list(), format = "xml"
     ),
     contains = "FAERS"
 )
@@ -128,7 +128,7 @@ methods::setMethod("show", "FAERS", function(object) {
     l <- length(faers_period(object))
     cat(sprintf(
         "A total of %s FAERS Quarterly %s Data file%s",
-        l, object@type, if (l > 1L) "s" else ""
+        l, object@format, if (l > 1L) "s" else ""
     ), sep = "\n")
 })
 

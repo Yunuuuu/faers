@@ -12,18 +12,18 @@
 #' will be created if necessary.
 #' @return A [FAERSxml] or [FAERSascii] object.
 #' @export
-faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress_dir = getwd()) {
+faers_parse <- function(path, format = NULL, year = NULL, quarter = NULL, compress_dir = getwd()) {
     assert_string(path, empty_ok = FALSE)
-    if (is.null(type)) {
-        type <- str_extract(basename(path), "xml|ascii", ignore.case = TRUE)
-        if (!any(type == faers_file_types)) {
+    if (is.null(format)) {
+        format <- str_extract(basename(path), "xml|ascii", ignore.case = TRUE)
+        if (!any(format == faers_file_format)) {
             cli::cli_abort(c(
-                "Cannot parse file type from {.arg path}",
-                i = "Try to set {.arg type} manually"
+                "Cannot parse file format from {.arg path}",
+                i = "Try to set {.arg format} manually"
             ))
         }
     } else {
-        type <- match.arg(type, faers_file_types)
+        format <- match.arg(format, faers_file_format)
     }
     year <- year %||% str_extract(path, "20\\d+(?=q[1-4])")
     year <- as.integer(year)
@@ -37,7 +37,7 @@ faers_parse <- function(path, type = NULL, year = NULL, quarter = NULL, compress
             i = "with pattern: \"20\\\\d{{2}}q[1-4]\\\\.zip\""
         )
     )
-    switch(type,
+    switch(format,
         xml = parse_xml(path, year, quarter),
         ascii = parse_ascii(path, year, quarter)
     )

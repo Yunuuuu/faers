@@ -3,7 +3,7 @@
 #' This function downloads the FAERS data for selected years and quarters.
 #'
 #' @inheritParams faers_available
-#' @param type File type to used, only "ascii" and "xml" are availabe. Default:
+#' @param format File format to used, only "ascii" and "xml" are availabe. Default:
 #'  "ascii".
 #' @param dir The destination directory for any downloads. Defaults to
 #'  current working dir.
@@ -15,8 +15,8 @@
 #' faers_download(year = 2018, quarter = "q4", dir = tempdir())
 #' }
 #' @export
-faers_download <- function(years, quarters, type = NULL, dir = getwd(), ...) {
-    type <- match.arg(type, faers_file_types)
+faers_download <- function(years, quarters, format = NULL, dir = getwd(), ...) {
+    format <- match.arg(format, faers_file_format)
     assert_string(dir, empty_ok = FALSE)
     data_available <- faers_available(years, quarters)
     if (!all(data_available)) {
@@ -28,7 +28,7 @@ faers_download <- function(years, quarters, type = NULL, dir = getwd(), ...) {
             x = "Missed pair{?s}: {.val {out_pairs}}"
         ))
     }
-    if (type == "xml") {
+    if (format == "xml") {
         # only faers database has xml data files
         is_aers_pairs <- is_from_laers(years, quarters)
         if (any(is_aers_pairs)) {
@@ -41,7 +41,7 @@ faers_download <- function(years, quarters, type = NULL, dir = getwd(), ...) {
             ))
         }
     }
-    urls <- build_faers_url(type, years, quarters)
+    urls <- build_faers_url(format, years, quarters)
     if (!dir.exists(dir)) {
         dir.create(dir)
     }

@@ -91,6 +91,6 @@ locate_files <- function(path, pattern, ignore.case = TRUE) {
 }
 
 fda_host <- "https://fis.fda.gov"
-faers_file_types <- c("ascii", "xml")
+faers_file_format <- c("ascii", "xml")
 faers_file_quarters <- c("q1", "q2", "q3", "q4")
 faers_ascii_file_fields <- c("demo", "drug", "indi", "ther", "reac", "rpsr", "outc")

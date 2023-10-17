@@ -15,7 +15,7 @@ methods::setGeneric("faers_dedup", function(object, ...) {
 #' @rdname faers_dedup
 methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_cases = TRUE) {
     if (!is.null(object@dedup)) {
-        cli::cli_abort("You must not run `faers_dedup` twice")
+        cli::cli_abort("You must not run {.fn faers_dedup} twice")
     }
     object@dedup <- do.call(
         dedup_faers_ascii,

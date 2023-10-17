@@ -52,10 +52,10 @@ parse_year_xml_table <- function(year_xml) {
         out <- data.table::data.table(
             period = str_remove(period, "\\s*\\d*(\\s*posted.*\\s*)?$"),
             urls = rvest::html_attr(file_xmls, "href"),
-            file_type = tolower(str_extract(files, "XML|ASCII")),
+            file_format = tolower(str_extract(files, "XML|ASCII")),
             file_size = str_extract(files, "\\d[\\d.]*(MB)")
         )
-        data.table::dcast(out, period ~ file_type,
+        data.table::dcast(out, period ~ file_format,
             value.var = c("urls", "file_size")
         )
     })

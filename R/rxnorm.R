@@ -66,7 +66,7 @@ rxnorm_parse_dt <- function(resp, xpath) {
 #' all values in dots should be named.
 #' @return A list of resp objects
 #' @noRd
-rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3L, type = "xml") {
+rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3L, format = "xml") {
     pool <- max(1L, min(pool, 20L))
     resps <- vector("list", length(terms))
     groups <- seq_along(resps)
@@ -77,15 +77,13 @@ rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3
     bar_id <- cli::cli_progress_bar(
         name = "Querying RxNorm",
         format = "{cli::pb_bar} {cli::pb_current}/{cli::pb_total} | ETA: {cli::pb_eta}",
-        format_done = sprintf(
-            "Querying RxNorm {.val {cli::pb_total}} run{?s} per %s in {cli::pb_elapsed}", pool
-        ),
+        format_done = "Querying RxNorm for {.val {cli::pb_total}} run{?s} per {pool} quer{?y/ies} in {cli::pb_elapsed}",
         total = length(groups)
     )
     for (idx in groups) {
         req_list <- lapply(terms[idx], rxnorm_api,
             path = path, query_api_id = query_api_id,
-            ..., type = type
+            ..., format = format
         )
         resps[idx] <- httr2::multi_req_perform(req_list)
         cli::cli_progress_update(id = bar_id)
@@ -99,7 +97,7 @@ rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3
                 query_api_id = query_api_id,
                 terms = terms[fail],
                 ..., pool = pool, retry = retry - 1L,
-                type = type
+                format = format
             )
         }
     }
@@ -110,9 +108,9 @@ rxnorm_is_fail <- function(resp) {
     inherits(resp, "error") || httr2::resp_status(resp) != 200L
 }
 
-rxnorm_api <- function(path, query_api_id, query, ..., type = "xml") {
+rxnorm_api <- function(path, query_api_id, query, ..., format = "xml") {
     req <- httr2::request(rxnorm_host)
-    req <- httr2::req_url_path(req, sprintf("REST/%s.%s", path, type))
+    req <- httr2::req_url_path(req, sprintf("REST/%s.%s", path, format))
     req <- rlang::exec(
         httr2::req_url_query,
         .req = req, !!query_api_id := query, ...
