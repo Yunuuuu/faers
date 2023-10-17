@@ -37,12 +37,32 @@ methods::setClass(
 )
 
 ## Validator for FAERS
+
+################ utils methods ########################
+# methods::setGeneric("faers_data_period", function(object) {
+#     methods::makeStandardGeneric("faers_data_period")
+# })
+
+# methods::setMethod("faers_data_period", "FAERSxml", function(object) {
+#     faers_period(object)
+# })
+
+# methods::setMethod("faers_data_period", "FAERSascii", function(object) {
+#     object@data$demo
+# })
+
 validate_faers <- function(object) {
+    if (length(object@year) != length(object@quarter)) {
+        return("the length of `@year` and `@quarter` must be the same")
+    }
     if (!all(object@quarter %in% faers_file_quarters)) {
         return(sprintf(
             "`@quarter` must be values in %s",
             oxford_comma(faers_file_quarters, final = "or")
         ))
+    }
+    if (anyDuplicated(faers_period(object))) {
+        return("the period combined from `@year` and `@quarter` must be unique, you cannot import duplicated FAERS Quarterly Data file")
     }
     if (!rlang::is_string(object@type, faers_file_types)) {
         return(sprintf(
@@ -50,6 +70,12 @@ validate_faers <- function(object) {
             oxford_comma(faers_file_types, final = "or")
         ))
     }
+    ### Also, we check if year-quarter in @data slot contain all data from
+    # @year-@quarter
+    # period <- faers_period(object)
+    # if (!setequal(period, faers_data_period(object))) {
+    #     return("`@data` must be compatible with `@year` and `@quarter`")
+    # }
     TRUE
 }
 
@@ -139,7 +165,7 @@ methods::setMethod("faers_header", "FAERSxml", function(object) {
 #######################################################
 #' @param object A [FAERS] object.
 #' @param ... Other arguments passed to specific methods. For `faers_filter`
-#' Other arguments passed to `.fn`. 
+#' Other arguments passed to `.fn`.
 #' @export
 #' @aliases faers_data
 #' @rdname FAERS-class
@@ -256,7 +282,12 @@ methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL
     if (is.null(primaryid)) {
         return(object)
     }
-    object@data <- lapply(object@data, function(x) x[primaryid %in% primaryid])
+    # as all data has a column primaryid, we just rename the variable to use it
+    # in the data.table `i`
+    .__primaryid__. <- primaryid
+    object@data <- lapply(object@data, function(x) {
+        x[primaryid %in% .__primaryid__.]
+    })
     object
 })
 
