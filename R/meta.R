@@ -29,6 +29,9 @@ faers_meta <- function() {
 
 faers_meta_doc <- function() {
     if (!exists(".faers_meta_doc", where = faers_cache_env, inherits = FALSE)) {
+        if (!curl::has_internet()) {
+            cli::cli_abort("No internet")
+        }
         url <- sprintf(
             "%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_host
         )
