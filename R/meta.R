@@ -35,7 +35,7 @@ faers_meta_doc <- function() {
         url <- sprintf(
             "%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_host
         )
-        cli::cli_alert_info("Reading html: {.url {url}}")
+        cli::cli_alert("Reading html: {.url {url}}")
         faers_cache_env[[".faers_meta_doc"]] <- xml2::read_html(url)
     }
     get(".faers_meta_doc", pos = faers_cache_env, inherits = FALSE)
