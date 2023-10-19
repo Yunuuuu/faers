@@ -2,7 +2,7 @@ faers_drug_normalize <- function(terms, athena = NULL, force = FALSE, exact = TR
     drug_normalize_by_athena(terms = terms, path = athena, force = force)
 }
 
-drug_normalize_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, search = 2, pool = 10L) {
+drug_normalize_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, search = 2, pool = 5L) {
     assert_bool(exact)
     assert_bool(approximate)
     rxnorm_map_to_rxcui(terms,
@@ -12,7 +12,7 @@ drug_normalize_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, se
     # get other drug details from rxnorm
 }
 
-rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc = NULL, srclist = NULL, search = NULL, pool = 10L) {
+rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc = NULL, srclist = NULL, search = NULL, pool = 5L) {
     if (exact) {
         cli::cli_alert("Running Exact Match")
         out <- rxnorm_findRxcuiByString(terms,
