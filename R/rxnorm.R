@@ -1,14 +1,14 @@
 rxnorm_getRxNormName <- function(terms, pool = 5L, retry = 3L) {
-    resps <- rxnorm_perform("rxcui/%s",
+    resps <- rxnorm_query("rxcui/%s",
         rxnorm_ids = terms,
         rxnorm_api_name = NULL,
         pool = pool, retry = retry
     )
-    rxnorm_return_atomic(resps, "//idGroup")
+    rxnorm_return_atomic(resps, "//name")
 }
 
 rxnorm_getDrugs <- function(terms, pool = 5L, retry = 3L) {
-    resps <- rxnorm_perform("drugs",
+    resps <- rxnorm_query("drugs",
         rxnorm_ids = terms, rxnorm_api_name = "name",
         pool = pool, retry = retry
     )
@@ -16,7 +16,7 @@ rxnorm_getDrugs <- function(terms, pool = 5L, retry = 3L) {
 }
 
 rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL, pool = 5L, retry = 3L) {
-    resps <- rxnorm_perform("approximateTerm",
+    resps <- rxnorm_query("approximateTerm",
         rxnorm_ids = terms, rxnorm_api_name = "term",
         maxEntries = max_entries, option = option,
         pool = pool, retry = retry
@@ -33,7 +33,7 @@ rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL,
 #' or normalized)
 #' @noRd
 rxnorm_findRxcuiByString <- function(terms, allsrc = NULL, srclist = NULL, search = NULL, pool = 5L, retry = 3L) {
-    resps <- rxnorm_perform("rxcui",
+    resps <- rxnorm_query("rxcui",
         rxnorm_ids = terms,
         rxnorm_api_name = "name",
         allsrc = allsrc,
@@ -43,7 +43,24 @@ rxnorm_findRxcuiByString <- function(terms, allsrc = NULL, srclist = NULL, searc
     rxnorm_return_atomic(resps, "//rxnormId")
 }
 
-# parse rxnorm resp
+########################################################
+rxnorm_getTermTypes <- function() {
+    resp <- rxnorm_perform("termtypes")
+    xml <- httr2::resp_body_xml(resp, check_type = FALSE)
+    xml2::xml_text(xml2::xml_find_all(xml, "//termType"))
+}
+
+rxnorm_getRxNormVersion <- function() {
+    resp <- rxnorm_perform("version")
+    xml <- xml2::xml_find_all(
+        httr2::resp_body_xml(resp, check_type = FALSE), "//rxnormdata"
+    )
+    xml <- xml2::xml_children(xml)
+    structure(xml2::xml_text(xml), names = xml2::xml_name(xml))
+}
+
+#########################################################
+# Parse rxnorm resp list --------------------------------
 rxnorm_return_list <- function(resps, xpath) {
     lapply(resps, rxnorm_parse_dt, xpath = xpath)
 }
@@ -73,17 +90,17 @@ rxnorm_parse_dt <- function(resp, xpath) {
     simplify_list_cols(out)[]
 }
 
-#' all values in dots should be named.
-#' @return A list of resp objects
+#' All values in dots should be named. If rxnorm_api_name is `NULL`, `path` must
+#' contain format strings used by sprintf.
+#'
+#' @return A list of resp objects of the query results from RxNorm
 #' @noRd
-rxnorm_perform <- function(path, rxnorm_ids, rxnorm_api_name = NULL, ..., pool = 5L, retry = 3L, format = "xml") {
+rxnorm_query <- function(path, rxnorm_ids, rxnorm_api_name = NULL, ..., pool = 5L, retry = 3L, format = "xml") {
     pool <- max(1L, min(pool, 20L))
     resps <- vector("list", length(rxnorm_ids))
     groups <- seq_along(resps)
     groups <- split(groups, ceiling(groups / pool))
-    if (!curl::has_internet()) {
-        cli::cli_abort("No internet")
-    }
+    assert_internet()
     bar_id <- cli::cli_progress_bar(
         name = "Querying RxNorm",
         format = "{cli::pb_bar} {cli::pb_current}/{cli::pb_total} [{cli::pb_rate}] | {cli::pb_eta_str}",
@@ -116,6 +133,16 @@ rxnorm_perform <- function(path, rxnorm_ids, rxnorm_api_name = NULL, ..., pool =
     resps
 }
 
+#########################################################
+#' @return
+#' @noRd
+rxnorm_perform <- function(path, format = "xml") {
+    assert_internet()
+    req <- rxnorm_api(path, rxnorm_id = NULL, format = format)
+    httr2::resp_check_status(httr2::req_perform(req))
+}
+
+###########################################################
 rxnorm_non_exist <- function(resp) {
     inherits(resp, "httr2_http_404")
 }
@@ -126,16 +153,19 @@ rxnorm_fail <- function(resp) {
 
 rxnorm_api <- function(path, rxnorm_id, rxnorm_api_name = NULL, ..., format = "xml") {
     req <- httr2::request(rxnorm_host)
-    if (is.null(rxnorm_api_name)) {
-        req <- httr2::req_url_path(
-            req = req, "REST",
-            sprintf("%s.%s", sprintf(path, rxnorm_id), format)
+    req <- httr2::req_url_path(req = req, "REST")
+    if (is.null(rxnorm_id)) {
+        req <- httr2::req_url_path_append(
+            req = req, sprintf("%s.%s", path, format)
+        )
+    } else if (is.null(rxnorm_api_name)) {
+        req <- httr2::req_url_path_append(
+            req = req, sprintf("%s.%s", sprintf(path, rxnorm_id), format)
         )
         req <- httr2::req_url_query(.req = req, ...)
     } else {
-        req <- httr2::req_url_path(
-            req = req, "REST",
-            sprintf("%s.%s", path, format)
+        req <- httr2::req_url_path_append(
+            req = req, sprintf("%s.%s", path, format)
         )
         req <- rlang::exec(
             httr2::req_url_query,
@@ -148,7 +178,8 @@ rxnorm_api <- function(path, rxnorm_id, rxnorm_api_name = NULL, ..., format = "x
 rxnorm_set_headers <- function(req) {
     # https://lhncbc.nlm.nih.gov/RxNav/TermsofService.html
     req <- httr2::req_headers(req, `Cache-Control` = "max-age=43200")
-    httr2::req_cache(httr2::req_throttle(req, rate = 20L),
+    httr2::req_cache(
+        httr2::req_throttle(req, rate = 20L),
         path = faers_cache_dir("rxnorm")
     )
 }
