@@ -32,8 +32,7 @@ rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc 
             if (is.null(x)) {
                 NA_character_
             } else {
-                out <- x$rxcui[[1L]]
-                out %||% NA_character_
+                x$rxcui[[1L]] %||% NA_character_
             }
         }, character(1L))
     }
