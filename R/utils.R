@@ -88,6 +88,12 @@ dir_create2 <- function(dir) {
     dir
 }
 
+assert_internet <- function(call = rlang::caller_env()) {
+    if (!curl::has_internet()) {
+        cli::cli_abort("No internet", call = call)
+    }
+}
+
 fda_host <- "https://fis.fda.gov"
 faers_file_format <- c("ascii", "xml")
 faers_file_quarters <- c("q1", "q2", "q3", "q4")
