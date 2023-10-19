@@ -77,8 +77,8 @@ rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3
     bar_id <- cli::cli_progress_bar(
         name = "Querying RxNorm",
         format = "{cli::pb_bar} {cli::pb_current}/{cli::pb_total} | ETA: {cli::pb_eta}",
-        format_done = "Querying RxNorm for {.val {cli::pb_total}} run{?s} per {pool} quer{?y/ies} in {cli::pb_elapsed}",
-        total = length(groups)
+        format_done = "Querying RxNorm for {.val {cli::pb_total}} quer{?y/ies} in {cli::pb_elapsed}",
+        total = length(resps)
     )
     for (idx in groups) {
         req_list <- lapply(terms[idx], rxnorm_api,
@@ -86,7 +86,7 @@ rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3
             ..., format = format
         )
         resps[idx] <- httr2::multi_req_perform(req_list)
-        cli::cli_progress_update(id = bar_id)
+        cli::cli_progress_update(inc = length(idx), id = bar_id)
     }
     if (retry > 0L) {
         fail <- vapply(resps, rxnorm_is_fail, logical(1))
