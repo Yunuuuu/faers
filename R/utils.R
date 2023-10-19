@@ -53,7 +53,9 @@ unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
         basename(path), "\\.zip$",
         ignore.case = ignore.case
     ))
-    utils::unzip(path, exdir = dir_create2(compress_dir), overwrite = TRUE)
+    if (is.null(utils::unzip(path, exdir = dir_create2(compress_dir), overwrite = TRUE))) {
+        cli::cli_abort("Cannot uncompress {.file {path}}")
+    }
     compress_dir
 }
 
