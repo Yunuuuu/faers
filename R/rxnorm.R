@@ -1,14 +1,23 @@
-rxnorm_getDrugs <- function(terms, pool = 10L, retry = 3L) {
+rxnorm_getRxNormName <- function(terms, pool = 5L, retry = 3L) {
+    resps <- rxnorm_perform("rxcui/%s",
+        rxnorm_ids = terms,
+        rxnorm_api_name = NULL,
+        pool = pool, retry = retry
+    )
+    rxnorm_return_atomic(resps, "//idGroup")
+}
+
+rxnorm_getDrugs <- function(terms, pool = 5L, retry = 3L) {
     resps <- rxnorm_perform("drugs",
-        query_api_id = "name",
-        terms = terms, pool = pool, retry = retry
+        rxnorm_ids = terms, rxnorm_api_name = "name",
+        pool = pool, retry = retry
     )
     rxnorm_return_list(resps, "//conceptProperties")
 }
 
-rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL, pool = 10L, retry = 3L) {
+rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL, pool = 5L, retry = 3L) {
     resps <- rxnorm_perform("approximateTerm",
-        query_api_id = "term", terms = terms,
+        rxnorm_ids = terms, rxnorm_api_name = "term",
         maxEntries = max_entries, option = option,
         pool = pool, retry = retry
     )
@@ -23,10 +32,11 @@ rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL,
 #' @param search 0: Exact match only; 1: Normalized match; 2: Best match (exact
 #' or normalized)
 #' @noRd
-rxnorm_findRxcuiByString <- function(terms, allsrc = NULL, srclist = NULL, search = NULL, pool = 10L, retry = 3L) {
+rxnorm_findRxcuiByString <- function(terms, allsrc = NULL, srclist = NULL, search = NULL, pool = 5L, retry = 3L) {
     resps <- rxnorm_perform("rxcui",
-        query_api_id = "name",
-        terms = terms, allsrc = allsrc,
+        rxnorm_ids = terms,
+        rxnorm_api_name = "name",
+        allsrc = allsrc,
         srclist = srclist, search = search,
         pool = pool, retry = retry
     )
@@ -43,15 +53,15 @@ rxnorm_return_atomic <- function(resps, xpath) {
 }
 
 rxnorm_parse_scalar <- function(resp, xpath) {
-    if (rxnorm_is_fail(resp)) {
-        return(NA)
+    if (rxnorm_fail(resp)) {
+        return(NA_character_)
     }
     xml <- httr2::resp_body_xml(resp)
     xml2::xml_text(xml2::xml_find_first(xml, xpath))
 }
 
 rxnorm_parse_dt <- function(resp, xpath) {
-    if (rxnorm_is_fail(resp)) {
+    if (rxnorm_fail(resp)) {
         return(NULL)
     }
     xml <- httr2::resp_body_xml(resp)
@@ -66,9 +76,9 @@ rxnorm_parse_dt <- function(resp, xpath) {
 #' all values in dots should be named.
 #' @return A list of resp objects
 #' @noRd
-rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3L, format = "xml") {
+rxnorm_perform <- function(path, rxnorm_ids, rxnorm_api_name = NULL, ..., pool = 5L, retry = 3L, format = "xml") {
     pool <- max(1L, min(pool, 20L))
-    resps <- vector("list", length(terms))
+    resps <- vector("list", length(rxnorm_ids))
     groups <- seq_along(resps)
     groups <- split(groups, ceiling(groups / pool))
     if (!curl::has_internet()) {
@@ -81,21 +91,23 @@ rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3
         total = length(resps)
     )
     for (idx in groups) {
-        req_list <- lapply(terms[idx], rxnorm_api,
-            path = path, query_api_id = query_api_id,
+        req_list <- lapply(rxnorm_ids[idx], rxnorm_api,
+            path = path, rxnorm_api_name = rxnorm_api_name,
             ..., format = format
         )
         resps[idx] <- httr2::multi_req_perform(req_list)
         cli::cli_progress_update(inc = length(idx), id = bar_id)
     }
     if (retry > 0L) {
-        fail <- vapply(resps, rxnorm_is_fail, logical(1))
+        fail <- vapply(resps, function(resp) {
+            !rxnorm_non_exist(resp) && rxnorm_fail(resp)
+        }, logical(1))
         if (any(fail)) {
             cli::cli_alert("Retry for {sum(fail)} quer{?y/ies}")
             resps[fail] <- Recall(
                 path = path,
-                query_api_id = query_api_id,
-                terms = terms[fail],
+                rxnorm_ids = rxnorm_ids[fail],
+                rxnorm_api_name = rxnorm_api_name,
                 ..., pool = pool, retry = retry - 1L,
                 format = format
             )
@@ -104,21 +116,41 @@ rxnorm_perform <- function(path, query_api_id, terms, ..., pool = 10L, retry = 3
     resps
 }
 
-rxnorm_is_fail <- function(resp) {
+rxnorm_non_exist <- function(resp) {
+    inherits(resp, "httr2_http_404")
+}
+
+rxnorm_fail <- function(resp) {
     inherits(resp, "error") || httr2::resp_status(resp) != 200L
 }
 
-rxnorm_api <- function(path, query_api_id, query, ..., format = "xml") {
+rxnorm_api <- function(path, rxnorm_id, rxnorm_api_name = NULL, ..., format = "xml") {
     req <- httr2::request(rxnorm_host)
-    req <- httr2::req_url_path(req, sprintf("REST/%s.%s", path, format))
-    req <- rlang::exec(
-        httr2::req_url_query,
-        .req = req, !!query_api_id := query, ...
-    )
+    if (is.null(rxnorm_api_name)) {
+        req <- httr2::req_url_path(
+            req = req, "REST",
+            sprintf("%s.%s", sprintf(path, rxnorm_id), format)
+        )
+        req <- httr2::req_url_query(.req = req, ...)
+    } else {
+        req <- httr2::req_url_path(
+            req = req, "REST",
+            sprintf("%s.%s", path, format)
+        )
+        req <- rlang::exec(
+            httr2::req_url_query,
+            .req = req, !!rxnorm_api_name := rxnorm_id, ...
+        )
+    }
+    rxnorm_set_headers(req)
+}
+
+rxnorm_set_headers <- function(req) {
     # https://lhncbc.nlm.nih.gov/RxNav/TermsofService.html
     req <- httr2::req_headers(req, `Cache-Control` = "max-age=43200")
     httr2::req_cache(httr2::req_throttle(req, rate = 20L),
         path = faers_cache_dir("rxnorm")
     )
 }
+
 rxnorm_host <- "https://rxnav.nlm.nih.gov"
