@@ -7,7 +7,7 @@
 faers_combine <- function(x) {
     assert_(x, is.list, "a list")
     l <- length(x)
-    if (length(x) == 0L) {
+    if (l == 0L) {
         cli::cli_abort("empty list")
     }
     type <- NULL
@@ -46,10 +46,10 @@ combine_faers_ascii <- function(x) {
     methods::new("FAERSascii",
         data = out,
         year = unlist(lapply(x, function(obj) obj@year),
-            use.names = FALSE
+            recursive = FALSE, use.names = FALSE
         ),
         quarter = unlist(lapply(x, function(obj) obj@quarter),
-            use.names = FALSE
+            recursive = FALSE, use.names = FALSE
         ),
         deletedCases = list_flatten(
             lapply(x, function(obj) obj@deletedCases)
@@ -64,10 +64,10 @@ combine_faers_xml <- function(x) {
             fill = TRUE, use.names = TRUE
         ),
         year = unlist(lapply(x, function(obj) obj@year),
-            use.names = FALSE
+            recursive = FALSE, use.names = FALSE
         ),
         quarter = unlist(lapply(x, function(obj) obj@quarter),
-            use.names = FALSE
+            recursive = FALSE, use.names = FALSE
         )
     )
 }
