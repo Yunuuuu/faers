@@ -34,6 +34,40 @@ meddra_hierarchy_data <- function(path) {
     out[, .SD, .SDcols = meddra_hierarchy_infos()]
 }
 
+meddra_map_code_into_names <- function(meddra_data, terms) {
+    out <- rep_len(NA_character_, length(terms))
+    for (i in c("llt", "pt")) {
+        operated_idx <- is.na(out)
+        idx <- match(
+            terms[operated_idx],
+            meddra_data[[paste(i, "code", sep = "_")]]
+        )
+        out[operated_idx] <- meddra_data[[
+            paste(i, "name", sep = "_")
+        ]][idx]
+        if (!anyNA(out)) break
+    }
+    out
+}
+
+meddra_standardize_pt <- function(terms, meddra_data) {
+    out_code <- rep_len(NA_integer_, length(terms))
+    idx <- rep_len(NA, length(terms))
+    for (i in c("llt", "pt")) {
+        operated_idx <- is.na(out_code)
+        mapped_idx <- data.table::chmatch(
+            terms[operated_idx],
+            toupper(meddra_data[[paste(i, "name", sep = "_")]])
+        )
+        out_code[operated_idx] <- meddra_data[[
+            paste(i, "code", sep = "_")
+        ]][mapped_idx]
+        idx[operated_idx] <- mapped_idx
+    }
+    out <- meddra_data[idx]
+    out[, meddra_code := as.character(out_code)]
+}
+
 meddra_hierarchy_infos <- function() {
     out <- paste(
         rep(c("llt", "pt", "hlt", "hlgt", "soc"), each = 2L),
@@ -74,7 +108,8 @@ meddra_names <- function(field) {
         ),
         hlgt_hlt = c("hlgt_code", "hlt_code"),
         soc = c(
-            "soc_code", "soc_name", "soc_abbrev", "soc_whoart_code", "soc_harts_code", "soc_costart_sym", "soc_icd9_code",
+            "soc_code", "soc_name", "soc_abbrev", "soc_whoart_code",
+            "soc_harts_code", "soc_costart_sym", "soc_icd9_code",
             "soc_icd9cm_code", "soc_icd10_code", "soc_jart_code"
         ),
         soc_hlgt = c("soc_code", "hlgt_code"),

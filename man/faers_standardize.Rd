@@ -22,3 +22,6 @@ A \link{FAERSascii} object.
 \description{
 Standardize FAERS Quarterly Data for Preferred Term and drug names
 }
+\seealso{
+\url{https://www.meddra.org/}
+}
