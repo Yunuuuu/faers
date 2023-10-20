@@ -43,7 +43,6 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
         object@data$reac,
         meddra_standardize_pt(object@data$reac$cleaned_pt, meddra_data)
     )
-    object@data$reac[is.na(meddra_code), sort(unique(pt))]
     object@data$reac[, cleaned_pt := meddra_map_code_into_names(
         meddra_data,
         terms = meddra_code
