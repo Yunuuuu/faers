@@ -22,3 +22,6 @@ A \link[data.table:data.table]{data.table} object.
 \description{
 Standardize FAERS Quarterly Data for PT and drug names
 }
+\note{
+For \code{FAERSascii} method, this function will modify object in place.
+}
