@@ -62,7 +62,7 @@ unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
 locate_dir <- function(path, pattern, ignore.case = TRUE) {
     path <- list.dirs(path, recursive = FALSE)
     path <- path[str_detect(basename(path), pattern, ignore.case = ignore.case)]
-    if (!dir.exists(path)) {
+    if (!length(path) || !dir.exists(path)) {
         cli::cli_abort("Cannot locate {.field {pattern}} directory in {.path {path}}")
     }
     path
