@@ -134,7 +134,6 @@ rxnorm_query <- function(path, rxnorm_ids, rxnorm_api_name = NULL, ..., pool = 5
 }
 
 #########################################################
-#' @return
 #' @noRd
 rxnorm_perform <- function(path, format = "xml") {
     assert_internet()
