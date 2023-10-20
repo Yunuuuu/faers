@@ -68,6 +68,10 @@ methods::setMethod("faers_dedup", "ANY", function(object) {
 # Perform string aggregation operations
 
 dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
+    if (!any("meddra_code" == names(indi)) ||
+        !any("meddra_code" == names(indi))) {
+            cli::cli_abort("{.cls FAERS} object must be standardized firstly using {.fn faers_standardize}")
+    }
     # As recommended by the FDA, a deduplication step was performed to retain
     # the most recent report for each case with the same case identifier
     # nolint start
@@ -88,10 +92,11 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
         by = "primaryid"
     ][out, on = "primaryid"]
     # meddra_code: indi_pt
-    # [!meddra_code %in% c(10070592L, 10057097L)]
-    out <- indi[
-        order(indi_drug_seq, indi_pt),
-        list(aligned_indi = paste0(indi_pt, collapse = "/")),
+    # 10070592	Product used for unknown indication
+    # 10057097	Drug use for unknown indication
+    out <- indi[!meddra_code %in% c("10070592", "10057097")][
+        order(indi_drug_seq, meddra_code),
+        list(aligned_indi = paste0(meddra_code, collapse = "/")),
         by = "primaryid"
     ][out, on = "primaryid"]
     out <- ther[order(dsg_drug_seq, start_dt),
@@ -99,8 +104,8 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
         by = "primaryid"
     ][out, on = "primaryid"]
     # meddra_code: pt
-    out <- reac[order(pt),
-        list(aligned_reac = paste0(pt, collapse = "/")),
+    out <- reac[order(meddra_code),
+        list(aligned_reac = paste0(meddra_code, collapse = "/")),
         by = "primaryid"
     ][out, on = "primaryid"]
 
@@ -152,6 +157,6 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
 }
 
 utils::globalVariables(c(
-    "drug_seq", "drugname", "indi_pt", "start_dt",
-    "indi_drug_seq", "dsg_drug_seq", "pt", "primaryid", "caseversion", "fda_dt", "i_f_code", "event_dt", "year", "caseid", "age_in_years_round"
+    "drug_seq", "drugname", "indi_meddra_code", "start_dt",
+    "indi_drug_seq", "dsg_drug_seq", "primaryid", "caseversion", "fda_dt", "i_f_code", "event_dt", "year", "caseid", "age_in_years_round"
 ))
