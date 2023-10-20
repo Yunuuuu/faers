@@ -5,6 +5,7 @@ unify_ascii <- function(data, field, year, quarter) {
     if (is_from_laers(year, quarter)) {
         data.table::setnames(data, "isr", "primaryid")
     }
+    data[, primaryid := as.character(primaryid)]
     switch(field,
         demo = unify_ascii_demo(data, year, quarter),
         ther = unify_ascii_ther(data, year, quarter),
@@ -28,6 +29,7 @@ unify_ascii_demo <- function(data, year, quarter) {
         # nolint start
         data[, caseversion := 0L]
     }
+    data[, caseid := as.character(caseid)]
     # AGE FILED TO YEARS
     data[, age := as.numeric(age)]
     data[, age_in_years := data.table::fcase(
