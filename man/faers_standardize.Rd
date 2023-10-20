@@ -3,7 +3,7 @@
 \name{faers_standardize}
 \alias{faers_standardize}
 \alias{faers_standardize,FAERSascii-method}
-\title{Standardize FAERS Quarterly Data for PT and drug names}
+\title{Standardize FAERS Quarterly Data for Preferred Term and drug names}
 \usage{
 faers_standardize(object, ...)
 
@@ -17,11 +17,8 @@ faers_standardize(object, ...)
 \item{meddra_path}{A string, define the path of MedDRA directory.}
 }
 \value{
-A \link[data.table:data.table]{data.table} object.
+A \link{FAERSascii} object.
 }
 \description{
-Standardize FAERS Quarterly Data for PT and drug names
-}
-\note{
-For \code{FAERSascii} method, this function will modify object in place.
+Standardize FAERS Quarterly Data for Preferred Term and drug names
 }

@@ -20,6 +20,29 @@ load_meddra <- function(path, use = NULL) {
     out
 }
 
+meddra_hierarchy_data <- function(path) {
+    meddra_data <- load_meddra(path, use = c(
+        "llt", "pt", "hlt_pt", "hlt", "hlgt_hlt",
+        "hlgt", "soc_hlgt", "soc"
+    ))
+    out <- Reduce(function(x, y) {
+        merge(x, y,
+            by = intersect(names(x), names(y)),
+            allow.cartesian = TRUE, all = TRUE
+        )
+    }, meddra_data)
+    out[, .SD, .SDcols = meddra_hierarchy_infos()]
+}
+
+meddra_hierarchy_infos <- function() {
+    out <- paste(
+        rep(c("llt", "pt", "hlt", "hlgt", "soc"), each = 2L),
+        rep(c("code", "name"), times = 5L),
+        sep = "_"
+    )
+    c(out, "soc_abbrev")
+}
+
 meddra_fields <- c(
     "llt", "pt", "hlt", "hlt_pt", "hlgt", "hlgt_hlt",
     "soc", "soc_hlgt", "mdhier", "intl_ord", "smq_content", "smq_list"
