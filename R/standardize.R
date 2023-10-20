@@ -1,8 +1,8 @@
-faers_drug_normalize <- function(terms, athena = NULL, force = FALSE, exact = TRUE, approximate = TRUE, search = 2L) {
-    drug_normalize_by_athena(terms = terms, path = athena, force = force)
+faers_drug_standardize <- function(terms, athena = NULL, force = FALSE, exact = TRUE, approximate = TRUE, search = 2L) {
+    drug_standardize_by_athena(terms = terms, path = athena, force = force)
 }
 
-drug_normalize_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, search = 2, pool = 5L) {
+drug_standardize_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, search = 2, pool = 5L) {
     assert_bool(exact)
     assert_bool(approximate)
     rxnorm_map_to_rxcui(terms,
@@ -39,7 +39,7 @@ rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc 
     out
 }
 
-drug_normalize_by_athena <- function(terms, path = NULL, force = FALSE) {
+drug_standardize_by_athena <- function(terms, path = NULL, force = FALSE) {
     data <- athena_parse(
         c("concept", "concept_synonym"),
         path = path, force = force
