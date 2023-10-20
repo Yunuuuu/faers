@@ -27,7 +27,11 @@ methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_
             object@dedup <- object@dedup[!caseid %in% deleted_cases]
         }
     }
-    faers_keep(object, primaryid = object@dedup$primaryid)
+    match_data <- object@dedup[, c("year", "quarter", "primaryid")]
+    object@data <- lapply(object@data, function(x) {
+        x[match_data, on = c("year", "quarter", "primaryid")]
+    })
+    object
 })
 
 #' @export
@@ -70,7 +74,7 @@ methods::setMethod("faers_dedup", "ANY", function(object) {
 dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     if (!any("meddra_code" == names(indi)) ||
         !any("meddra_code" == names(reac))) {
-            cli::cli_abort("{.cls FAERS} object must be standardized firstly using {.fn faers_standardize}")
+        cli::cli_abort("{.cls FAERS} object must be standardized firstly using {.fn faers_standardize}")
     }
     # As recommended by the FDA, a deduplication step was performed to retain
     # the most recent report for each case with the same case identifier
@@ -78,10 +82,10 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     cli::cli_alert("deduplication from the same source by retain the most recent report")
     out <- demo[
         order(
-            -primaryid, -year, -quarter,
+            -year, -quarter,
             -caseversion, -fda_dt, -i_f_code, -event_dt
         ), .SD[1L],
-        by = "caseid"
+        by = "primaryid"
     ]
     # collapse all used drugs, indi, ther states, use it as a whole to identify
     # same cases.
