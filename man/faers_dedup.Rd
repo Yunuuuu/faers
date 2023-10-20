@@ -24,7 +24,7 @@ faers_dedup(object, ...)
 \link[=FAERS-class]{deletedCases} from the final result.}
 }
 \value{
-A \link[data.table:data.table]{data.table} object.
+A \link{FAERSascii} object.
 }
 \description{
 Tidy up FAERS Quarterly Data with duplicate records removed

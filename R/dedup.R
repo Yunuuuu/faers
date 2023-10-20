@@ -1,7 +1,7 @@
 #' Tidy up FAERS Quarterly Data with duplicate records removed
 #' @param object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods.
-#' @return A [data.table][data.table::data.table] object.
+#' @return A [FAERSascii] object.
 #' @export
 #' @name faers_dedup
 methods::setGeneric("faers_dedup", function(object, ...) {
