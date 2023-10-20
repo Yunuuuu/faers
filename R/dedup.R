@@ -90,28 +90,29 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # collapse all used drugs, indi, ther states, use it as a whole to identify
     # same cases.
     # match drug, indi, and ther data.
+    common_keys <- c("year", "quarter", "primaryid")
     cli::cli_alert("merging `drug`, `indi`, `ther`, and `reac` data")
     out <- drug[order(drug_seq),
         list(aligned_drugs = paste0(drugname, collapse = "/")),
-        by = "primaryid"
-    ][out, on = "primaryid"]
+        by = common_keys
+    ][out, on = common_keys]
     # meddra_code: indi_pt
     # 10070592	Product used for unknown indication
     # 10057097	Drug use for unknown indication
     out <- indi[!meddra_code %in% c("10070592", "10057097")][
         order(indi_drug_seq, meddra_code),
         list(aligned_indi = paste0(meddra_code, collapse = "/")),
-        by = "primaryid"
-    ][out, on = "primaryid"]
+        by = common_keys
+    ][out, on = common_keys]
     out <- ther[order(dsg_drug_seq, start_dt),
         list(aligned_start_dt = paste0(start_dt, collapse = "/")),
-        by = "primaryid"
-    ][out, on = "primaryid"]
+        by = common_keys
+    ][out, on = common_keys]
     # meddra_code: pt
     out <- reac[order(meddra_code),
         list(aligned_reac = paste0(meddra_code, collapse = "/")),
-        by = "primaryid"
-    ][out, on = "primaryid"]
+        by = common_keys
+    ][out, on = common_keys]
 
     #  consider two cases to be the same if they had a complete match of the
     #  eight criteria which are gender, age, reporting country, event date,
