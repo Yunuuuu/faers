@@ -47,10 +47,10 @@ faers_parse <- function(path, format = NULL, year = NULL, quarter = NULL, compre
 parse_ascii <- function(path, year, quarter) {
     files <- locate_files(locate_dir(path, "^ascii$"), "\\.txt$")
     # for 2018q1 demo file, there exists a suffix "_new"
-    fields <- str_remove(basename(files), "\\d+q\\d(_new)?\\.txt$",
+    fields <- tolower(str_remove(
+        basename(files), "\\d+q\\d(_new)?\\.txt$",
         ignore.case = TRUE
-    )
-    fields <- tolower(fields)
+    ))
     idx <- match(faers_ascii_file_fields, fields)
     if (anyNA(idx)) {
         cli::cli_abort(sprintf(
@@ -113,10 +113,13 @@ read_ascii <- function(file, ...) {
     # the last columns often messed by the presence OF '$'.
     # AS PART OF THE ROWTERMINATOR IN DATA ROWS BUT NOT IN THE HEADER ROW
     # (LAERS)
-    vcolumns <- str_subset(names(out), "^V\\d+$")
-    out[, (vcolumns) := lapply(.SD, function(x) {
-        if (all(is.na(x))) NULL else x
-    }), .SDcols = vcolumns]
+    last_col <- names(out)[ncol(out)]
+    if (str_detect(last_col, "^V\\d+$")) {
+        out[, (last_col) := lapply(.SD, function(x) {
+            if (all(is.na(x))) NULL else x
+        }), .SDcols = last_col]
+    }
+    out
 }
 
 safely_read_ascii <- function(file, year, quarter) {
