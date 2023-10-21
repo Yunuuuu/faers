@@ -8,7 +8,7 @@
 #' "drug_seq" will be aligned as well. Only the initial instance, as specified
 #' in the `use` argument, of the "caseid" column will be preserved. Note: `use`
 #' shall be organized in the subsequent sequence: 'demo', 'drug', 'indi',
-#' 'ther', 'reac', 'rpsr', and 'outc'.
+#' 'reac', 'ther', 'rpsr', and 'outc'.
 #'
 #' @return A [data.table][data.table::data.table] object.
 #' @export
@@ -73,9 +73,12 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL) {
         if (any("caseid" == names(y))) {
             y <- y[, .SD, .SDcols = !"caseid"]
         }
+        # y[x, on = intersect(names(x), names(y)),
+        #     allow.cartesian = TRUE
+        # ]
         merge(x, y,
-            by = setdiff(intersect(names(x), names(y))),
-            allow.cartesian = TRUE, all = TRUE
+            by = intersect(names(x), names(y)),
+            allow.cartesian = TRUE, all.x = TRUE, all.y = FALSE
         )
     }, lst)
 })

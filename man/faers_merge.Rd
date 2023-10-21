@@ -37,5 +37,5 @@ Each pair of field data are merged based on "year", "quarter" and
 "drug_seq" will be aligned as well. Only the initial instance, as specified
 in the \code{use} argument, of the "caseid" column will be preserved. Note: \code{use}
 shall be organized in the subsequent sequence: 'demo', 'drug', 'indi',
-'ther', 'reac', 'rpsr', and 'outc'.
+'reac', 'ther', 'rpsr', and 'outc'.
 }
