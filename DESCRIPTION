@@ -14,6 +14,7 @@ Imports:
     curl,
     data.table,
     httr2,
+    MCMCpack,
     methods,
     rappdirs,
     rlang (>= 1.1.0),
