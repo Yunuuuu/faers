@@ -8,7 +8,7 @@
 #' "drug_seq" will be aligned as well. `use` shall be organized in the
 #' subsequent sequence: 'demo', 'drug', 'indi', 'reac', 'ther', 'rpsr', and
 #' 'outc' and the merging sequence will correspondingly adhere to this order.
-#' Only the initial instance, of the "caseid" column will be preserved. 
+#' Only the initial instance, of the "caseid" column will be preserved.
 #'
 #' @return A [data.table][data.table::data.table] object.
 #' @export
@@ -37,7 +37,7 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL, all
     if (length(use) == 1L) {
         return(object@data[[use]])
     }
-
+    lst <- object@data[use]
     # check if drug_seq should be matched
     if (any("indi" == use) && any(use %in% c("reac", "ther", "drug"))) {
         lst$indi <- data.table::copy(lst$indi)
