@@ -91,14 +91,10 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # nolint start
     cli::cli_alert("deduplication from the same source by retain the most recent report")
 
-    # Although `primaryid` in FAERS has been designed to be unique, we have
-    # found some duplicated `primaryid` in `demo`, so we remove this by keeping
-    # the latest one
-    out <- demo[order(-year, -quarter, -fda_dt, -i_f_code, -event_dt),
-        .SD[1L],
-        by = "primaryid"
-    ]
-
+    # There are also duplicate reports where the same report was submitted by a
+    # consumer and by the sponsor. we have found some duplicated `primaryid`
+    # with different caseid in `demo`, so we remove this by keeping the latest
+    # one
     # While the previous Legacy AERS (LAERS) database was Individual Safety
     # Report (ISR) based, the new FAERS database is Case/Version based. In
     # LAERS, a Case consisted of one or more ISRs (Initial and Follow-up
@@ -107,16 +103,19 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # current information about a particular case. (For example, Follow-up 1
     # would have the most up-to-date information about a case containing both an
     # Initial ISR and a Follow-up 1 ISR).
-
-    # then we keep the latest informations for the patients
-    # Such as caseid "11232882" in 2017q2 2019q2, 2019q3
-    out <- demo[
+    out <- demo[order(-year, -quarter, -fda_dt, -i_f_code, -event_dt),
+        .SD[1L],
+        by = "primaryid"
+    ][
+        # then we keep the latest informations for the patients
+        # Such as caseid "11232882" in 2017q2 2019q2, 2019q3
         order(
             -year, -quarter,
             -caseversion, -fda_dt, -i_f_code, -event_dt
         ), .SD[1L],
         by = "caseid"
     ]
+
     # collapse all used drugs, indi, ther states, use it as a whole to identify
     # same cases.
     # match drug, indi, and ther data.
