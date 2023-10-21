@@ -9,7 +9,7 @@
 \usage{
 faers_merge(object, ...)
 
-\S4method{faers_merge}{FAERSascii}(object, use = NULL)
+\S4method{faers_merge}{FAERSascii}(object, use = NULL, all = TRUE, all.x = all, all.y = all)
 
 \S4method{faers_merge}{FAERSxml}(object)
 
@@ -23,6 +23,16 @@ faers_merge(object, ...)
 \item{use}{A character vector specifying the fields to use. If \code{NULL}, all
 fields will be used. Note: You'd better only merge necessary data, otherwise
 all fields will consume a lot of memory.}
+
+\item{all}{logical; \code{all = TRUE} is shorthand to save setting both
+\code{all.x = TRUE} and \code{all.y = TRUE}.}
+
+\item{all.x}{logical; if \code{TRUE}, rows from \code{x} which have no matching row
+in \code{y} are included. These rows will have 'NA's in the columns that are usually
+filled with values from \code{y}. The default is \code{FALSE} so that only rows with
+data from both \code{x} and \code{y} are included in the output.}
+
+\item{all.y}{logical; analogous to \code{all.x} above.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.
@@ -34,8 +44,8 @@ Merge all FAERS field data into one
 Each pair of field data are merged based on "year", "quarter" and
 "primaryid". In cases where any pair of data contains information related to
 "drug_seq" elements, such as "drug_seq", "indi_drug_seq", or "dsg_drug_seq",
-"drug_seq" will be aligned as well. Only the initial instance, as specified
-in the \code{use} argument, of the "caseid" column will be preserved. Note: \code{use}
-shall be organized in the subsequent sequence: 'demo', 'drug', 'indi',
-'reac', 'ther', 'rpsr', and 'outc'.
+"drug_seq" will be aligned as well. \code{use} shall be organized in the
+subsequent sequence: 'demo', 'drug', 'indi', 'reac', 'ther', 'rpsr', and
+'outc' and the merging sequence will correspondingly adhere to this order.
+Only the initial instance, of the "caseid" column will be preserved.
 }

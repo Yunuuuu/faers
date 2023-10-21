@@ -5,10 +5,10 @@
 #' Each pair of field data are merged based on "year", "quarter" and
 #' "primaryid". In cases where any pair of data contains information related to
 #' "drug_seq" elements, such as "drug_seq", "indi_drug_seq", or "dsg_drug_seq",
-#' "drug_seq" will be aligned as well. Only the initial instance, as specified
-#' in the `use` argument, of the "caseid" column will be preserved. Note: `use`
-#' shall be organized in the subsequent sequence: 'demo', 'drug', 'indi',
-#' 'reac', 'ther', 'rpsr', and 'outc'.
+#' "drug_seq" will be aligned as well. `use` shall be organized in the
+#' subsequent sequence: 'demo', 'drug', 'indi', 'reac', 'ther', 'rpsr', and
+#' 'outc' and the merging sequence will correspondingly adhere to this order.
+#' Only the initial instance, of the "caseid" column will be preserved. 
 #'
 #' @return A [data.table][data.table::data.table] object.
 #' @export
@@ -20,10 +20,11 @@ methods::setGeneric("faers_merge", function(object, ...) {
 #' @param use A character vector specifying the fields to use. If `NULL`, all
 #' fields will be used. Note: You'd better only merge necessary data, otherwise
 #' all fields will consume a lot of memory.
+#' @inheritParams data.table::merge.data.table
 #' @export
 #' @method faers_merge FAERSascii
 #' @rdname faers_merge
-methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL) {
+methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL, all = TRUE, all.x = all, all.y = all) {
     assert_inclusive(use, faers_ascii_file_fields, null_ok = TRUE)
     if (is.null(use)) {
         use <- faers_ascii_file_fields
@@ -78,7 +79,8 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL) {
         # ]
         merge(x, y,
             by = intersect(names(x), names(y)),
-            allow.cartesian = TRUE, all.x = TRUE, all.y = FALSE
+            allow.cartesian = TRUE, sort = FALSE,
+            all.x = all.x, all.y = all.y
         )
     }, lst)
 })
