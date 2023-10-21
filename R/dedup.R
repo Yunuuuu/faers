@@ -27,10 +27,20 @@ methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_
             object@dedup <- object@dedup[!caseid %in% deleted_cases]
         }
     }
-    match_data <- object@dedup[, c("year", "quarter", "primaryid")]
+    ..__matched_data__.. <- object@dedup[, c("year", "quarter", "primaryid")]
     object@data <- lapply(object@data, function(x) {
-        x[match_data, on = c("year", "quarter", "primaryid")]
+        x[..__matched_data__.., on = c("year", "quarter", "primaryid")]
     })
+    # ..__matched_ids__.. <- unique(..__matched_data__..$primaryid)
+    # # we keep the latest demographic information for the patients
+    # object@data$demo <- object@data$demo[
+    #     ..__matched_data__..,
+    #     on = c("year", "quarter", "primaryid")
+    # ]
+    # # we keep all other information for the patients
+    # for (i in setdiff(faers_ascii_file_fields, "demo")) {
+    #     object@data[[i]] <- object@data[[i]][primaryid %in% ..__matched_ids__..]
+    # }
     object
 })
 
@@ -80,12 +90,32 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # the most recent report for each case with the same case identifier
     # nolint start
     cli::cli_alert("deduplication from the same source by retain the most recent report")
+
+    # Although `primaryid` in FAERS has been designed to be unique, we have
+    # found some duplicated `primaryid` in `demo`, so we remove this by keeping
+    # the latest one
+    out <- demo[order(-year, -quarter, -fda_dt, -i_f_code, -event_dt),
+        .SD[1L],
+        by = "primaryid"
+    ]
+
+    # While the previous Legacy AERS (LAERS) database was Individual Safety
+    # Report (ISR) based, the new FAERS database is Case/Version based. In
+    # LAERS, a Case consisted of one or more ISRs (Initial and Follow-up
+    # reports), and each ISR number represented a separate version of a case. A
+    # case could contain multiple ISRs, and the latest ISR represented the most
+    # current information about a particular case. (For example, Follow-up 1
+    # would have the most up-to-date information about a case containing both an
+    # Initial ISR and a Follow-up 1 ISR).
+
+    # then we keep the latest informations for the patients
+    # Such as caseid "11232882" in 2017q2 2019q2, 2019q3
     out <- demo[
         order(
-            -year, -quarter,
+            -primaryid, -year, -quarter,
             -caseversion, -fda_dt, -i_f_code, -event_dt
         ), .SD[1L],
-        by = "primaryid"
+        by = "caseid"
     ]
     # collapse all used drugs, indi, ther states, use it as a whole to identify
     # same cases.
