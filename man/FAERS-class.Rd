@@ -85,8 +85,9 @@ Other arguments passed to \code{.fn}.}
 \item{flatten}{If \code{TRUE}, will flatten the \code{deletedCases} list.}
 
 \item{field}{A string indicates the FAERS fields data applied with \code{.fn} to
-extract primaryid. Only values "demo", "drug", "indi", "ther", "reac",
-"rpsr", and "outc" can be used.}
+extract primaryid. If \code{NULL}, the object will be passed to \code{.fn} directly.
+For string, only values "demo", "drug", "indi", "ther", "reac", "rpsr", and
+"outc" can be used.}
 
 \item{primaryid}{An atomic character or integer specifies the reports to
 keep. If \code{NULL}, will do nothing.}

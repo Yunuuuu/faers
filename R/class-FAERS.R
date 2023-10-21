@@ -298,8 +298,9 @@ methods::setGeneric("faers_filter", function(object, ...) {
 })
 
 #' @param field A string indicates the FAERS fields data applied with `.fn` to
-#' extract primaryid. Only values "demo", "drug", "indi", "ther", "reac",
-#' "rpsr", and "outc" can be used.
+#' extract primaryid. If `NULL`, the object will be passed to `.fn` directly.
+#' For string, only values "demo", "drug", "indi", "ther", "reac", "rpsr", and
+#' "outc" can be used.
 #' @param .fn A function or formula.
 #'
 #'   If a **function**, it is used as is.
@@ -319,7 +320,11 @@ methods::setGeneric("faers_filter", function(object, ...) {
 #' @method faers_filter FAERSascii
 #' @rdname FAERS-class
 methods::setMethod("faers_filter", "FAERSascii", function(object, field, .fn, ...) {
-    data <- faers_get(object, field = field)
+    if (is.null(field)) {
+        data <- object
+    } else {
+        data <- faers_get(object, field = field)
+    }
     ids <- rlang::as_function(.fn)(data, ...)
     if (!(is.numeric(ids) || is.character(ids))) {
         cli::cli_abort("{.arg .fn} must return an atomic integer or character")
