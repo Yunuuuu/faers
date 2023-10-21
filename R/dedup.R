@@ -112,7 +112,7 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # Such as caseid "11232882" in 2017q2 2019q2, 2019q3
     out <- demo[
         order(
-            -primaryid, -year, -quarter,
+            -year, -quarter,
             -caseversion, -fda_dt, -i_f_code, -event_dt
         ), .SD[1L],
         by = "caseid"
