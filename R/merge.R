@@ -1,6 +1,15 @@
 #' Merge all FAERS field data into one
 #' @param object A [FAERSascii] or [FAERSxml] object.
 #' @param ... Other arguments passed to specific methods.
+#' @details
+#' Each pair of field data are merged based on "year", "quarter" and
+#' "primaryid". In cases where any pair of data contains information related to
+#' "drug_seq" elements, such as "drug_seq", "indi_drug_seq", or "dsg_drug_seq",
+#' "drug_seq" will be aligned as well. Only the initial instance, as specified
+#' in the `use` argument, of the "caseid" column will be preserved. Note: `use`
+#' shall be organized in the subsequent sequence: 'demo', 'drug', 'indi',
+#' 'ther', 'reac', 'rpsr', and 'outc'.
+#'
 #' @return A [data.table][data.table::data.table] object.
 #' @export
 #' @name faers_merge
@@ -21,23 +30,30 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL) {
     } else {
         use <- intersect(faers_ascii_file_fields, use)
     }
-    lst <- object@data[use]
+
+    # for LAERS, caseid only exist in `demo` data.
+    # So we just keep the caseid of `demo`
+    if (length(use) == 1L) {
+        return(object@data[[use]])
+    }
 
     # check if drug_seq should be matched
     if (any("indi" == use) && any(use %in% c("reac", "ther", "drug"))) {
         lst$indi <- data.table::copy(lst$indi)
     }
     if (all(c("indi", "reac") %in% use)) {
-        data.table::setnames(
-            lst$indi,
+        meddra_columns <- c(
             meddra_hierarchy_infos(meddra_hierarchy_fields),
+            "meddra_hierarchy", "meddra_code", "meddra_pt"
+        )
+        data.table::setnames(
+            lst$indi, meddra_columns,
             function(x) paste("indi", x, sep = "_"),
             skip_absent = TRUE
         )
         lst$reac <- data.table::copy(lst$reac)
         data.table::setnames(
-            lst$reac,
-            meddra_hierarchy_infos(meddra_hierarchy_fields),
+            lst$reac, meddra_columns,
             function(x) paste("reac", x, sep = "_"),
             skip_absent = TRUE
         )
@@ -54,8 +70,11 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL) {
         }
     }
     Reduce(function(x, y) {
+        if (any("caseid" == names(y))) {
+            y <- y[, .SD, .SDcols = !"caseid"]
+        }
         merge(x, y,
-            by = setdiff(intersect(names(x), names(y)), "caseid"),
+            by = setdiff(intersect(names(x), names(y))),
             allow.cartesian = TRUE, all = TRUE
         )
     }, lst)

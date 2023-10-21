@@ -30,3 +30,12 @@ A \link[data.table:data.table]{data.table} object.
 \description{
 Merge all FAERS field data into one
 }
+\details{
+Each pair of field data are merged based on "year", "quarter" and
+"primaryid". In cases where any pair of data contains information related to
+"drug_seq" elements, such as "drug_seq", "indi_drug_seq", or "dsg_drug_seq",
+"drug_seq" will be aligned as well. Only the initial instance, as specified
+in the \code{use} argument, of the "caseid" column will be preserved. Note: \code{use}
+shall be organized in the subsequent sequence: 'demo', 'drug', 'indi',
+'ther', 'reac', 'rpsr', and 'outc'.
+}
