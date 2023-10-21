@@ -2,7 +2,7 @@
 #' @param object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods.
 #' @return A [FAERSascii] object.
-#' @seealso 
+#' @seealso
 #' <https://www.meddra.org/>
 #' @export
 #' @name faers_standardize
@@ -30,11 +30,7 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
         object@data$indi,
         meddra_standardize_pt(object@data$indi$cleaned_pt, meddra_data)
     )
-    object@data$indi[, cleaned_pt := meddra_map_code_into_names(
-        meddra_data,
-        terms = meddra_code
-    )]
-
+    object@data$indi[, cleaned_pt := NULL]
     cli::cli_alert("standardize {.field Preferred Term} in reac")
     object@data$reac$cleaned_pt <- clean_reac_pt(
         object@data$reac$pt, meddra_data
@@ -43,10 +39,7 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
         object@data$reac,
         meddra_standardize_pt(object@data$reac$cleaned_pt, meddra_data)
     )
-    object@data$reac[, cleaned_pt := meddra_map_code_into_names(
-        meddra_data,
-        terms = meddra_code
-    )]
+    object@data$reac[, cleaned_pt := NULL]
     object
 })
 
@@ -142,7 +135,7 @@ clean_indi_pt <- function(x, meddra_data) {
     x[operated_idx] <- meddra_map_code_into_names(meddra_data,
         terms = code[operated_idx]
     )
-    toupper(x)
+    x
 }
 
 clean_reac_pt <- function(x, meddra_data) {
@@ -196,15 +189,15 @@ clean_reac_pt <- function(x, meddra_data) {
     x[operated_idx] <- meddra_map_code_into_names(meddra_data,
         terms = code[operated_idx]
     )
-    toupper(x)
+    x
 }
 
 ########################################################
 faers_standardize_drug <- function(terms, athena = NULL, force = FALSE, exact = TRUE, approximate = TRUE, search = 2L) {
-    standardize_drug_by_athena(terms = terms, path = athena, force = force)
+    athena_standardize_drug(terms = terms, path = athena, force = force)
 }
 
-standardize_drug_by_rxnorm <- function(terms, exact = TRUE, approximate = TRUE, search = 2, pool = 5L) {
+rxnorm_standardize_drug <- function(terms, exact = TRUE, approximate = TRUE, search = 2, pool = 5L) {
     assert_bool(exact)
     assert_bool(approximate)
     rxnorm_map_to_rxcui(terms,
@@ -241,7 +234,7 @@ rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc 
     out
 }
 
-standardize_drug_by_athena <- function(terms, path = NULL, force = FALSE) {
+athena_standardize_drug <- function(terms, path = NULL, force = FALSE) {
     data <- athena_parse(
         c("concept", "concept_synonym"),
         path = path, force = force

@@ -4,7 +4,7 @@ load_meddra <- function(path, use = NULL) {
         basename(files), "\\.asc$",
         ignore.case = TRUE
     ))
-    use <- use %||% meddra_fields
+    use <- use %||% meddra_full_fields
     idx <- match(use, fields)
     if (anyNA(idx)) {
         cli::cli_abort(sprintf(
@@ -31,12 +31,12 @@ meddra_hierarchy_data <- function(path) {
             allow.cartesian = TRUE, all = TRUE
         )
     }, meddra_data)
-    out[, .SD, .SDcols = meddra_hierarchy_infos()]
+    out[, .SD, .SDcols = meddra_hierarchy_infos(meddra_hierarchy_fields)]
 }
 
-meddra_map_code_into_names <- function(meddra_data, terms) {
+meddra_map_code_into_names <- function(meddra_data, terms, use = c("llt", "pt")) {
     out <- rep_len(NA_character_, length(terms))
-    for (i in c("llt", "pt")) {
+    for (i in use) {
         operated_idx <- is.na(out)
         idx <- match(
             terms[operated_idx],
@@ -50,34 +50,57 @@ meddra_map_code_into_names <- function(meddra_data, terms) {
     out
 }
 
-meddra_standardize_pt <- function(terms, meddra_data) {
+meddra_standardize_pt <- function(terms, meddra_data, use = c("llt", "pt")) {
+    # ignore letter case
+    terms <- toupper(terms)
+    # prepare data
+    pt_from <- rep_len(NA_character_, length(terms))
     out_code <- rep_len(NA_integer_, length(terms))
-    idx <- rep_len(NA, length(terms))
-    for (i in c("llt", "pt")) {
+    idx <- rep_len(NA_integer_, length(terms))
+    # order `use` based on the order in `meddra_hierarchy_fields`
+    use <- intersect(meddra_hierarchy_fields, use)
+    for (i in use) {
         operated_idx <- is.na(out_code)
         mapped_idx <- data.table::chmatch(
             terms[operated_idx],
             toupper(meddra_data[[paste(i, "name", sep = "_")]])
         )
+        pt_from[operated_idx] <- i
         out_code[operated_idx] <- meddra_data[[
             paste(i, "code", sep = "_")
         ]][mapped_idx]
         idx[operated_idx] <- mapped_idx
+        if (!anyNA(idx)) break
     }
     out <- meddra_data[idx]
+    # nolint start
+    out[, meddra_hierarchy := pt_from]
     out[, meddra_code := as.character(out_code)]
+    out[, meddra_pt := meddra_map_code_into_names(meddra_data, meddra_code)]
+    # nolint end
+
+    # remove the low meddra hierarchy fields
+    deleted_columns <- meddra_hierarchy_infos(
+        use[-length(use)],
+        add_soc_abbrev = FALSE
+    )
+    out[, .SD, .SDcols = !deleted_columns]
 }
 
-meddra_hierarchy_infos <- function() {
-    out <- paste(
-        rep(c("llt", "pt", "hlt", "hlgt", "soc"), each = 2L),
+meddra_hierarchy_infos <- function(use, add_soc_abbrev = TRUE) {
+    out <- paste(rep(use, each = 2L),
         rep(c("code", "name"), times = 5L),
         sep = "_"
     )
-    c(out, "soc_abbrev")
+    if (add_soc_abbrev) {
+        c(out, "soc_abbrev")
+    } else {
+        out
+    }
 }
 
-meddra_fields <- c(
+meddra_hierarchy_fields <- c("llt", "pt", "hlt", "hlgt", "soc")
+meddra_full_fields <- c(
     "llt", "pt", "hlt", "hlt_pt", "hlgt", "hlgt_hlt",
     "soc", "soc_hlgt", "mdhier", "intl_ord", "smq_content", "smq_list"
 )
@@ -131,3 +154,5 @@ meddra_names <- function(field) {
         )
     )
 }
+
+utils::globalVariables(c("meddra_hierarchy", "meddra_pt"))
