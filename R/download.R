@@ -3,8 +3,8 @@
 #' This function downloads the FAERS data for selected years and quarters.
 #'
 #' @inheritParams faers_available
-#' @param format File format to used, only "ascii" and "xml" are availabe. Default:
-#'  "ascii".
+#' @param format File format to used, only "ascii" and "xml" are availabe.
+#'  Default: "ascii".
 #' @param dir The destination directory for any downloads. Defaults to
 #'  current working dir.
 #' @param ... Extra handle options passed to each request

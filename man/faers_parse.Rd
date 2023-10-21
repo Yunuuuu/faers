@@ -18,8 +18,8 @@ the FAERS zip file directly, In this way, all files in the zip file will be
 extracted in \code{compress_dir}. Or, you can also uncompressed youself, and
 passed the directory contained the uncompressed files.}
 
-\item{format}{File format to used, only "ascii" and "xml" are availabe. Default:
-"ascii".}
+\item{format}{File format to used, only "ascii" and "xml" are availabe.
+Default: "ascii".}
 
 \item{year}{Year of the FAERS Quarterly Data. Coerced into integer, if
 \code{NULL}, this will be extracted from path.}
