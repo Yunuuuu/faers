@@ -21,7 +21,7 @@ faers_keep(object, ...)
 
 faers_filter(object, ...)
 
-\S4method{faers_filter}{FAERSascii}(object, .fn, ..., field)
+\S4method{faers_filter}{FAERSascii}(object, .fn, ..., field = NULL)
 
 faers_phv_table(object, ...)
 
@@ -49,9 +49,7 @@ If a \strong{function}, it is used as is.
 If a \strong{formula}, e.g. \code{~ .x + 2}, it is converted to a function with up to
 two arguments: \code{.x} (single argument) or \code{.x} and \code{.y} (two arguments). The
 \code{.} placeholder can be used instead of \code{.x}.  This allows you to create
-very compact anonymous functions (lambdas) with up to two inputs. Functions
-created from formulas have a special class. Use \code{is_lambda()} to test for
-it.
+very compact anonymous functions (lambdas) with up to two inputs.
 
 If a \strong{string}, the function is looked up in \code{globalenv()}.}
 
