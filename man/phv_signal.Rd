@@ -6,6 +6,7 @@
 \alias{phv_prr}
 \alias{phv_bcpnn_norm}
 \alias{phv_bcpnn_mcmc}
+\alias{phv_obsexp_shrink}
 \title{Pharmacovigilance Analysis}
 \usage{
 phv_ror(a, b, c, d, alpha = 0.05)
@@ -15,6 +16,8 @@ phv_prr(a, b, c, d, alpha = 0.05)
 phv_bcpnn_norm(a, b, c, d, alpha = 0.05)
 
 phv_bcpnn_mcmc(a, b, c, d, alpha = 0.05, n_mcmc = 100000L)
+
+phv_obsexp_shrink(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5)
 }
 \arguments{
 \item{a}{also referred to as \code{n11} as this is the count of event of interest
@@ -32,17 +35,41 @@ of interest under \emph{not} exposure of interest.}
 \item{alpha}{Level of significance, for construction of the confidence
 intervals.}
 
-\item{n_mcmc}{number of MCMC simulations per \code{(a,b,c,d)}-tuple.}
+\item{n_mcmc}{number of MCMC simulations per \verb{(a,b,c,d)}-tuple.}
+
+\item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.
+See section phv_obsexp_shrink.}
+
+\item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.
+See section phv_obsexp_shrink.}
 }
 \value{
-A \link[data.table:data.table]{data.table}
+A \link[data.table:data.table]{data.table} with columns of estimated
+value and it's confidence interval (\code{ci_low} and \code{ci_high}). Estimated column
+are as follows:
+\itemize{
+\item \code{phv_ror}: reporting odds ratio (\code{ror}).
+\item \code{phv_prr}: proportional reporting ratio (\code{prr}).
+\item \code{phv_bcpnn_norm}: information component (\code{ic}).
+\item \code{phv_bcpnn_mcmc}: information component (\code{ic}).
+\item \code{phv_obsexp_shrink}: observed to expected ratio (\code{oe}).
+}
 }
 \description{
-In the context of pharmacovigilance studies, disproportionality analysis
-primarily served as a tool to evaluate possible association between a
-specific adverse event and a particular drug which can then be investigated
-through clinical assessment of individual case reports. Pharmacovigilance,
-also known as drug safety. Following function can be used to Signal mining
+Pharmacovigilance, also known as drug safety. In the context of
+pharmacovigilance studies, disproportionality analysis primarily served as a
+tool to evaluate possible association between a specific adverse event and a
+particular drug which can then be investigated through clinical assessment of
+individual case reports.
+}
+\details{
+Note that the \code{a}, \code{b}, \code{c}, \code{d} inputs can be an atomic vectors of equal
+length, for which the function will perform the calculations for each
+individual \verb{(a,b,c,d)}-tuple moving across the vectors.
+
+It is assumed that the contingency table under consideration has
+drugs/exposures in the rows and outcomes/events in the columns. See
+contingency table section.
 }
 \section{Contingency table}{
 \tabular{llll}{
@@ -51,5 +78,23 @@ also known as drug safety. Following function can be used to Signal mining
    Other drugs \tab c=n01 \tab d=n00 \tab c + d \cr
    Total \tab a+c \tab b+d \tab a+b+c+d \cr
 }
+}
+
+\section{phv_obsexp_shrink}{
+
+
+The observed to expected (OE) ratio with approximate confidence intervals are
+constructed on the log2 scale as outlined in Norén et al. (2013).
+
+Expected value was estimated by \code{(a + b) / (a + b + c + d) * (a + c)}.
+
+The OE ratio with shrinkage estimates is calculated as \code{(O + alpha1) / (E + alpha2)}.
+
+If \code{(O + alpha1) < 1}, then the exact uncertainty limits should be used. That
+is the confidence intervals as implemented in \code{phv_bcpnn_mcmc} (Norén et al.,
+2013).
+
+\code{log2(OE)} approximates the Bayesian confidence propagation neural
+network information component (IC) with reasonable accuracy when \code{alpha1 = alpha2 = 0.5} (Norén et al., 2013).
 }
 
