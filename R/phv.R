@@ -1,12 +1,3 @@
-#+-------------------+-----------------+------------+-------+
-#|                   | ADR of interest | Other ADRs | Total |
-#+-------------------+-----------------+------------+-------|
-#| Drug of interest  |      a=n11      |    b=n10   | a + b |
-#+-------------------+-----------------+------------+-------|
-#| Other drugs       |      c=n01      |    d=n00   | c + d |
-#+-------------------+-----------------+------------+-------|
-#| Total             |       a+c       |    b+d     |a+b+c+d|
-#+-------------------+-----------------+------------+-------+
 #' Pharmacovigilance Analysis
 #'
 #' In the context of pharmacovigilance studies, disproportionality analysis
@@ -25,6 +16,13 @@
 #' @param alpha Level of significance, for construction of the confidence
 #'  intervals.
 #' @param n_mcmc number of MCMC simulations per \code{(a,b,c,d)}-tuple.
+#' @section Contingency table:
+#' |                   | ADR of interest | Other ADRs | Total |
+#' |-------------------|-----------------|------------|-------|
+#' | Drug of interest  |      a=n11      |    b=n10   | a + b |
+#' | Other drugs       |      c=n01      |    d=n00   | c + d |
+#' | Total             |       a+c       |    b+d     |a+b+c+d|
+#' @return A [data.table][data.table::data.table]
 #' @name phv_signal
 NULL
 

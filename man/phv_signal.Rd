@@ -34,6 +34,9 @@ intervals.}
 
 \item{n_mcmc}{number of MCMC simulations per \code{(a,b,c,d)}-tuple.}
 }
+\value{
+A \link[data.table:data.table]{data.table}
+}
 \description{
 In the context of pharmacovigilance studies, disproportionality analysis
 primarily served as a tool to evaluate possible association between a
@@ -41,3 +44,12 @@ specific adverse event and a particular drug which can then be investigated
 through clinical assessment of individual case reports. Pharmacovigilance,
 also known as drug safety. Following function can be used to Signal mining
 }
+\section{Contingency table}{
+\tabular{llll}{
+    \tab ADR of interest \tab Other ADRs \tab Total \cr
+   Drug of interest \tab a=n11 \tab b=n10 \tab a + b \cr
+   Other drugs \tab c=n01 \tab d=n00 \tab c + d \cr
+   Total \tab a+c \tab b+d \tab a+b+c+d \cr
+}
+}
+
