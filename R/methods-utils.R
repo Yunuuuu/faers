@@ -83,7 +83,7 @@ methods::setGeneric("faers_filter", function(object, ...) {
 #' @export
 #' @method faers_filter FAERSascii
 #' @rdname FAERS-methods
-methods::setMethod("faers_filter", "FAERSascii", function(object, .fn, ..., field) {
+methods::setMethod("faers_filter", "FAERSascii", function(object, .fn, ..., field = NULL) {
     if (is.null(field)) {
         data <- object
     } else {
