@@ -119,6 +119,10 @@ assert_internet <- function(call = rlang::caller_env()) {
     }
 }
 
+has_name <- function(x, name) {
+    any(name == rlang::names2(x))
+}
+
 fda_host <- "https://fis.fda.gov"
 faers_file_format <- c("ascii", "xml")
 faers_file_quarters <- c("q1", "q2", "q3", "q4")

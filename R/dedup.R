@@ -82,8 +82,9 @@ methods::setMethod("faers_dedup", "ANY", function(object) {
 # Perform string aggregation operations
 
 dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
-    if (!any("meddra_code" == names(indi)) ||
-        !any("meddra_code" == names(reac))) {
+    
+    if (!has_name(indi, "meddra_code") ||
+        !has_name(reac, "meddra_code")) {
         cli::cli_abort("{.cls FAERS} object must be standardized firstly using {.fn faers_standardize}")
     }
     # As recommended by the FDA, a deduplication step was performed to retain

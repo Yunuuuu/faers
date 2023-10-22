@@ -70,8 +70,9 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL, all
             data.table::setnames(lst$ther, "dsg_drug_seq", "drug_seq")
         }
     }
+
     Reduce(function(x, y) {
-        if (any("caseid" == names(y))) {
+        if (has_name(y, "caseid") && has_name(x, "caseid")) {
             y <- y[, .SD, .SDcols = !"caseid"]
         }
         # y[x, on = intersect(names(x), names(y)),
