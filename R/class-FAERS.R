@@ -15,14 +15,6 @@
 #'  - `faers_period`: Extract the `period` slot (just Concatenate the year and
 #'    quarter slot).
 #'  - `faers_deleted_cases`: Extract the `deletedCases` slot.
-#'  - `faers_get`: Extract a specific [data.table][data.table::data.table] field
-#'    from [FAERS] object.
-#'  - `faers_keep`: only keep data from specified `primaryid`. Note: `year`,
-#'    `quarter`, `deletedCases` will be kept as the original. So make sure you
-#'    didn't filter a whole period FAERS quarterly data, in this way, it's much
-#'    better to run [faers].
-#'  - `faers_filter`: apply a function to extract wanted `primaryid`, then use
-#'    `faers_keep` to filter.
 #' @aliases FAERS
 #' @name FAERS-class
 methods::setClass(
@@ -30,10 +22,16 @@ methods::setClass(
     slots = list(
         year = "integer",
         quarter = "character",
-        data = "ANY", dedup = "ANY",
+        data = "ANY",
+        deduplication = "logical",
+        standardization = "logical",
         format = "character"
     ),
-    prototype = list(data = NULL, dedup = NULL)
+    prototype = list(
+        data = NULL,
+        deduplication = FALSE,
+        standardization = FALSE
+    )
 )
 
 ## Validator for FAERS
@@ -64,6 +62,14 @@ validate_faers <- function(object) {
     if (anyDuplicated(faers_period(object))) {
         return("the period combined from `@year` and `@quarter` must be unique, you cannot import duplicated FAERS Quarterly Data file")
     }
+
+    if (length(object@standardization) != 1L) {
+        return("@standardization must be a scalar logical")
+    }
+    if (length(object@deduplication) != 1L) {
+        return("@deduplication must be a scalar logical")
+    }
+
     if (!rlang::is_string(object@format, faers_file_format)) {
         return(sprintf(
             "`@format` must be a string of %s",
@@ -126,10 +132,21 @@ methods::setClass(
 #' @rdname FAERS-class
 methods::setMethod("show", "FAERS", function(object) {
     l <- length(faers_period(object))
-    cat(sprintf(
-        "A total of %s FAERS Quarterly %s Data file%s",
+    msg <- sprintf(
+        "FAERS data from %s Quarterly %s file%s",
         l, object@format, if (l > 1L) "s" else ""
-    ), sep = "\n")
+    )
+    if (object@standardization && object@deduplication) {
+        prefix <- "Standardized and De-duplicated"
+    } else if (object@standardization) {
+        prefix <- "Standardized"
+    } else if (object@deduplication) {
+        prefix <- "De-duplicated"
+    } else {
+        prefix <- NULL
+    }
+    if (!is.null(prefix)) msg <- paste(prefix, msg, sep = " ")
+    cat(msg, sep = "\n")
 })
 
 #######################################################
@@ -164,8 +181,7 @@ methods::setMethod("faers_header", "FAERSxml", function(object) {
 
 #######################################################
 #' @param object A [FAERS] object.
-#' @param ... Other arguments passed to specific methods. For `faers_filter`
-#' Other arguments passed to `.fn`.
+#' @param ... Other arguments passed to specific methods.
 #' @export
 #' @aliases faers_data
 #' @rdname FAERS-class
@@ -246,90 +262,6 @@ methods::setMethod("faers_deleted_cases", "FAERSascii", function(object, flatten
     } else {
         out
     }
-})
-
-##############################################################
-#' @export
-#' @rdname FAERS-class
-methods::setGeneric("faers_get", function(object, ...) {
-    methods::makeStandardGeneric("faers_get")
-})
-
-#' @param field A string indicates the FAERS fields to used. Only values "demo",
-#' "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.
-#' @export
-#' @method faers_get FAERSascii
-#' @rdname FAERS-class
-methods::setMethod("faers_get", "FAERSascii", function(object, field) {
-    field <- match.arg(field, faers_ascii_file_fields)
-    object@data[[field]]
-})
-
-##############################################################
-#' @export
-#' @rdname FAERS-class
-methods::setGeneric("faers_keep", function(object, ...) {
-    methods::makeStandardGeneric("faers_keep")
-})
-
-#' @export
-#' @param primaryid An atomic character or integer specifies the reports to
-#' keep. If `NULL`, will do nothing.
-#' @method faers_keep FAERSascii
-#' @rdname FAERS-class
-methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL) {
-    if (is.null(primaryid)) {
-        return(object)
-    }
-    # as all data has a column primaryid, we just rename the variable to use it
-    # in the data.table `i`
-    .__primaryid__. <- primaryid
-    object@data <- lapply(object@data, function(x) {
-        x[primaryid %in% .__primaryid__.]
-    })
-    object
-})
-
-##############################################################
-#' @export
-#' @rdname FAERS-class
-methods::setGeneric("faers_filter", function(object, ...) {
-    methods::makeStandardGeneric("faers_filter")
-})
-
-#' @param field A string indicates the FAERS fields data applied with `.fn` to
-#' extract primaryid. If `NULL`, the object will be passed to `.fn` directly.
-#' For string, only values "demo", "drug", "indi", "ther", "reac", "rpsr", and
-#' "outc" can be used.
-#' @param .fn A function or formula.
-#'
-#'   If a **function**, it is used as is.
-#'
-#'   If a **formula**, e.g. `~ .x + 2`, it is converted to a function with up to
-#'   two arguments: `.x` (single argument) or `.x` and `.y` (two arguments). The
-#'   `.` placeholder can be used instead of `.x`.  This allows you to create
-#'   very compact anonymous functions (lambdas) with up to two inputs. Functions
-#'   created from formulas have a special class. Use `is_lambda()` to test for
-#'   it.
-#'
-#'   If a **string**, the function is looked up in `env`. Note that
-#'   this interface is strictly for user convenience because of the
-#'   scoping issues involved. Package developers should avoid
-#'   supplying functions by name and instead supply them by value.
-#' @export
-#' @method faers_filter FAERSascii
-#' @rdname FAERS-class
-methods::setMethod("faers_filter", "FAERSascii", function(object, field, .fn, ...) {
-    if (is.null(field)) {
-        data <- object
-    } else {
-        data <- faers_get(object, field = field)
-    }
-    ids <- rlang::as_function(.fn)(data, ...)
-    if (!(is.numeric(ids) || is.character(ids))) {
-        cli::cli_abort("{.arg .fn} must return an atomic integer or character")
-    }
-    faers_keep(object, primaryid = ids)
 })
 
 #############################################################

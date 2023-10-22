@@ -14,27 +14,31 @@ methods::setGeneric("faers_dedup", function(object, ...) {
 #' @method faers_dedup FAERSascii
 #' @rdname faers_dedup
 methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_cases = TRUE) {
-    if (!is.null(object@dedup)) {
+    if (object@deduplication) {
         cli::cli_abort("You must not run {.fn faers_dedup} twice")
     }
-    object@dedup <- do.call(
+    if (!object@standardization) {
+        cli::cli_abort("{.cls FAERS} object must be standardized using {.fn faers_standardize} firstly")
+    }
+    deduplicated_data <- do.call(
         dedup_faers_ascii,
         faers_data(object)[c("demo", "drug", "indi", "ther", "reac")]
     )
     if (isTRUE(remove_deleted_cases)) {
         deleted_cases <- faers_deleted_cases(object)
         if (length(deleted_cases)) {
-            object@dedup <- object@dedup[!caseid %in% deleted_cases]
+            deduplicated_data <- deduplicated_data[!caseid %in% deleted_cases]
         }
     }
-    ..__matched_data__.. <- object@dedup[, c("year", "quarter", "primaryid")]
+    deduplicated_data <- deduplicated_data[, c("year", "quarter", "primaryid")]
     object@data <- lapply(object@data, function(x) {
-        x[..__matched_data__.., on = c("year", "quarter", "primaryid")]
+        x[deduplicated_data, on = c("year", "quarter", "primaryid")]
     })
-    # ..__matched_ids__.. <- unique(..__matched_data__..$primaryid)
+    object@deduplication <- TRUE
+    # ..__matched_ids__.. <- unique(deduplicated_data$primaryid)
     # # we keep the latest demographic information for the patients
     # object@data$demo <- object@data$demo[
-    #     ..__matched_data__..,
+    #     deduplicated_data,
     #     on = c("year", "quarter", "primaryid")
     # ]
     # # we keep all other information for the patients
@@ -82,11 +86,6 @@ methods::setMethod("faers_dedup", "ANY", function(object) {
 # Perform string aggregation operations
 
 dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
-    
-    if (!has_name(indi, "meddra_code") ||
-        !has_name(reac, "meddra_code")) {
-        cli::cli_abort("{.cls FAERS} object must be standardized firstly using {.fn faers_standardize}")
-    }
     # As recommended by the FDA, a deduplication step was performed to retain
     # the most recent report for each case with the same case identifier
     # nolint start
