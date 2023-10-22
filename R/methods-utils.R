@@ -158,12 +158,13 @@ methods::setGeneric("faers_phv_signal", function(object, ...) {
 #' @seealso [phv_signal]
 #' @method faers_phv_signal FAERSascii
 #' @rdname FAERS-methods
-methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., methods = NULL, alpha = 0.05, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
+methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
     out <- faers_phv_table(object, ...)
     cbind(
         out,
         do.call(phv_signal, c(out[, !"reac_events"], list(
-            alpha = alpha, alpha1 = alpha1, alpha2 = alpha2, n_mcmc = n_mcmc
+            methods = methods, alpha = alpha, correct = correct,
+            n_mcmc = n_mcmc, alpha1 = alpha1, alpha2 = alpha2
         )))
     )
 })

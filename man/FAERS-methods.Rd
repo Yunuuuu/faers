@@ -36,6 +36,7 @@ faers_phv_signal(object, ...)
   ...,
   methods = NULL,
   alpha = 0.05,
+  correct = TRUE,
   n_mcmc = 100000L,
   alpha1 = 0.5,
   alpha2 = 0.5
@@ -79,11 +80,15 @@ function will be employed to extract data for the drug of interest from the
 \code{object}.}
 
 \item{methods}{An atomic character, specifies the method used to signal
-mining. Currently, only "ror", "prr", "bcpnn_norm", "bcpnn_mcmc", and
-"obsexp_shrink" are supported. If \code{NULL}, all supported methods will be used.}
+mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
+"obsexp_shrink", and "fisher" are supported. If \code{NULL}, all supported methods
+will be used.}
 
 \item{alpha}{Level of significance, for construction of the confidence
 intervals.}
+
+\item{correct}{A bool indicating whether to apply Yates's continuity
+correction when computing the chi-squared statistic.}
 
 \item{n_mcmc}{Number of MCMC simulations per \verb{(a,b,c,d)}-tuple to calculate
 confidence intervals.}

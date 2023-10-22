@@ -15,8 +15,9 @@
 #' @param d also referred to as `n00` as this is the count of \emph{not} event
 #' of interest under \emph{not} exposure of interest.
 #' @param methods An atomic character, specifies the method used to signal
-#' mining. Currently, only "ror", "prr", "bcpnn_norm", "bcpnn_mcmc", and
-#' "obsexp_shrink" are supported. If `NULL`, all supported methods will be used.
+#' mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
+#' "obsexp_shrink", and "fisher" are supported. If `NULL`, all supported methods
+#' will be used.
 #' @param alpha Level of significance, for construction of the confidence
 #'  intervals.
 #' @details
@@ -37,16 +38,19 @@
 #' value and it's confidence interval (`ci_low` and `ci_high`). Estimated column
 #' are as follows:
 #' - `phv_ror`: reporting odds ratio (`ror`).
-#' - `phv_prr`: proportional reporting ratio (`prr`).
+#' - `phv_prr`: proportional reporting ratio (`prr`). Signal defined as a `prr`
+#'   of at least 2, chi-squared with Yates's correction of at least 4 and `a >=
+#'   3`. An equivalent alternative to chi-squared is to calculate a confidence
+#'   interval around the `prr`.
 #' - `phv_bcpnn_norm`: information component (`ic`).
 #' - `phv_bcpnn_mcmc`: information component (`ic`).
 #' - `phv_obsexp_shrink`: observed to expected ratio (`oe_ratio`).
 #' @export
 #' @name phv_signal
-phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
+phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
     allowed_methods <- c(
-        "ror", "prr", "bcpnn_norm", "bcpnn_mcmc",
-        "obsexp_shrink"
+        "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
+        "obsexp_shrink", "fisher"
     )
     assert_inclusive(methods, allowed_methods, null_ok = TRUE)
     methods <- unique(methods %||% allowed_methods)
@@ -62,11 +66,19 @@ phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, n_mcmc = 1e5L, 
                 phv_fn,
                 c(args, list(alpha1 = alpha1, alpha2 = alpha2, n_mcmc = n_mcmc))
             ),
-            bcpnn_norm = ,
+            chisq = do.call(phv_fn, c(
+                args[c("a", "b", "c", "d")], list(correct = correct)
+            )),
             do.call(phv_fn, args)
         )
         added_names <- names(signal_out)
-        added_names[-1L] <- paste(added_names[1L], added_names[-1L], sep = "_")
+        added_names <- data.table::fcase(
+            added_names %in% c("ci_low", "ci_high"),
+            paste(added_names[1L], added_names, sep = "_"),
+            added_names == "pvalue",
+            paste(method, added_names, sep = "_"),
+            rep_len(TRUE, length(added_names)), added_names
+        )
         if (startsWith(method, "bcpnn_")) {
             added_names <- paste(method, added_names, sep = "_")
         }
@@ -94,6 +106,11 @@ phv_ror <- function(a, b, c, d, alpha = 0.05) {
 
 #' @export
 #' @rdname phv_signal
+#' @references
+#' - Evans, S.J.W., Waller, P.C. and Davis, S. (2001), Use of proportional
+#'   reporting ratios (PRRs) for signal generation from spontaneous adverse drug
+#'   reaction reports. Pharmacoepidem. Drug Safe., 10: 483-486.
+#'   https://doi.org/10.1002/pds.677
 phv_prr <- function(a, b, c, d, alpha = 0.05) {
     assert_phv_table(a, b, c, d)
 
@@ -105,6 +122,42 @@ phv_prr <- function(a, b, c, d, alpha = 0.05) {
     ci_low <- exp(stats::qnorm(half, log_prr, sd_log_prr))
     ci_high <- exp(stats::qnorm(1 - half, log_prr, sd_log_prr))
     data.table::data.table(prr = prr, ci_low = ci_low, ci_high = ci_high)
+}
+
+#' @param correct A bool indicating whether to apply Yates's continuity
+#' correction when computing the chi-squared statistic.
+#' @export
+#' @rdname phv_signal
+phv_chisq <- function(a, b, c, d, correct = TRUE) {
+    out <- .mapply(
+        function(n11, n10, n01, n00) {
+            out <- stats::chisq.test(
+                matrix(c(n11, n10, n01, n00), nrow = 2L),
+                correct = correct
+            )
+            c(out$statistic, out$p.value)
+        }, list(n11 = a, n10 = b, n01 = c, n00 = d), NULL
+    )
+    out <- data.table::as.data.table(do.call("rbind", out))
+    data.table::setnames(out, c("chisq", "pvalue"))
+    out[]
+}
+
+#' @export
+#' @rdname phv_signal
+phv_fisher <- function(a, b, c, d, alpha = 0.05) {
+    out <- .mapply(
+        function(n11, n10, n01, n00) {
+            out <- stats::fisher.test(
+                matrix(c(n11, n10, n01, n00), nrow = 2L),
+                conf.int = TRUE, conf.level = 1 - alpha
+            )
+            c(out$estimate, out$conf.int, out$p.value)
+        }, list(n11 = a, n10 = b, n01 = c, n00 = d), NULL
+    )
+    out <- data.table::as.data.table(do.call("rbind", out))
+    data.table::setnames(out, c("odds_ratio", "ci_low", "ci_high", "pvalue"))
+    out[]
 }
 
 #' @export
@@ -138,7 +191,7 @@ phv_bcpnn_norm <- function(a, b, c, d, alpha = 0.05) {
 }
 
 #' @param n_mcmc Number of MCMC simulations per `(a,b,c,d)`-tuple to calculate
-#' confidence intervals. 
+#' confidence intervals.
 #' @export
 #' @rdname phv_signal
 phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
@@ -256,7 +309,7 @@ phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0
     }
     data.table::data.table(
         oe_ratio = oe_ratio,
-        ci_low = ci_low, i_high = ci_high
+        ci_low = ci_low, ci_high = ci_high
     )
 }
 

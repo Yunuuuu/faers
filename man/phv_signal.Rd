@@ -4,6 +4,8 @@
 \alias{phv_signal}
 \alias{phv_ror}
 \alias{phv_prr}
+\alias{phv_chisq}
+\alias{phv_fisher}
 \alias{phv_bcpnn_norm}
 \alias{phv_bcpnn_mcmc}
 \alias{phv_obsexp_shrink}
@@ -16,6 +18,7 @@ phv_signal(
   d,
   methods = NULL,
   alpha = 0.05,
+  correct = TRUE,
   n_mcmc = 100000L,
   alpha1 = 0.5,
   alpha2 = 0.5
@@ -24,6 +27,10 @@ phv_signal(
 phv_ror(a, b, c, d, alpha = 0.05)
 
 phv_prr(a, b, c, d, alpha = 0.05)
+
+phv_chisq(a, b, c, d, correct = TRUE)
+
+phv_fisher(a, b, c, d, alpha = 0.05)
 
 phv_bcpnn_norm(a, b, c, d, alpha = 0.05)
 
@@ -54,11 +61,15 @@ under \emph{not} exposure of interest.}
 of interest under \emph{not} exposure of interest.}
 
 \item{methods}{An atomic character, specifies the method used to signal
-mining. Currently, only "ror", "prr", "bcpnn_norm", "bcpnn_mcmc", and
-"obsexp_shrink" are supported. If \code{NULL}, all supported methods will be used.}
+mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
+"obsexp_shrink", and "fisher" are supported. If \code{NULL}, all supported methods
+will be used.}
 
 \item{alpha}{Level of significance, for construction of the confidence
 intervals.}
+
+\item{correct}{A bool indicating whether to apply Yates's continuity
+correction when computing the chi-squared statistic.}
 
 \item{n_mcmc}{Number of MCMC simulations per \verb{(a,b,c,d)}-tuple to calculate
 confidence intervals.}
@@ -73,7 +84,9 @@ value and it's confidence interval (\code{ci_low} and \code{ci_high}). Estimated
 are as follows:
 \itemize{
 \item \code{phv_ror}: reporting odds ratio (\code{ror}).
-\item \code{phv_prr}: proportional reporting ratio (\code{prr}).
+\item \code{phv_prr}: proportional reporting ratio (\code{prr}). Signal defined as a \code{prr}
+of at least 2, chi-squared with Yates's correction of at least 4 and \code{a >= 3}. An equivalent alternative to chi-squared is to calculate a confidence
+interval around the \code{prr}.
 \item \code{phv_bcpnn_norm}: information component (\code{ic}).
 \item \code{phv_bcpnn_mcmc}: information component (\code{ic}).
 \item \code{phv_obsexp_shrink}: observed to expected ratio (\code{oe_ratio}).
@@ -122,3 +135,11 @@ is the confidence intervals as implemented in \code{phv_bcpnn_mcmc} (Norén et a
 network information component (IC) with reasonable accuracy when \code{alpha1 = alpha2 = 0.5} (Norén et al., 2013).
 }
 
+\references{
+\itemize{
+\item Evans, S.J.W., Waller, P.C. and Davis, S. (2001), Use of proportional
+reporting ratios (PRRs) for signal generation from spontaneous adverse drug
+reaction reports. Pharmacoepidem. Drug Safe., 10: 483-486.
+https://doi.org/10.1002/pds.677
+}
+}
