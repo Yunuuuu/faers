@@ -41,7 +41,7 @@
 #' - `phv_bcpnn_norm`: information component (`ic`).
 #' - `phv_bcpnn_mcmc`: information component (`ic`).
 #' - `phv_obsexp_shrink`: observed to expected ratio (`oe_ratio`).
-#' @export 
+#' @export
 #' @name phv_signal
 phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5, n_mcmc = 1e5L) {
     allowed_methods <- c(
@@ -126,7 +126,8 @@ phv_bcpnn_norm <- function(a, b, c, d, alpha = 0.05) {
     q1 <- 1L + n.1
     q2 <- 1L + n - n.1
     r1 <- 1L + a
-    r2b <- n - a - 1L + (2L + n)^2L / (q1 * p1)
+    # fix q1 * p1 : NAs produced by integer overflow
+    r2b <- n - a - 1L + (2L + n)^2L / q1 / p1
 
     ic <- (digamma(r1) - digamma(r1 + r2b) -
         (digamma(p1) - digamma(p1 + p2) + digamma(q1) - digamma(q1 + q2))) /
