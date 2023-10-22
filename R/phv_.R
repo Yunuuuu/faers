@@ -207,9 +207,7 @@ phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
 }
 
 #' @param alpha1 Numerator shrinkage parameter `>=0`, default `0.5`.
-#' See section phv_obsexp_shrink.
 #' @param alpha2 Denominator shrinkage parameter `>=0`, default `0.5`.
-#' See section phv_obsexp_shrink.
 #' @section phv_obsexp_shrink:
 #'
 #' The observed to expected (OE) ratio with approximate confidence intervals are

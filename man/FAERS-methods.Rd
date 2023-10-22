@@ -44,10 +44,13 @@ faers_phv_signal(object, ...)
 \arguments{
 \item{object}{A \link{FAERS} object.}
 
-\item{...}{Other arguments passed to specific methods. For \code{faers_filter},
-other arguments passed to \code{.fn}. For \code{faers_phv_table}, other arguments
-passed to \code{faers_filter} and \code{...} is solely used when interested is \code{NULL}.
-For \code{faers_phv_signal}, other arguments passed to \code{faers_filter}.}
+\item{...}{Other arguments passed to specific methods.
+\itemize{
+\item \code{faers_filter}: other arguments passed to \code{.fn}.
+\item \code{faers_phv_table}: other arguments passed to \code{faers_filter} and \code{...} is
+solely used when \code{interested} is \code{NULL}.
+\item \code{faers_phv_signal}: other arguments passed to \code{faers_phv_table}.
+}}
 
 \item{field}{A string indicates the FAERS fields data applied with \code{.fn} to
 extract primaryid. If \code{NULL}, the object will be passed to \code{.fn} directly.
@@ -70,7 +73,7 @@ If a \strong{string}, the function is looked up in \code{globalenv()}.}
 
 \item{pt}{A string specify the events column in \code{reac} field of object.}
 
-\item{interested}{A \code{FAERSascii} object with data from interested drug, must
+\item{interested}{A \link{FAERSascii} object with data from interested drug, must
 be a subset of \code{object}. If \code{interested} is set to \code{NULL}, the \code{faers_filter}
 function will be employed to extract data for the drug of interest from the
 \code{object}.}
@@ -82,11 +85,9 @@ mining. Currently, only "ror", "prr", "bcpnn_norm", "bcpnn_mcmc", and
 \item{alpha}{Level of significance, for construction of the confidence
 intervals.}
 
-\item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.
-See section phv_obsexp_shrink.}
+\item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.}
 
-\item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.
-See section phv_obsexp_shrink.}
+\item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.}
 
 \item{n_mcmc}{number of MCMC simulations per \verb{(a,b,c,d)}-tuple.}
 }
@@ -105,6 +106,8 @@ better to run \link[=FAERS]{faers}.
 \code{faers_keep} to filter.
 \item \code{faers_phv_table}: build a contingency table for all events in \code{pt}
 column.
+\item \code{faers_phv_signal}: Pharmacovigilance Analysis used contingency table
+constructed with \code{faers_phv_table}. Details see \link{phv_signal}.
 }
 }
 \seealso{

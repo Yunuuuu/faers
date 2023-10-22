@@ -2,10 +2,11 @@
 #'
 #' Utils function for [FAERS] class.
 #' @param object A [FAERS] object.
-#' @param ... Other arguments passed to specific methods. For `faers_filter`,
-#' other arguments passed to `.fn`. For `faers_phv_table`, other arguments
-#' passed to `faers_filter` and `...` is solely used when interested is `NULL`.
-#' For `faers_phv_signal`, other arguments passed to `faers_filter`.
+#' @param ... Other arguments passed to specific methods. 
+#'  - `faers_filter`: other arguments passed to `.fn`. 
+#'  - `faers_phv_table`: other arguments passed to `faers_filter` and `...` is
+#'    solely used when `interested` is `NULL`.
+#'  - `faers_phv_signal`: other arguments passed to `faers_phv_table`.
 #' @details
 #'  - `faers_get`: Extract a specific field [data.table][data.table::data.table]
 #'    from [FAERS] object.
@@ -17,6 +18,8 @@
 #'    `faers_keep` to filter.
 #'  - `faers_phv_table`: build a contingency table for all events in `pt`
 #'    column.
+#'  - `faers_phv_signal`: Pharmacovigilance Analysis used contingency table
+#'    constructed with `faers_phv_table`. Details see [phv_signal].
 #' @export
 #' @rdname FAERS-methods
 methods::setGeneric("faers_get", function(object, ...) {
@@ -103,7 +106,7 @@ methods::setGeneric("faers_phv_table", function(object, ...) {
 })
 
 #' @param pt A string specify the events column in `reac` field of object.
-#' @param interested A `FAERSascii` object with data from interested drug, must
+#' @param interested A [FAERSascii] object with data from interested drug, must
 #' be a subset of `object`. If `interested` is set to `NULL`, the `faers_filter`
 #' function will be employed to extract data for the drug of interest from the
 #' `object`.
