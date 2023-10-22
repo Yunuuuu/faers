@@ -14,6 +14,9 @@
 #' under \emph{not} exposure of interest.
 #' @param d also referred to as `n00` as this is the count of \emph{not} event
 #' of interest under \emph{not} exposure of interest.
+#' @param methods An atomic character, specifies the method used to signal
+#' mining. Currently, only "ror", "prr", "bcpnn_norm", "bcpnn_mcmc", and
+#' "obsexp_shrink" are supported. If `NULL`, all supported methods will be used.
 #' @param alpha Level of significance, for construction of the confidence
 #'  intervals.
 #' @details
@@ -37,9 +40,40 @@
 #' - `phv_prr`: proportional reporting ratio (`prr`).
 #' - `phv_bcpnn_norm`: information component (`ic`).
 #' - `phv_bcpnn_mcmc`: information component (`ic`).
-#' - `phv_obsexp_shrink`: observed to expected ratio (`oe`).
+#' - `phv_obsexp_shrink`: observed to expected ratio (`oe_ratio`).
+#' @export 
 #' @name phv_signal
-NULL
+phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5, n_mcmc = 1e5L) {
+    allowed_methods <- c(
+        "ror", "prr", "bcpnn_norm", "bcpnn_mcmc",
+        "obsexp_shrink"
+    )
+    assert_inclusive(methods, allowed_methods, null_ok = TRUE)
+    methods <- unique(methods %||% allowed_methods)
+    out <- data.table::data.table(
+        expected = (a + b) / (a + b + c + d) * (a + c)
+    )
+    args <- list(a = a, b = b, c = c, d = d, alpha = alpha)
+    for (method in methods) {
+        phv_fn <- sprintf("phv_%s", method)
+        signal_out <- switch(method,
+            bcpnn_mcmc = do.call(phv_fn, c(args, list(n_mcmc = n_mcmc))),
+            obsexp_shrink = do.call(
+                phv_fn,
+                c(args, list(alpha1 = alpha1, alpha2 = alpha2))
+            ),
+            bcpnn_norm = ,
+            do.call(phv_fn, args)
+        )
+        added_names <- names(signal_out)
+        added_names[-1L] <- paste(added_names[1L], added_names[-1L], sep = "_")
+        if (startsWith(method, "bcpnn_")) {
+            added_names <- paste(method, added_names, sep = "_")
+        }
+        out[, (added_names) := signal_out]
+    }
+    out[]
+}
 
 # modified from https://github.com/tystan/pharmsignal
 #' @export
@@ -203,10 +237,10 @@ phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0
     n.1 <- a + c
     expected <- (n1. / n) * n.1
 
-    oe <- log2((a + alpha1) / (expected + alpha2))
-    ci_low <- oe - 3.3 * (a + alpha1)^(-1L / 2L) -
+    oe_ratio <- log2((a + alpha1) / (expected + alpha2))
+    ci_low <- oe_ratio - 3.3 * (a + alpha1)^(-1L / 2L) -
         2L * (a + alpha1)^(-3L / 2L)
-    ci_high <- oe + 2.4 * (a + alpha1)^(-1L / 2L) -
+    ci_high <- oe_ratio + 2.4 * (a + alpha1)^(-1L / 2L) -
         0.5 * (a + alpha1)^(-3L / 2L)
 
     need_exact_lims <- (a + alpha1) < 1L
@@ -226,7 +260,10 @@ phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0
         ci_low[need_exact_lims] <- ic$ci_low
         ci_high[need_exact_lims] <- ic$ci_high
     }
-    data.table::data.table(oe = oe, ci_low = ci_low, ci_high = ci_high)
+    data.table::data.table(
+        oe_ratio = oe_ratio,
+        ci_low = ci_low, ci_high = ci_high
+    )
 }
 
 assert_phv_table <- function(a, b, c, d, call = rlang::caller_env()) {

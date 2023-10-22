@@ -9,6 +9,8 @@
 \alias{faers_filter,FAERSascii-method}
 \alias{faers_phv_table}
 \alias{faers_phv_table,FAERSascii-method}
+\alias{faers_phv_signal}
+\alias{faers_phv_signal,FAERSascii-method}
 \title{Methods for FAERS class}
 \usage{
 faers_get(object, ...)
@@ -26,13 +28,26 @@ faers_filter(object, ...)
 faers_phv_table(object, ...)
 
 \S4method{faers_phv_table}{FAERSascii}(object, pt = "soc_name", ..., interested = NULL)
+
+faers_phv_signal(object, ...)
+
+\S4method{faers_phv_signal}{FAERSascii}(
+  object,
+  methods = NULL,
+  ...,
+  alpha = 0.05,
+  alpha1 = 0.5,
+  alpha2 = 0.5,
+  n_mcmc = 100000L
+)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
 
 \item{...}{Other arguments passed to specific methods. For \code{faers_filter},
 other arguments passed to \code{.fn}. For \code{faers_phv_table}, other arguments
-passed to \code{faers_filter} and \code{...} is solely used when interested is \code{NULL}.}
+passed to \code{faers_filter} and \code{...} is solely used when interested is \code{NULL}.
+For \code{faers_phv_signal}, other arguments passed to \code{faers_filter}.}
 
 \item{field}{A string indicates the FAERS fields data applied with \code{.fn} to
 extract primaryid. If \code{NULL}, the object will be passed to \code{.fn} directly.
@@ -59,6 +74,21 @@ If a \strong{string}, the function is looked up in \code{globalenv()}.}
 be a subset of \code{object}. If \code{interested} is set to \code{NULL}, the \code{faers_filter}
 function will be employed to extract data for the drug of interest from the
 \code{object}.}
+
+\item{methods}{An atomic character, specifies the method used to signal
+mining. Currently, only "ror", "prr", "bcpnn_norm", "bcpnn_mcmc", and
+"obsexp_shrink" are supported. If \code{NULL}, all supported methods will be used.}
+
+\item{alpha}{Level of significance, for construction of the confidence
+intervals.}
+
+\item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.
+See section phv_obsexp_shrink.}
+
+\item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.
+See section phv_obsexp_shrink.}
+
+\item{n_mcmc}{number of MCMC simulations per \verb{(a,b,c,d)}-tuple.}
 }
 \description{
 Utils function for \link{FAERS} class.
@@ -76,4 +106,7 @@ better to run \link[=FAERS]{faers}.
 \item \code{faers_phv_table}: build a contingency table for all events in \code{pt}
 column.
 }
+}
+\seealso{
+\link{phv_signal}
 }

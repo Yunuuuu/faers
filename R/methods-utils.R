@@ -5,6 +5,7 @@
 #' @param ... Other arguments passed to specific methods. For `faers_filter`,
 #' other arguments passed to `.fn`. For `faers_phv_table`, other arguments
 #' passed to `faers_filter` and `...` is solely used when interested is `NULL`.
+#' For `faers_phv_signal`, other arguments passed to `faers_filter`.
 #' @details
 #'  - `faers_get`: Extract a specific field [data.table][data.table::data.table]
 #'    from [FAERS] object.
@@ -75,7 +76,7 @@ methods::setGeneric("faers_filter", function(object, ...) {
 #'   If a **formula**, e.g. `~ .x + 2`, it is converted to a function with up to
 #'   two arguments: `.x` (single argument) or `.x` and `.y` (two arguments). The
 #'   `.` placeholder can be used instead of `.x`.  This allows you to create
-#'   very compact anonymous functions (lambdas) with up to two inputs. 
+#'   very compact anonymous functions (lambdas) with up to two inputs.
 #'
 #'   If a **string**, the function is looked up in `globalenv()`.
 #' @export
@@ -105,7 +106,7 @@ methods::setGeneric("faers_phv_table", function(object, ...) {
 #' @param interested A `FAERSascii` object with data from interested drug, must
 #' be a subset of `object`. If `interested` is set to `NULL`, the `faers_filter`
 #' function will be employed to extract data for the drug of interest from the
-#' `object`. 
+#' `object`.
 #' @method faers_phv_table FAERSascii
 #' @rdname FAERS-methods
 methods::setMethod("faers_phv_table", "FAERSascii", function(object, pt = "soc_name", ..., interested = NULL) {
@@ -122,10 +123,14 @@ methods::setMethod("faers_phv_table", "FAERSascii", function(object, pt = "soc_n
         full_primaryids <- faers_get(object, field = "demo")$primaryid
         interested_primaryids <- faers_get(interested, field = "demo")$primaryid
         if (!all(interested_primaryids %in% full_primaryids)) {
-            cli::cli_abort("Provided {.arg interested} {.cls FAERS} data must be a subset of {.arg object}")
+            cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
         }
     }
     interested_reac <- faers_get(interested, field = "reac")[[pt]]
+    # assert again, `interested` must be a subset of `object`
+    if (!is.null(interested) && !all(interested_reac %in% full_reac)) {
+        cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
+    }
     n1. <- length(interested_reac) # scalar
     n <- length(full_reac) # scalar
     n.1 <- c(table(full_reac))
@@ -136,5 +141,26 @@ methods::setMethod("faers_phv_table", "FAERSascii", function(object, pt = "soc_n
         reac_events = reac_names,
         a = n11, b = n1. - n11, c = n.1 - n11,
         d = n - (n1. + n.1 - n11)
+    )
+})
+
+##############################################################
+#' @export
+#' @rdname FAERS-methods
+methods::setGeneric("faers_phv_signal", function(object, ...) {
+    methods::makeStandardGeneric("faers_phv_signal")
+})
+
+#' @inheritParams phv_signal
+#' @seealso [phv_signal]
+#' @method faers_phv_signal FAERSascii
+#' @rdname FAERS-methods
+methods::setMethod("faers_phv_signal", "FAERSascii", function(object, methods = NULL, ..., alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5, n_mcmc = 1e5L) {
+    out <- faers_phv_table(object, ...)
+    cbind(
+        out,
+        do.call(phv_signal, c(out[, !"reac_events"], list(
+            alpha = alpha, alpha1 = alpha1, alpha2 = alpha2, n_mcmc = n_mcmc
+        )))
     )
 })

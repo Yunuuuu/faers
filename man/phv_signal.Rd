@@ -9,6 +9,18 @@
 \alias{phv_obsexp_shrink}
 \title{Pharmacovigilance Analysis}
 \usage{
+phv_signal(
+  a,
+  b,
+  c,
+  d,
+  methods = NULL,
+  alpha = 0.05,
+  alpha1 = 0.5,
+  alpha2 = 0.5,
+  n_mcmc = 100000L
+)
+
 phv_ror(a, b, c, d, alpha = 0.05)
 
 phv_prr(a, b, c, d, alpha = 0.05)
@@ -32,16 +44,20 @@ under \emph{not} exposure of interest.}
 \item{d}{also referred to as \code{n00} as this is the count of \emph{not} event
 of interest under \emph{not} exposure of interest.}
 
+\item{methods}{An atomic character, specifies the method used to signal
+mining. Currently, only "ror", "prr", "bcpnn_norm", "bcpnn_mcmc", and
+"obsexp_shrink" are supported. If \code{NULL}, all supported methods will be used.}
+
 \item{alpha}{Level of significance, for construction of the confidence
 intervals.}
-
-\item{n_mcmc}{number of MCMC simulations per \verb{(a,b,c,d)}-tuple.}
 
 \item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.
 See section phv_obsexp_shrink.}
 
 \item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.
 See section phv_obsexp_shrink.}
+
+\item{n_mcmc}{number of MCMC simulations per \verb{(a,b,c,d)}-tuple.}
 }
 \value{
 A \link[data.table:data.table]{data.table} with columns of estimated
@@ -52,7 +68,7 @@ are as follows:
 \item \code{phv_prr}: proportional reporting ratio (\code{prr}).
 \item \code{phv_bcpnn_norm}: information component (\code{ic}).
 \item \code{phv_bcpnn_mcmc}: information component (\code{ic}).
-\item \code{phv_obsexp_shrink}: observed to expected ratio (\code{oe}).
+\item \code{phv_obsexp_shrink}: observed to expected ratio (\code{oe_ratio}).
 }
 }
 \description{
