@@ -1,9 +1,10 @@
 #' Methods for FAERS class
-#' 
+#'
 #' Utils function for [FAERS] class.
 #' @param object A [FAERS] object.
-#' @param ... Other arguments passed to specific methods. For `faers_filter`
-#' Other arguments passed to `.fn`.
+#' @param ... Other arguments passed to specific methods. For `faers_filter`,
+#' other arguments passed to `.fn`. For `faers_phv_table`, other arguments
+#' passed to `faers_filter` and `...` is solely used when interested is `NULL`.
 #' @details
 #'  - `faers_get`: Extract a specific field [data.table][data.table::data.table]
 #'    from [FAERS] object.
@@ -13,6 +14,8 @@
 #'    better to run [faers].
 #'  - `faers_filter`: apply a function to extract wanted `primaryid`, then use
 #'    `faers_keep` to filter.
+#'  - `faers_phv_table`: build a contingency table for all events in `pt`
+#'    column.
 #' @export
 #' @rdname FAERS-methods
 methods::setGeneric("faers_get", function(object, ...) {
@@ -80,7 +83,7 @@ methods::setGeneric("faers_filter", function(object, ...) {
 #' @export
 #' @method faers_filter FAERSascii
 #' @rdname FAERS-methods
-methods::setMethod("faers_filter", "FAERSascii", function(object, field, .fn, ...) {
+methods::setMethod("faers_filter", "FAERSascii", function(object, .fn, ..., field) {
     if (is.null(field)) {
         data <- object
     } else {
@@ -91,4 +94,49 @@ methods::setMethod("faers_filter", "FAERSascii", function(object, field, .fn, ..
         cli::cli_abort("{.arg .fn} must return an atomic integer or character")
     }
     faers_keep(object, primaryid = ids)
+})
+
+##############################################################
+#' @export
+#' @rdname FAERS-methods
+methods::setGeneric("faers_phv_table", function(object, ...) {
+    methods::makeStandardGeneric("faers_phv_table")
+})
+
+#' @param pt A string specify the events column in `reac` field of object.
+#' @param interested A `FAERSascii` object with data from interested drug, must
+#' be a subset of `object`. If `interested` is set to `NULL`, the `faers_filter`
+#' function will be employed to extract data for the drug of interest from the
+#' `object`. 
+#' @method faers_phv_table FAERSascii
+#' @rdname FAERS-methods
+methods::setMethod("faers_phv_table", "FAERSascii", function(object, pt = "soc_name", ..., interested = NULL) {
+    assert_string(pt, empty_ok = FALSE)
+    full_reac <- faers_get(object, field = "reac")
+    full_reac <- full_reac[[pt]]
+    if (is.null(full_reac)) {
+        cli::cli_abort("Cannot find {.arg pt} in {.field reac} field")
+    }
+    assert_s4_class(interested, "FAERSascii", null_ok = TRUE)
+    if (is.null(interested)) {
+        interested <- faers_filter(object, ...)
+    } else {
+        full_primaryids <- faers_get(object, field = "demo")$primaryid
+        interested_primaryids <- faers_get(interested, field = "demo")$primaryid
+        if (!all(interested_primaryids %in% full_primaryids)) {
+            cli::cli_abort("Provided {.arg interested} {.cls FAERS} data must be a subset of {.arg object}")
+        }
+    }
+    interested_reac <- faers_get(interested, field = "reac")[[pt]]
+    n1. <- length(interested_reac) # scalar
+    n <- length(full_reac) # scalar
+    n.1 <- c(table(full_reac))
+    reac_names <- names(n.1)
+    n11 <- c(table(interested_reac))[reac_names]
+    n11 <- data.table::fifelse(is.na(n11), 0L, n11)
+    data.table::data.table(
+        reac_events = reac_names,
+        a = n11, b = n1. - n11, c = n.1 - n11,
+        d = n - (n1. + n.1 - n11)
+    )
 })

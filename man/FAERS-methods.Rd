@@ -7,6 +7,8 @@
 \alias{faers_keep,FAERSascii-method}
 \alias{faers_filter}
 \alias{faers_filter,FAERSascii-method}
+\alias{faers_phv_table}
+\alias{faers_phv_table,FAERSascii-method}
 \title{Methods for FAERS class}
 \usage{
 faers_get(object, ...)
@@ -19,13 +21,18 @@ faers_keep(object, ...)
 
 faers_filter(object, ...)
 
-\S4method{faers_filter}{FAERSascii}(object, field, .fn, ...)
+\S4method{faers_filter}{FAERSascii}(object, .fn, ..., field)
+
+faers_phv_table(object, ...)
+
+\S4method{faers_phv_table}{FAERSascii}(object, pt = "soc_name", ..., interested = NULL)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
 
-\item{...}{Other arguments passed to specific methods. For \code{faers_filter}
-Other arguments passed to \code{.fn}.}
+\item{...}{Other arguments passed to specific methods. For \code{faers_filter},
+other arguments passed to \code{.fn}. For \code{faers_phv_table}, other arguments
+passed to \code{faers_filter} and \code{...} is solely used when interested is \code{NULL}.}
 
 \item{field}{A string indicates the FAERS fields data applied with \code{.fn} to
 extract primaryid. If \code{NULL}, the object will be passed to \code{.fn} directly.
@@ -47,6 +54,13 @@ created from formulas have a special class. Use \code{is_lambda()} to test for
 it.
 
 If a \strong{string}, the function is looked up in \code{globalenv()}.}
+
+\item{pt}{A string specify the events column in \code{reac} field of object.}
+
+\item{interested}{A \code{FAERSascii} object with data from interested drug, must
+be a subset of \code{object}. If \code{interested} is set to \code{NULL}, the \code{faers_filter}
+function will be employed to extract data for the drug of interest from the
+\code{object}.}
 }
 \description{
 Utils function for \link{FAERS} class.
@@ -61,5 +75,7 @@ didn't filter a whole period FAERS quarterly data, in this way, it's much
 better to run \link[=FAERS]{faers}.
 \item \code{faers_filter}: apply a function to extract wanted \code{primaryid}, then use
 \code{faers_keep} to filter.
+\item \code{faers_phv_table}: build a contingency table for all events in \code{pt}
+column.
 }
 }
