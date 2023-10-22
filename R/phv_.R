@@ -43,7 +43,7 @@
 #' - `phv_obsexp_shrink`: observed to expected ratio (`oe_ratio`).
 #' @export
 #' @name phv_signal
-phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5, n_mcmc = 1e5L) {
+phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
     allowed_methods <- c(
         "ror", "prr", "bcpnn_norm", "bcpnn_mcmc",
         "obsexp_shrink"
@@ -60,7 +60,7 @@ phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, alpha1 = 0.5, a
             bcpnn_mcmc = do.call(phv_fn, c(args, list(n_mcmc = n_mcmc))),
             obsexp_shrink = do.call(
                 phv_fn,
-                c(args, list(alpha1 = alpha1, alpha2 = alpha2))
+                c(args, list(alpha1 = alpha1, alpha2 = alpha2, n_mcmc = n_mcmc))
             ),
             bcpnn_norm = ,
             do.call(phv_fn, args)
@@ -89,11 +89,7 @@ phv_ror <- function(a, b, c, d, alpha = 0.05) {
     ci_low <- exp(stats::qnorm(half, log_ror, var_log_ror))
     ci_high <- exp(stats::qnorm(1L - half, log_ror, var_log_ror))
 
-    data.table::data.table(
-        ror = ror,
-        ci_low = ci_low,
-        ci_high = ci_high
-    )
+    data.table::data.table(ror = ror, ci_low = ci_low, ci_high = ci_high)
 }
 
 #' @export
@@ -138,14 +134,11 @@ phv_bcpnn_norm <- function(a, b, c, d, alpha = 0.05) {
     half <- alpha / 2L
     ci_low <- stats::qnorm(half, ic, sqrt(var_ic))
     ci_high <- stats::qnorm(1 - half, ic, sqrt(var_ic))
-    data.table::data.table(
-        ic = ic,
-        ci_low = ci_low,
-        ci_high = ci_high
-    )
+    data.table::data.table(ic = ic, ci_low = ci_low, ci_high = ci_high)
 }
 
-#' @param n_mcmc number of MCMC simulations per `(a,b,c,d)`-tuple.
+#' @param n_mcmc Number of MCMC simulations per `(a,b,c,d)`-tuple to calculate
+#' confidence intervals. 
 #' @export
 #' @rdname phv_signal
 phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
@@ -228,7 +221,7 @@ phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
 #' = alpha2 = 0.5` (Norén et al., 2013).
 #' @export
 #' @rdname phv_signal
-phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5) {
+phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5, n_mcmc = 1e5L) {
     assert_phv_table(a, b, c, d)
     # run bcpnn analysis
     n <- a + b + c + d
@@ -254,14 +247,16 @@ phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0
         b_star <- b[need_exact_lims]
         c_star <- c[need_exact_lims]
         d_star <- d[need_exact_lims]
-        ic <- phv_bcpnn_mcmc(a_star, b_star, c_star, d_star, alpha = alpha)
+        ic <- phv_bcpnn_mcmc(a_star, b_star, c_star, d_star,
+            alpha = alpha, n_mcmc = n_mcmc
+        )
         # replace the CIs for those with (O + alpha1) < 1
         ci_low[need_exact_lims] <- ic$ci_low
         ci_high[need_exact_lims] <- ic$ci_high
     }
     data.table::data.table(
         oe_ratio = oe_ratio,
-        ci_low = ci_low, ci_high = ci_high
+        ci_low = ci_low, i_high = ci_high
     )
 }
 

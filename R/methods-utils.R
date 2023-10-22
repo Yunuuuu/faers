@@ -2,8 +2,8 @@
 #'
 #' Utils function for [FAERS] class.
 #' @param object A [FAERS] object.
-#' @param ... Other arguments passed to specific methods. 
-#'  - `faers_filter`: other arguments passed to `.fn`. 
+#' @param ... Other arguments passed to specific methods.
+#'  - `faers_filter`: other arguments passed to `.fn`.
 #'  - `faers_phv_table`: other arguments passed to `faers_filter` and `...` is
 #'    solely used when `interested` is `NULL`.
 #'  - `faers_phv_signal`: other arguments passed to `faers_phv_table`.
@@ -158,7 +158,7 @@ methods::setGeneric("faers_phv_signal", function(object, ...) {
 #' @seealso [phv_signal]
 #' @method faers_phv_signal FAERSascii
 #' @rdname FAERS-methods
-methods::setMethod("faers_phv_signal", "FAERSascii", function(object, methods = NULL, ..., alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5, n_mcmc = 1e5L) {
+methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., methods = NULL, alpha = 0.05, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
     out <- faers_phv_table(object, ...)
     cbind(
         out,

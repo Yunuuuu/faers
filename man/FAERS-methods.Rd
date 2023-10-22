@@ -33,12 +33,12 @@ faers_phv_signal(object, ...)
 
 \S4method{faers_phv_signal}{FAERSascii}(
   object,
-  methods = NULL,
   ...,
+  methods = NULL,
   alpha = 0.05,
+  n_mcmc = 100000L,
   alpha1 = 0.5,
-  alpha2 = 0.5,
-  n_mcmc = 100000L
+  alpha2 = 0.5
 )
 }
 \arguments{
@@ -85,11 +85,12 @@ mining. Currently, only "ror", "prr", "bcpnn_norm", "bcpnn_mcmc", and
 \item{alpha}{Level of significance, for construction of the confidence
 intervals.}
 
+\item{n_mcmc}{Number of MCMC simulations per \verb{(a,b,c,d)}-tuple to calculate
+confidence intervals.}
+
 \item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.}
 
 \item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.}
-
-\item{n_mcmc}{number of MCMC simulations per \verb{(a,b,c,d)}-tuple.}
 }
 \description{
 Utils function for \link{FAERS} class.

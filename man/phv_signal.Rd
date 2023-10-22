@@ -16,9 +16,9 @@ phv_signal(
   d,
   methods = NULL,
   alpha = 0.05,
+  n_mcmc = 100000L,
   alpha1 = 0.5,
-  alpha2 = 0.5,
-  n_mcmc = 100000L
+  alpha2 = 0.5
 )
 
 phv_ror(a, b, c, d, alpha = 0.05)
@@ -29,7 +29,16 @@ phv_bcpnn_norm(a, b, c, d, alpha = 0.05)
 
 phv_bcpnn_mcmc(a, b, c, d, alpha = 0.05, n_mcmc = 100000L)
 
-phv_obsexp_shrink(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5)
+phv_obsexp_shrink(
+  a,
+  b,
+  c,
+  d,
+  alpha = 0.05,
+  alpha1 = 0.5,
+  alpha2 = 0.5,
+  n_mcmc = 100000L
+)
 }
 \arguments{
 \item{a}{also referred to as \code{n11} as this is the count of event of interest
@@ -51,11 +60,12 @@ mining. Currently, only "ror", "prr", "bcpnn_norm", "bcpnn_mcmc", and
 \item{alpha}{Level of significance, for construction of the confidence
 intervals.}
 
+\item{n_mcmc}{Number of MCMC simulations per \verb{(a,b,c,d)}-tuple to calculate
+confidence intervals.}
+
 \item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.}
 
 \item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.}
-
-\item{n_mcmc}{number of MCMC simulations per \verb{(a,b,c,d)}-tuple.}
 }
 \value{
 A \link[data.table:data.table]{data.table} with columns of estimated
