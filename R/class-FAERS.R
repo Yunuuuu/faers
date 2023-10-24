@@ -132,7 +132,7 @@ methods::setClass(
 #' @rdname FAERS-class
 methods::setMethod("show", "FAERS", function(object) {
     l <- length(faers_period(object))
-    msg <- sprintf(
+    general_msg <- sprintf(
         "FAERS data from %s Quarterly %s file%s",
         l, object@format, if (l > 1L) "s" else ""
     )
@@ -145,8 +145,33 @@ methods::setMethod("show", "FAERS", function(object) {
     } else {
         prefix <- NULL
     }
-    if (!is.null(prefix)) msg <- paste(prefix, msg, sep = " ")
-    cat(msg, sep = "\n")
+    if (!is.null(prefix)) general_msg <- paste(prefix, general_msg, sep = " ")
+    cat(general_msg, sep = "\n")
+    invisible(object)
+})
+
+#' @export
+#' @method show FAERSascii
+#' @rdname FAERS-class
+methods::setMethod("show", "FAERSascii", function(object) {
+    methods::callNextMethod(object)
+    n_reports <- nrow(object@data$demo)
+    n_unique_reports <- length(unique(object@data$demo$primaryid))
+    n_reports_msg <- sprintf(
+        "  Total report%s: %s",
+        if (n_reports > 1L) "s" else "", n_reports
+    )
+    if (n_unique_reports < n_reports_msg) {
+        n_reports_msg <- paste(n_reports_msg, "(with duplicates)", sep = " ")
+        cat(n_reports_msg, sep = "\n")
+        return(invisible(object))
+    }
+    n_unique_reports_msg <- sprintf(
+        "  Total unique report%s: %s",
+        if (n_unique_reports > 1L) "s" else "", n_unique_reports
+    )
+    cat(n_unique_reports_msg, sep = "\n")
+    invisible(object)
 })
 
 #######################################################

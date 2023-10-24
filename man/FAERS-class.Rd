@@ -9,6 +9,7 @@
 \alias{FAERSxml-class}
 \alias{FAERSxml}
 \alias{show,FAERS-method}
+\alias{show,FAERSascii-method}
 \alias{faers_header}
 \alias{faers_header,FAERSxml-method}
 \alias{[[.FAERS}
@@ -27,6 +28,8 @@
 \title{FAERS class}
 \usage{
 \S4method{show}{FAERS}(object)
+
+\S4method{show}{FAERSascii}(object)
 
 faers_header(object)
 
