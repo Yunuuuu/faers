@@ -236,7 +236,7 @@ parse_xml <- function(path, year, quarter) {
     simplify_list_cols(data)
     data.table::setnames(data, tolower)
     methods::new("FAERSxml",
-        datat = data, header = header,
+        data = data, header = header,
         year = year, quarter = quarter
     )
 }
