@@ -140,8 +140,14 @@ methods::setMethod(
         n <- nrow(full_reac) # scalar
         n1. <- nrow(interested_reac) # scalar
         out <- merge(
-            full_reac[, list(n.1 = .N), by = pt],
-            interested_reac[, list(a = .N), by = pt],
+            eval(substitute(
+                full_reac[, list(n.1 = .N), by = pt],
+                list(pt = pt)
+            )),
+            eval(substitute(
+                interested_reac[, list(a = .N), by = pt],
+                list(pt = pt)
+            )),
             by = pt, all = TRUE, allow.cartesian = TRUE
         )
         out[, a := data.table::fifelse(is.na(a), 0L, a)] # nolint
@@ -172,8 +178,14 @@ methods::setMethod(
         n1. <- nrow(interested_reac)
         n0. <- nrow(interested_reac2)
         out <- merge(
-            interested_reac[, list(a = .N), by = pt],
-            interested_reac2[, list(c = .N), by = pt],
+            eval(substitute(
+                interested_reac[, list(a = .N), by = pt],
+                list(pt = pt)
+            )),
+            eval(substitute(
+                interested_reac2[, list(c = .N), by = pt],
+                list(pt = pt)
+            )),
             by = pt, all = TRUE, allow.cartesian = TRUE
         )
         out[, c("a", "c") := lapply(.SD, function(x) {
