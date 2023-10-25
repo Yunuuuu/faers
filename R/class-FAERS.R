@@ -191,18 +191,21 @@ methods::setMethod("faers_header", "FAERSxml", function(object) {
 })
 
 #######################################################
+#' @param x A [FAERS] object.
 #' @param i Indices specifying elements to extract.
 #' @export
+#' @aliases [[,FAERS-method
 #' @rdname FAERS-class
-`[[.FAERS` <- function(object, i) {
-    object@data[[use_indices(i, names(object@data))]]
-}
+methods::setMethod("[[", "FAERS", function(x, i) {
+    x@data[[use_indices(i, names(x@data))]]
+})
 
 #' @export
+#' @aliases [,FAERS-method
 #' @rdname FAERS-class
-`[.FAERS` <- function(object, i) {
-    object@data[use_indices(i, names(object@data))]
-}
+methods::setMethod("[", "FAERS", function(x, i) {
+    x@data[use_indices(i, names(x@data))]
+})
 
 #######################################################
 #' @param object A [FAERS] object.

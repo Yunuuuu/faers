@@ -12,8 +12,9 @@
 \alias{show,FAERSascii-method}
 \alias{faers_header}
 \alias{faers_header,FAERSxml-method}
-\alias{[[.FAERS}
-\alias{[.FAERS}
+\alias{[[,FAERS-method}
+\alias{[,FAERS,ANY,ANY,ANY-method}
+\alias{[,FAERS-method}
 \alias{faers_data}
 \alias{faers_data,FAERS-method}
 \alias{faers_year}
@@ -35,9 +36,9 @@ faers_header(object)
 
 \S4method{faers_header}{FAERSxml}(object)
 
-\method{[[}{FAERS}(object, i)
+\S4method{[[}{FAERS}(x, i)
 
-\method{[}{FAERS}(object, i)
+\S4method{[}{FAERS,ANY,ANY,ANY}(x, i)
 
 faers_data(object, ...)
 
@@ -61,6 +62,8 @@ faers_deleted_cases(object, ...)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
+
+\item{x}{A \link{FAERS} object.}
 
 \item{i}{Indices specifying elements to extract.}
 
