@@ -57,12 +57,15 @@ methods::setMethod("[[", "FAERSascii", function(x, i) {
 #' @aliases [,FAERSascii-method
 #' @rdname FAERS-methods
 methods::setMethod("[", "FAERSascii", function(x, i) {
-    full_nms <- names(x@data)
-    nms <- full_nms[use_indices(i, full_nms)]
-    out <- lapply(nms, function(nm) {
-        faers_get(x, nms)
-    })
-    names(out) <- nms
+    data <- x@data
+    out <- data[use_indices(i, names(data))]
+    if (x@standardization) {
+        ii <- intersect(names(out), c("indi", "reac"))
+        for (i in ii) {
+            meddra_idx <- out[[i]]$meddra_idx
+            out[[i]] <- cbind(out[[i]][, !"meddra_idx"], x@meddra[meddra_idx])
+        }
+    }
     out
 })
 
@@ -252,3 +255,34 @@ methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., metho
         )))
     )
 })
+
+#########################################################
+use_indices <- function(i, names, arg = rlang::caller_arg(i), call = rlang::caller_env()) {
+    if (anyNA(i)) {
+        cli::cli_abort(
+            sprintf("%s cannot contain `NA`", style_arg(arg)),
+            call = call
+        )
+    }
+    if (is.character(i)) {
+        outbounded_values <- setdiff(i, names)
+        if (length(outbounded_values)) {
+            cli::cli_abort(sprintf(
+                "%s contains outbounded values: {outbounded_values}",
+                style_arg(arg)
+            ), call = call)
+        }
+    } else if (is.numeric(i)) {
+        if (any(i < 1L) || any(i > length(names))) {
+            cli::cli_abort(sprintf(
+                "%s contains out-of-bounds indices", style_arg(arg)
+            ), call = call)
+        }
+    } else {
+        cli::cli_abort(sprintf(
+            "%s must be an atomic numeric or character",
+            style_arg(arg)
+        ), call = call)
+    }
+    i
+}
