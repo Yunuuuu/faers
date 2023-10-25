@@ -27,11 +27,7 @@ meddra_hierarchy_data <- function(path, add_smq = FALSE) {
     )
     if (add_smq) {
         use <- c("llt", "mdhier", "smq_content", "smq_list")
-        cols <- c(
-            cols, "smq_code", "smq_name", "smq_level", "smq_description",
-            "smq_source", "smq_note", "MedDRA_version", "smq_status",
-            "smq_algorithm"
-        )
+        cols <- c(cols, "smq")
     } else {
         use <- c("llt", "mdhier")
     }
