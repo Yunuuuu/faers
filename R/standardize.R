@@ -21,7 +21,7 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
     # for indi
     assert_string(meddra_path)
     assert_bool(add_smq)
-    meddra_data <- meddra_hierarchy_data(meddra_path, add_smq = FALSE)
+    meddra_data <- meddra_hierarchy_data(meddra_path, add_smq = add_smq)
 
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
     # fix error: when load a saved FAERS object
