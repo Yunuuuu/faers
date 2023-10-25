@@ -22,7 +22,7 @@ methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_
     }
     deduplicated_data <- do.call(
         dedup_faers_ascii,
-        faers_data(object)[c("demo", "drug", "indi", "ther", "reac")]
+        object[c("demo", "drug", "indi", "ther", "reac")]
     )
     if (isTRUE(remove_deleted_cases)) {
         deleted_cases <- faers_deleted_cases(object)

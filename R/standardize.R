@@ -46,6 +46,7 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
         meddra_standardize_pt(object@data$reac$cleaned_pt, meddra_data)
     )
     object@data$reac[, cleaned_pt := NULL]
+    object@meddra <- meddra_data
     object@standardization <- TRUE
     object
 })

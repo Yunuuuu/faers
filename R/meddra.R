@@ -104,19 +104,12 @@ meddra_standardize_pt <- function(terms, meddra_data, use = c("llt", "pt")) {
         idx[operated_idx] <- mapped_idx
         if (!anyNA(idx)) break
     }
-    out <- meddra_data[idx]
-    # nolint start
-    out[, meddra_hierarchy := pt_from]
-    out[, meddra_code := as.character(out_code)]
-    out[, meddra_pt := meddra_map_code_into_names(meddra_code, meddra_data)]
-    # nolint end
-
-    # remove the low meddra hierarchy fields
-    deleted_columns <- meddra_hierarchy_infos(
-        use[-length(use)],
-        add_soc_abbrev = FALSE
+    data.table::data.table(
+        meddra_idx = idx,
+        meddra_hierarchy = pt_from,
+        meddra_code = as.character(out_code),
+        meddra_pt = meddra_map_code_into_names(meddra_code, meddra_data)
     )
-    out[, .SD, .SDcols = !deleted_columns]
 }
 
 meddra_hierarchy_infos <- function(use, add_soc_abbrev = TRUE) {

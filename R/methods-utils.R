@@ -33,7 +33,37 @@ methods::setGeneric("faers_get", function(object, ...) {
 #' @rdname FAERS-methods
 methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     field <- match.arg(field, faers_ascii_file_fields)
-    object@data[[field]]
+    out <- object@data[[field]]
+    if (object@standardization && any(field == c("indi", "reac"))) {
+        out <- cbind(out[, !"meddra_idx"], object@meddra[out$meddra_idx])
+    }
+    out
+})
+
+#######################################################
+#' @param x A [FAERSascii] object.
+#' @param i Indices specifying elements to extract. See `field`. It will be okay
+#' to use integer indices.
+#' @export
+#' @aliases [[,FAERSascii-method
+#' @rdname FAERS-methods
+methods::setMethod("[[", "FAERSascii", function(x, i) {
+    full_nms <- names(x@data)
+    nms <- full_nms[[use_indices(i, full_nms)]]
+    faers_get(x, nms)
+})
+
+#' @export
+#' @aliases [,FAERSascii-method
+#' @rdname FAERS-methods
+methods::setMethod("[", "FAERSascii", function(x, i) {
+    full_nms <- names(x@data)
+    nms <- full_nms[use_indices(i, full_nms)]
+    out <- lapply(nms, function(nm) {
+        faers_get(x, nms)
+    })
+    names(out) <- nms
+    out
 })
 
 ##############################################################
@@ -161,7 +191,7 @@ methods::setMethod(
 
 #' @param object2 A [FAERSascii] object with data from another interested drug,
 #' In this way, `object` and `object2` should be not overlapped. The value `n11`
-#' or `a` will be calculated from `object` 
+#' or `a` will be calculated from `object`
 #' @rdname FAERS-methods
 methods::setMethod(
     "faers_phv_table",

@@ -5,8 +5,10 @@
 #' @slot quarter A string specifies the quarter information.
 #' @slot data For `FAERSxml`, a [data.table][data.table::data.table]. For
 #' `FAERSascii`, a list of [data.table][data.table::data.table].
-#' @slot format: A string of "ascii" or "xml" indicates the file format used.
-#' @slot deletedCases: A list of integers, as of 2019 Quarter one there are new
+#' @slot meddra A [data.table][data.table::data.table] or `NULL` representing
+#' the meddra data used for standardization.
+#' @slot format A string of "ascii" or "xml" indicates the file format used.
+#' @slot deletedCases A list of integers, as of 2019 Quarter one there are new
 #' files that lists deleted cases.
 #' @details
 #'  - `faers_data`: Extract the `data` slot.
@@ -17,18 +19,24 @@
 #'  - `faers_deleted_cases`: Extract the `deletedCases` slot.
 #' @aliases FAERS
 #' @name FAERS-class
+NULL
+
+#' @importClassesFrom data.table data.table
+methods::setClassUnion("DTOrNull", c("NULL", "data.table"))
+
 methods::setClass(
     "FAERS",
     slots = list(
         year = "integer",
         quarter = "character",
         data = "ANY",
+        meddra = "DTOrNull",
         deduplication = "logical",
         standardization = "logical",
         format = "character"
     ),
     prototype = list(
-        data = NULL,
+        data = NULL, meddra = NULL,
         deduplication = FALSE,
         standardization = FALSE
     )
@@ -117,9 +125,9 @@ methods::setValidity("FAERSascii", function(object) {
 #' @rdname FAERS-class
 methods::setClass(
     "FAERSxml",
-    slots = list(data = "data.table", header = "list"),
+    slots = list(data = "DTOrNull", header = "list"),
     prototype = list(
-        data = data.table::data.table(),
+        data = NULL,
         header = list(), format = "xml"
     ),
     contains = "FAERS"
@@ -185,23 +193,6 @@ methods::setGeneric("faers_header", function(object) {
 #' @rdname FAERS-class
 methods::setMethod("faers_header", "FAERSxml", function(object) {
     object@header
-})
-
-#######################################################
-#' @param x A [FAERS] object.
-#' @param i Indices specifying elements to extract.
-#' @export
-#' @aliases [[,FAERS-method
-#' @rdname FAERS-class
-methods::setMethod("[[", "FAERS", function(x, i) {
-    x@data[[use_indices(i, names(x@data))]]
-})
-
-#' @export
-#' @aliases [,FAERS-method
-#' @rdname FAERS-class
-methods::setMethod("[", "FAERS", function(x, i) {
-    x@data[use_indices(i, names(x@data))]
 })
 
 #######################################################
