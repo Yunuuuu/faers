@@ -20,31 +20,62 @@ load_meddra <- function(path, use = NULL) {
     out
 }
 
-meddra_hierarchy_data <- function(path) {
-    meddra_data <- load_meddra(path, use = c(
-        "llt", "pt", "hlt_pt", "hlt", "hlgt_hlt",
-        "hlgt", "soc_hlgt", "soc"
-    ))
-    out <- Reduce(function(x, y) {
-        merge(x, y,
-            by = intersect(names(x), names(y)),
-            allow.cartesian = TRUE, all = TRUE
+meddra_hierarchy_data <- function(path, add_smq = TRUE) {
+    cols <- c(
+        meddra_hierarchy_infos(meddra_hierarchy_fields),
+        "primary_soc_fg"
+    )
+    if (add_smq) {
+        use <- c("llt", "mdhier", "smq_content", "smq_list")
+        cols <- c(
+            cols, "smq_code", "smq_name", "smq_level", "smq_description",
+            "smq_source", "smq_note", "MedDRA_version", "status",
+            "smq_Algorithm"
         )
-    }, meddra_data)
-    out[, .SD, .SDcols = meddra_hierarchy_infos(meddra_hierarchy_fields)]
+    } else {
+        use <- c("llt", "mdhier")
+    }
+    meddra_data <- load_meddra(path, use = use)
+    out <- meddra_data$mdhier[meddra_data$llt,
+        on = "pt_code", allow.cartesian = TRUE
+    ]
+    if (add_smq) {
+        smq_data <- meddra_data$smq_content[, c("smq_code", "term_code")]
+        smq_data <- meddra_data$smq_list[smq_data,
+            on = "smq_code",
+            allow.cartesian = TRUE
+        ]
+        out <- cbind(out, smq_data[meddra_match(out, smq_data$term_code)])
+    }
+    # one PT can linked more than one hlt
+    # But we only choose the primary SOC
+    # meddra_data$mdhier[, .SD[, any(primary_soc_fg == "Y")], by = "pt_code"][
+    #     , all(V1)
+    # ] # [1] TRUE
+    out[primary_soc_fg == "Y", .SD, .SDcols = cols]
 }
 
-meddra_map_code_into_names <- function(meddra_data, terms, use = c("llt", "pt")) {
-    out <- rep_len(NA_character_, length(terms))
+#' @return An integer index of terms to match meddra_data
+#' @noRd
+meddra_match <- function(meddra_data, terms, use = c("llt_code", "pt_code", "hlt_code", "hlgt_code", "soc_code")) {
+    out <- rep_len(NA_integer_, nrow(meddra_data))
     for (i in use) {
         operated_idx <- is.na(out)
-        idx <- match(
-            terms[operated_idx],
-            meddra_data[[paste(i, "code", sep = "_")]]
-        )
-        out[operated_idx] <- meddra_data[[
-            paste(i, "name", sep = "_")
-        ]][idx]
+        out[operated_idx] <- match(meddra_data[[i]][operated_idx], terms)
+        if (!anyNA(out)) break
+    }
+    out
+}
+
+meddra_map_code_into_names <- function(
+    terms, meddra_data,
+    term_col = c("llt_code", "pt_code"),
+    value_cols = c("llt_name", "pt_name")) {
+    out <- rep_len(NA_character_, length(terms))
+    for (i in seq_along(term_col)) {
+        na_idx <- is.na(out)
+        idx <- match(terms[na_idx], meddra_data[[term_col[i]]])
+        out[na_idx] <- meddra_data[[value_cols[i]]][idx]
         if (!anyNA(out)) break
     }
     out
@@ -76,7 +107,7 @@ meddra_standardize_pt <- function(terms, meddra_data, use = c("llt", "pt")) {
     # nolint start
     out[, meddra_hierarchy := pt_from]
     out[, meddra_code := as.character(out_code)]
-    out[, meddra_pt := meddra_map_code_into_names(meddra_data, meddra_code)]
+    out[, meddra_pt := meddra_map_code_into_names(meddra_code, meddra_data)]
     # nolint end
 
     # remove the low meddra hierarchy fields
@@ -143,16 +174,16 @@ meddra_names <- function(field) {
         ),
         intl_ord = c("intl_ord_code", "soc_code"),
         smq_list = c(
-            "SMQ_code", "SMQ_name", "SMQ_level", "SMQ_description",
-            "SMQ_source", "SMQ_note", "MedDRA_version", "status",
-            "SMQ_Algorithm"
+            "smq_code", "smq_name", "smq_level", "smq_description",
+            "smq_source", "smq_note", "MedDRA_version", "status",
+            "smq_Algorithm"
         ),
         smq_content = c(
-            "SMQ_code", "Term_code", "Term_level", "Term_scope",
-            "Term_category", "Term_weight", "Term_status",
-            "Term_addition_version", "Term_last_modified"
+            "smq_code", "term_code", "term_level", "term_scope",
+            "term_category", "term_weight", "term_status",
+            "term_addition_version", "term_last_modified"
         )
     )
 }
 
-utils::globalVariables(c("meddra_hierarchy", "meddra_pt"))
+utils::globalVariables(c("meddra_hierarchy", "meddra_pt", "primary_soc_fg"))

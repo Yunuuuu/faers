@@ -11,14 +11,17 @@ methods::setGeneric("faers_standardize", function(object, ...) {
 })
 
 #' @param meddra_path A string, define the path of MedDRA directory.
+#' @param add_smq A bool, indicates whether Standardised MedDRA Queries should
+#' be added. If `TRUE`, "smq_content.asc", and "smq_list.asc" must exist.
 #' @export
 #' @method faers_standardize FAERSascii
 #' @rdname faers_standardize
-methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_path) {
+methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_path, add_smq = TRUE) {
     # standardize PT terms
     # for indi
     assert_string(meddra_path)
-    meddra_data <- meddra_hierarchy_data(meddra_path)
+    assert_bool(add_smq)
+    meddra_data <- meddra_hierarchy_data(meddra_path, add_smq = add_smq)
 
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
     # fix error: when load a saved FAERS object
@@ -133,8 +136,8 @@ clean_indi_pt <- function(x, meddra_data) {
         x == "TYPE II DIABETES", "10045242"
     )
     operated_idx <- !is.na(code)
-    x[operated_idx] <- meddra_map_code_into_names(meddra_data,
-        terms = code[operated_idx]
+    x[operated_idx] <- meddra_map_code_into_names(
+        terms = code[operated_idx], meddra_data
     )
     x
 }
@@ -187,8 +190,8 @@ clean_reac_pt <- function(x, meddra_data) {
         x == "MOREL-LAVELLEE SEROMA", "10088873"
     )
     operated_idx <- !is.na(code)
-    x[operated_idx] <- meddra_map_code_into_names(meddra_data,
-        terms = code[operated_idx]
+    x[operated_idx] <- meddra_map_code_into_names(
+        terms = code[operated_idx], meddra_data
     )
     x
 }
