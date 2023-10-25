@@ -49,6 +49,7 @@ faers_phv_signal(object, ...)
 
 \S4method{faers_phv_signal}{FAERSascii}(
   object,
+  pt = "soc_name",
   ...,
   methods = NULL,
   alpha = 0.05,
@@ -103,7 +104,7 @@ interest from the \code{object}. The value \code{n11} or \code{a} will be calcul
 In this way, \code{object} and \code{object2} should be not overlapped. The value \code{n11}
 or \code{a} will be calculated from \code{object}}
 
-\item{pt}{A string specify the events column in \code{reac} field of object.}
+\item{pt}{A character specify the events column in \code{reac} field of object.}
 
 \item{methods}{An atomic character, specifies the method used to signal
 mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",

@@ -141,7 +141,7 @@ methods::setGeneric(
     }
 )
 
-#' @param pt A string specify the events column in `reac` field of object.
+#' @param pt A character specify the events column in `reac` field of object.
 #' @param interested A [FAERSascii] object with data from interested drug, must
 #' be a subset of `object`. If `interested` and `object2` are both `missing`,
 #' the `faers_filter` function will be employed to extract data for the drug of
@@ -162,33 +162,27 @@ methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "FAERSascii", object2 = "missing"),
     function(object, pt = "soc_name", interested, object2) {
-        assert_string(pt, empty_ok = FALSE)
-        full_reac <- faers_get(object, field = "reac")
-        full_reac <- full_reac[[pt]]
-        if (is.null(full_reac)) {
-            cli::cli_abort("Cannot find {.arg pt} in {.field reac} field")
-        }
         full_primaryids <- faers_get(object, field = "demo")$primaryid
         interested_primaryids <- faers_get(interested, field = "demo")$primaryid
         if (!all(interested_primaryids %in% full_primaryids)) {
             cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
         }
-        interested_reac <- faers_get(interested, field = "reac")[[pt]]
-        # assert again, `interested` must be a subset of `object`
-        if (!is.null(interested) && !all(interested_reac %in% full_reac)) {
-            cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
-        }
-        n1. <- length(interested_reac) # scalar
-        n <- length(full_reac) # scalar
-        n.1 <- c(table(full_reac))
-        reac_names <- names(n.1)
-        n11 <- c(table(interested_reac))[reac_names]
-        n11 <- data.table::fifelse(is.na(n11), 0L, n11)
-        data.table::data.table(
-            reac_events = reac_names,
-            a = n11, b = n1. - n11, c = n.1 - n11,
-            d = n - (n1. + n.1 - n11)
+        full_reac <- faers_get(object, field = "reac")
+        interested_reac <- faers_get(interested, field = "reac")
+
+        n <- nrow(full_reac) # scalar
+        n1. <- nrow(interested_reac) # scalar
+        out <- data.table::merge(
+            full_reac[, list(n.1 = .N), by = pt],
+            interested_reac[, list(a = .N), by = pt],
+            by = pt, all = TRUE, allow.cartesian = TRUE
         )
+        out[, a := data.table::fifelse(is.na(a), 0L, a)] # nolint
+        out[, b := n1. - a] # nolint
+        out[, c := n.1 - a] # nolint
+        out[, d := n - (n1. + n.1 - a)] # nolint
+        out <- out[, !"n.1"]
+        data.table::setcolorder(out, c(pt, "a", "b", "c", "d"))[]
     }
 )
 
@@ -206,22 +200,21 @@ methods::setMethod(
         if (any(overlapped_idx)) {
             cli::cli_warn("{.val {overlapped_idx}} report{?s} are overlapped between {.arg object} and {.arg object2}")
         }
-        interested_reac <- faers_get(object, field = "reac")[[pt]]
-        interested_reac2 <- faers_get(object2, field = "reac")[[pt]]
-        n1. <- length(interested_reac)
-        n0. <- length(interested_reac2)
-        n11 <- c(table(interested_reac))
-        n01 <- c(table(interested_reac2))
-        reac_names <- union(names(n11), names(01))
-        n11 <- n11[reac_names]
-        n11 <- data.table::fifelse(is.na(n11), 0L, n11)
-        n01 <- n01[reac_names]
-        n01 <- data.table::fifelse(is.na(n01), 0L, n01)
-        data.table::data.table(
-            reac_events = reac_names,
-            a = n11, b = n1. - n11, c = n01,
-            d = n0. - n01
+        interested_reac <- faers_get(object, field = "reac")
+        interested_reac2 <- faers_get(object2, field = "reac")
+        n1. <- nrow(interested_reac)
+        n0. <- nrow(interested_reac2)
+        out <- data.table::merge(
+            interested_reac[, list(a = .N), by = pt],
+            interested_reac2[, list(c = .N), by = pt],
+            by = pt, all = TRUE, allow.cartesian = TRUE
         )
+        out[, c("a", "c") := lapply(.SD, function(x) {
+            data.table::fifelse(is.na(x), 0L, x)
+        }), .SDcols = c("a", "c")]
+        out[, b := n1. - a] # nolint
+        out[, d := n0. - c] # nolint
+        data.table::setcolorder(out, c(pt, "a", "b", "c", "d"))[]
     }
 )
 
@@ -245,44 +238,13 @@ methods::setGeneric("faers_phv_signal", function(object, ...) {
 #' @seealso [phv_signal]
 #' @method faers_phv_signal FAERSascii
 #' @rdname FAERS-methods
-methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
-    out <- faers_phv_table(object, ...)
+methods::setMethod("faers_phv_signal", "FAERSascii", function(object, pt = "soc_name", ..., methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
+    out <- faers_phv_table(object, pt = pt, ...)
     cbind(
         out,
-        do.call(phv_signal, c(out[, !"reac_events"], list(
+        do.call(phv_signal, c(out[, .SD, .SDcols = -pt], list(
             methods = methods, alpha = alpha, correct = correct,
             n_mcmc = n_mcmc, alpha1 = alpha1, alpha2 = alpha2
         )))
     )
 })
-
-#########################################################
-use_indices <- function(i, names, arg = rlang::caller_arg(i), call = rlang::caller_env()) {
-    if (anyNA(i)) {
-        cli::cli_abort(
-            sprintf("%s cannot contain `NA`", style_arg(arg)),
-            call = call
-        )
-    }
-    if (is.character(i)) {
-        outbounded_values <- setdiff(i, names)
-        if (length(outbounded_values)) {
-            cli::cli_abort(sprintf(
-                "%s contains outbounded values: {outbounded_values}",
-                style_arg(arg)
-            ), call = call)
-        }
-    } else if (is.numeric(i)) {
-        if (any(i < 1L) || any(i > length(names))) {
-            cli::cli_abort(sprintf(
-                "%s contains out-of-bounds indices", style_arg(arg)
-            ), call = call)
-        }
-    } else {
-        cli::cli_abort(sprintf(
-            "%s must be an atomic numeric or character",
-            style_arg(arg)
-        ), call = call)
-    }
-    i
-}
