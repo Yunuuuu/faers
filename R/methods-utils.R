@@ -101,51 +101,105 @@ methods::setMethod("faers_filter", "FAERSascii", function(object, .fn, ..., fiel
 ##############################################################
 #' @export
 #' @rdname FAERS-methods
-methods::setGeneric("faers_phv_table", function(object, ...) {
-    methods::makeStandardGeneric("faers_phv_table")
-})
+methods::setGeneric(
+    "faers_phv_table",
+    function(object, ..., interested, object2) {
+        methods::makeStandardGeneric("faers_phv_table")
+    }
+)
 
 #' @param pt A string specify the events column in `reac` field of object.
 #' @param interested A [FAERSascii] object with data from interested drug, must
-#' be a subset of `object`. If `interested` is set to `NULL`, the `faers_filter`
-#' function will be employed to extract data for the drug of interest from the
-#' `object`.
-#' @method faers_phv_table FAERSascii
+#' be a subset of `object`. If `interested` and `object2` are both `missing`,
+#' the `faers_filter` function will be employed to extract data for the drug of
+#' interest from the `object`. The value `n11` or `a` will be calculated from
+#' `interested` .
 #' @rdname FAERS-methods
-methods::setMethod("faers_phv_table", "FAERSascii", function(object, pt = "soc_name", ..., interested = NULL) {
-    assert_string(pt, empty_ok = FALSE)
-    full_reac <- faers_get(object, field = "reac")
-    full_reac <- full_reac[[pt]]
-    if (is.null(full_reac)) {
-        cli::cli_abort("Cannot find {.arg pt} in {.field reac} field")
-    }
-    assert_s4_class(interested, "FAERSascii", null_ok = TRUE)
-    if (is.null(interested)) {
+methods::setMethod(
+    "faers_phv_table",
+    c(object = "FAERSascii", interested = "missing", object2 = "missing"),
+    function(object, pt = "soc_name", ..., interested, object2) {
         interested <- faers_filter(object, ...)
-    } else {
+        faers_phv_table(object = object, pt = pt, interested = interested)
+    }
+)
+
+#' @rdname FAERS-methods
+methods::setMethod(
+    "faers_phv_table",
+    c(object = "FAERSascii", interested = "FAERSascii", object2 = "missing"),
+    function(object, pt = "soc_name", interested, object2) {
+        assert_string(pt, empty_ok = FALSE)
+        full_reac <- faers_get(object, field = "reac")
+        full_reac <- full_reac[[pt]]
+        if (is.null(full_reac)) {
+            cli::cli_abort("Cannot find {.arg pt} in {.field reac} field")
+        }
         full_primaryids <- faers_get(object, field = "demo")$primaryid
         interested_primaryids <- faers_get(interested, field = "demo")$primaryid
         if (!all(interested_primaryids %in% full_primaryids)) {
             cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
         }
+        interested_reac <- faers_get(interested, field = "reac")[[pt]]
+        # assert again, `interested` must be a subset of `object`
+        if (!is.null(interested) && !all(interested_reac %in% full_reac)) {
+            cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
+        }
+        n1. <- length(interested_reac) # scalar
+        n <- length(full_reac) # scalar
+        n.1 <- c(table(full_reac))
+        reac_names <- names(n.1)
+        n11 <- c(table(interested_reac))[reac_names]
+        n11 <- data.table::fifelse(is.na(n11), 0L, n11)
+        data.table::data.table(
+            reac_events = reac_names,
+            a = n11, b = n1. - n11, c = n.1 - n11,
+            d = n - (n1. + n.1 - n11)
+        )
     }
-    interested_reac <- faers_get(interested, field = "reac")[[pt]]
-    # assert again, `interested` must be a subset of `object`
-    if (!is.null(interested) && !all(interested_reac %in% full_reac)) {
-        cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
+)
+
+#' @param object2 A [FAERSascii] object with data from another interested drug,
+#' In this way, `object` and `object2` should be not overlapped. The value `n11`
+#' or `a` will be calculated from `object` 
+#' @rdname FAERS-methods
+methods::setMethod(
+    "faers_phv_table",
+    c(object = "FAERSascii", interested = "missing", object2 = "FAERSascii"),
+    function(object, pt = "soc_name", interested, object2) {
+        primaryids <- faers_get(object, field = "demo")$primaryid
+        primaryids2 <- faers_get(object2, field = "demo")$primaryid
+        overlapped_idx <- primaryids %in% primaryids2
+        if (any(overlapped_idx)) {
+            cli::cli_warn("{.val {overlapped_idx}} report{?s} are overlapped between {.arg object} and {.arg object2}")
+        }
+        interested_reac <- faers_get(object, field = "reac")[[pt]]
+        interested_reac2 <- faers_get(object2, field = "reac")[[pt]]
+        n1. <- length(interested_reac)
+        n0. <- length(interested_reac2)
+        n11 <- c(table(interested_reac))
+        n01 <- c(table(interested_reac2))
+        reac_names <- union(names(n11), names(01))
+        n11 <- n11[reac_names]
+        n11 <- data.table::fifelse(is.na(n11), 0L, n11)
+        n01 <- n01[reac_names]
+        n01 <- data.table::fifelse(is.na(n01), 0L, n01)
+        data.table::data.table(
+            reac_events = reac_names,
+            a = n11, b = n1. - n11, c = n01,
+            d = n0. - n01
+        )
     }
-    n1. <- length(interested_reac) # scalar
-    n <- length(full_reac) # scalar
-    n.1 <- c(table(full_reac))
-    reac_names <- names(n.1)
-    n11 <- c(table(interested_reac))[reac_names]
-    n11 <- data.table::fifelse(is.na(n11), 0L, n11)
-    data.table::data.table(
-        reac_events = reac_names,
-        a = n11, b = n1. - n11, c = n.1 - n11,
-        d = n - (n1. + n.1 - n11)
-    )
-})
+)
+
+#' @rdname FAERS-methods
+methods::setMethod(
+    "faers_phv_table",
+    c(object = "FAERSascii", interested = "FAERSascii", object2 = "FAERSascii"),
+    function(object, interested, object2) {
+        cli::cli_abort("{.arg interested} and {.arg object2} are both exclusive, must be provided only one or none")
+    }
+)
 
 ##############################################################
 #' @export

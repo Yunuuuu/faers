@@ -8,7 +8,10 @@
 \alias{faers_filter}
 \alias{faers_filter,FAERSascii-method}
 \alias{faers_phv_table}
-\alias{faers_phv_table,FAERSascii-method}
+\alias{faers_phv_table,FAERSascii,missing,missing-method}
+\alias{faers_phv_table,FAERSascii,FAERSascii,missing-method}
+\alias{faers_phv_table,FAERSascii,missing,FAERSascii-method}
+\alias{faers_phv_table,FAERSascii,FAERSascii,FAERSascii-method}
 \alias{faers_phv_signal}
 \alias{faers_phv_signal,FAERSascii-method}
 \title{Methods for FAERS class}
@@ -25,9 +28,15 @@ faers_filter(object, ...)
 
 \S4method{faers_filter}{FAERSascii}(object, .fn, ..., field = NULL)
 
-faers_phv_table(object, ...)
+faers_phv_table(object, ..., interested, object2)
 
-\S4method{faers_phv_table}{FAERSascii}(object, pt = "soc_name", ..., interested = NULL)
+\S4method{faers_phv_table}{FAERSascii,missing,missing}(object, pt = "soc_name", ..., interested, object2)
+
+\S4method{faers_phv_table}{FAERSascii,FAERSascii,missing}(object, pt = "soc_name", interested, object2)
+
+\S4method{faers_phv_table}{FAERSascii,missing,FAERSascii}(object, pt = "soc_name", interested, object2)
+
+\S4method{faers_phv_table}{FAERSascii,FAERSascii,FAERSascii}(object, interested, object2)
 
 faers_phv_signal(object, ...)
 
@@ -72,12 +81,17 @@ very compact anonymous functions (lambdas) with up to two inputs.
 
 If a \strong{string}, the function is looked up in \code{globalenv()}.}
 
-\item{pt}{A string specify the events column in \code{reac} field of object.}
-
 \item{interested}{A \link{FAERSascii} object with data from interested drug, must
-be a subset of \code{object}. If \code{interested} is set to \code{NULL}, the \code{faers_filter}
-function will be employed to extract data for the drug of interest from the
-\code{object}.}
+be a subset of \code{object}. If \code{interested} and \code{object2} are both \code{missing},
+the \code{faers_filter} function will be employed to extract data for the drug of
+interest from the \code{object}. The value \code{n11} or \code{a} will be calculated from
+\code{interested} .}
+
+\item{object2}{A \link{FAERSascii} object with data from another interested drug,
+In this way, \code{object} and \code{object2} should be not overlapped. The value \code{n11}
+or \code{a} will be calculated from \code{object}}
+
+\item{pt}{A string specify the events column in \code{reac} field of object.}
 
 \item{methods}{An atomic character, specifies the method used to signal
 mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
