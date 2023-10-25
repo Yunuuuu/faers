@@ -139,7 +139,7 @@ methods::setMethod(
 
         n <- nrow(full_reac) # scalar
         n1. <- nrow(interested_reac) # scalar
-        out <- data.table::merge(
+        out <- merge(
             full_reac[, list(n.1 = .N), by = pt],
             interested_reac[, list(a = .N), by = pt],
             by = pt, all = TRUE, allow.cartesian = TRUE
@@ -171,7 +171,7 @@ methods::setMethod(
         interested_reac2 <- faers_get(object2, field = "reac")
         n1. <- nrow(interested_reac)
         n0. <- nrow(interested_reac2)
-        out <- data.table::merge(
+        out <- merge(
             interested_reac[, list(a = .N), by = pt],
             interested_reac2[, list(c = .N), by = pt],
             by = pt, all = TRUE, allow.cartesian = TRUE
