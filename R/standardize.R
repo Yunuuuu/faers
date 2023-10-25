@@ -25,7 +25,7 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
     # assert_bool(add_smq)
     # add SMQ data will increase the usage of memory
     # don't use it anymore.
-    meddra_data <- meddra_hierarchy_data(meddra_path, add_smq = FALSE)
+    meddra_data <- meddra_hierarchy_data(meddra_path)
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
     # fix error: when load a saved FAERS object
     cli::cli_alert("standardize {.field Preferred Term} in indi")

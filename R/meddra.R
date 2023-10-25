@@ -20,34 +20,33 @@ load_meddra <- function(path, use = NULL) {
     out
 }
 
-meddra_hierarchy_data <- function(path, add_smq = FALSE) {
-    cols <- c(
-        meddra_hierarchy_infos(meddra_hierarchy_fields),
-        "primary_soc_fg"
-    )
-    if (add_smq) {
-        use <- c("llt", "mdhier", "smq_content", "smq_list")
-        cols <- c(cols, "smq")
-    } else {
-        use <- c("llt", "mdhier")
-    }
+meddra_smq <- function(path) {
+    data <- load_meddra(path, use = c("smq_content", "smq_list"))
+    out <- data$smq_content[, c("smq_code", "term_code")]
+    data$smq_list[out, on = "smq_code", allow.cartesian = TRUE]
+}
+
+meddra_hierarchy_data <- function(path) {
+    use <- c("llt", "mdhier")
+    cols <- c(meddra_hierarchy_infos(meddra_hierarchy_fields), "primary_soc_fg")
     meddra_data <- load_meddra(path, use = use)
     out <- meddra_data$mdhier[meddra_data$llt,
         on = "pt_code", allow.cartesian = TRUE
     ]
     # this will add a lot of data into all rows resulting in a lots of memory
-    # usage 
-    if (add_smq) {
-        smq_data <- meddra_data$smq_content[, c("smq_code", "term_code")]
-        smq_data <- meddra_data$smq_list[smq_data,
-            on = "smq_code",
-            allow.cartesian = TRUE
-        ]
-        # one PT can map into multiple SMQs, just splitted them into a list
-        smq_data <- split(smq_data, by = "term_code")
-        smq_data <- smq_data[meddra_match(out, names(smq_data))]
-        out[, smq := smq_data]
-    }
+    # usage, don't use it anymore
+    # if (add_smq) {
+    #     smq_data <- meddra_data$smq_content[, c("smq_code", "term_code")]
+    #     smq_data <- meddra_data$smq_list[smq_data,
+    #         on = "smq_code",
+    #         allow.cartesian = TRUE
+    #     ]
+    #     # one PT can map into multiple SMQs, just splitted them into a list
+    #     smq_data <- split(smq_data, by = "term_code")
+    #     smq_data <- smq_data[meddra_match(out, names(smq_data))]
+    #     out[, smq := smq_data]
+    # }
+
     # one PT can linked more than one hlt
     # But we only choose the primary SOC
     # meddra_data$mdhier[, .SD[, any(primary_soc_fg == "Y")], by = "pt_code"][
