@@ -38,16 +38,17 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL, all
         return(object@data[[use]])
     }
     lst <- object@data[use]
-    # check if drug_seq should be matched
-    if (any("indi" == use) && any(use %in% c("reac", "ther", "drug"))) {
-        lst$indi <- data.table::copy(lst$indi)
-    }
-    if (all(c("indi", "reac") %in% use)) {
+    # check if we need copy indi
+    # to prevent modify in place (change the input object)
+    indi_reference <- TRUE
+    if (object@standardization && all(c("indi", "reac") %in% use)) {
         meddra_columns <- c(
             meddra_hierarchy_infos(meddra_hierarchy_fields),
             "primary_soc_fg", "meddra_hierarchy",
             "meddra_code", "meddra_pt", "smq"
         )
+        lst$indi <- data.table::copy(lst$indi)
+        indi_reference <- FALSE
         data.table::setnames(
             lst$indi, meddra_columns,
             function(x) paste("indi", x, sep = "_"),
@@ -64,6 +65,7 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL, all
     # check if drug_seq should be matched
     if (sum(use %in% c("indi", "ther", "drug")) >= 2L) {
         if (any(use == "indi")) {
+            if (indi_reference) lst$indi <- data.table::copy(lst$indi)
             data.table::setnames(lst$indi, "indi_drug_seq", "drug_seq")
         }
         if (any(use == "ther")) {
