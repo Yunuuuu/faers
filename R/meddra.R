@@ -91,12 +91,12 @@ meddra_standardize_pt <- function(terms, meddra_data, use = c("llt", "pt")) {
     # order `use` based on the order in `meddra_hierarchy_fields`
     use <- intersect(meddra_hierarchy_fields, use)
     for (i in use) {
-        operated_idx <- is.na(out_code)
+        operated_idx <- which(is.na(out_code))
         mapped_idx <- data.table::chmatch(
             terms[operated_idx],
             toupper(meddra_data[[paste(i, "name", sep = "_")]])
         )
-        pt_from[operated_idx] <- i
+        pt_from[operated_idx[!is.na(mapped_idx)]] <- i
         out_code[operated_idx] <- meddra_data[[
             paste(i, "code", sep = "_")
         ]][mapped_idx]
