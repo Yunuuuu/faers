@@ -20,7 +20,7 @@ load_meddra <- function(path, use = NULL) {
     out
 }
 
-meddra_hierarchy_data <- function(path, add_smq = TRUE) {
+meddra_hierarchy_data <- function(path, add_smq = FALSE) {
     cols <- c(
         meddra_hierarchy_infos(meddra_hierarchy_fields),
         "primary_soc_fg"
@@ -29,8 +29,8 @@ meddra_hierarchy_data <- function(path, add_smq = TRUE) {
         use <- c("llt", "mdhier", "smq_content", "smq_list")
         cols <- c(
             cols, "smq_code", "smq_name", "smq_level", "smq_description",
-            "smq_source", "smq_note", "MedDRA_version", "status",
-            "smq_Algorithm"
+            "smq_source", "smq_note", "MedDRA_version", "smq_status",
+            "smq_algorithm"
         )
     } else {
         use <- c("llt", "mdhier")
@@ -45,7 +45,10 @@ meddra_hierarchy_data <- function(path, add_smq = TRUE) {
             on = "smq_code",
             allow.cartesian = TRUE
         ]
-        out <- cbind(out, smq_data[meddra_match(out, smq_data$term_code)])
+        # one PT can map into multiple SMQs, just splitted them into a list
+        smq_data <- split(smq_data, by = "term_code")
+        smq_data <- smq_data[meddra_match(out, names(smq_data))]
+        out[, smq := smq_data]
     }
     # one PT can linked more than one hlt
     # But we only choose the primary SOC
@@ -175,8 +178,8 @@ meddra_names <- function(field) {
         intl_ord = c("intl_ord_code", "soc_code"),
         smq_list = c(
             "smq_code", "smq_name", "smq_level", "smq_description",
-            "smq_source", "smq_note", "MedDRA_version", "status",
-            "smq_Algorithm"
+            "smq_source", "smq_note", "MedDRA_version", "smq_status",
+            "smq_algorithm"
         ),
         smq_content = c(
             "smq_code", "term_code", "term_level", "term_scope",
@@ -186,4 +189,7 @@ meddra_names <- function(field) {
     )
 }
 
-utils::globalVariables(c("meddra_hierarchy", "meddra_pt", "primary_soc_fg"))
+utils::globalVariables(c(
+    "meddra_hierarchy", "meddra_pt",
+    "primary_soc_fg", "smq"
+))

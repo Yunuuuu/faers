@@ -16,12 +16,12 @@ methods::setGeneric("faers_standardize", function(object, ...) {
 #' @export
 #' @method faers_standardize FAERSascii
 #' @rdname faers_standardize
-methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_path, add_smq = TRUE) {
+methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_path, add_smq = FALSE) {
     # standardize PT terms
     # for indi
     assert_string(meddra_path)
     assert_bool(add_smq)
-    meddra_data <- meddra_hierarchy_data(meddra_path, add_smq = add_smq)
+    meddra_data <- meddra_hierarchy_data(meddra_path, add_smq = FALSE)
 
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
     # fix error: when load a saved FAERS object
@@ -134,6 +134,19 @@ clean_indi_pt <- function(x, meddra_data) {
         x == "TOTAL KNEE ARTHROPLASTY", "10003398",
         x == "TRAVELLER'S DIARRHEA", "10044552",
         x == "TYPE II DIABETES", "10045242"
+        # following items were not mapped
+        # "LLT"
+        # "AUTIOIMMUNE INDUCED RASH",
+        # "STROKE PREVENTION",
+        # "CORONARY ARTERY DISEASE/HYPERTENSION",
+        # "INFECTED MOLE",
+        # "SUNBURN PROPHYLAXIS",
+        # "DRUG USE",
+        # "INTRACTABLE SPASTICITY",
+        # "INFLAMATION",
+        # "PRECAUTIONARY MEASURE",
+        # "DRUG",
+        # "REGULATE HEART RATE",
     )
     operated_idx <- !is.na(code)
     x[operated_idx] <- meddra_map_code_into_names(
@@ -187,7 +200,8 @@ clean_reac_pt <- function(x, meddra_data) {
         x == "ORAL APPLIANCE", "10085270",
         x == "VAGINAL RING", "10082353",
         x == "VAGINAL CUFF", "10088846",
-        x == "MOREL-LAVELLEE SEROMA", "10088873"
+        x == "MOREL-LAVELLEE SEROMA", "10088873",
+        x == "RABSON MENDENHALL SYNDROME", "10088742"
     )
     operated_idx <- !is.na(code)
     x[operated_idx] <- meddra_map_code_into_names(

@@ -45,7 +45,8 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL, all
     if (all(c("indi", "reac") %in% use)) {
         meddra_columns <- c(
             meddra_hierarchy_infos(meddra_hierarchy_fields),
-            "meddra_hierarchy", "meddra_code", "meddra_pt"
+            "primary_soc_fg", "meddra_hierarchy",
+            "meddra_code", "meddra_pt", "smq"
         )
         data.table::setnames(
             lst$indi, meddra_columns,

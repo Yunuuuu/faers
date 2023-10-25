@@ -7,7 +7,7 @@
 \usage{
 faers_standardize(object, ...)
 
-\S4method{faers_standardize}{FAERSascii}(object, meddra_path, add_smq = TRUE)
+\S4method{faers_standardize}{FAERSascii}(object, meddra_path, add_smq = FALSE)
 }
 \arguments{
 \item{object}{A \link{FAERSascii} object.}
