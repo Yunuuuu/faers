@@ -7,7 +7,7 @@
 \usage{
 faers_standardize(object, ...)
 
-\S4method{faers_standardize}{FAERSascii}(object, meddra_path, add_smq = FALSE)
+\S4method{faers_standardize}{FAERSascii}(object, meddra_path)
 }
 \arguments{
 \item{object}{A \link{FAERSascii} object.}
@@ -15,9 +15,6 @@ faers_standardize(object, ...)
 \item{...}{Other arguments passed to specific methods.}
 
 \item{meddra_path}{A string, define the path of MedDRA directory.}
-
-\item{add_smq}{A bool, indicates whether Standardised MedDRA Queries should
-be added. If \code{TRUE}, "smq_content.asc", and "smq_list.asc" must exist.}
 }
 \value{
 A \link{FAERSascii} object.

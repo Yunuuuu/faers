@@ -35,6 +35,8 @@ meddra_hierarchy_data <- function(path, add_smq = FALSE) {
     out <- meddra_data$mdhier[meddra_data$llt,
         on = "pt_code", allow.cartesian = TRUE
     ]
+    # this will add a lot of data into all rows resulting in a lots of memory
+    # usage 
     if (add_smq) {
         smq_data <- meddra_data$smq_content[, c("smq_code", "term_code")]
         smq_data <- meddra_data$smq_list[smq_data,
@@ -88,6 +90,7 @@ meddra_standardize_pt <- function(terms, meddra_data, use = c("llt", "pt")) {
     out_code <- rep_len(NA_integer_, length(terms))
     idx <- rep_len(NA_integer_, length(terms))
     # order `use` based on the order in `meddra_hierarchy_fields`
+    # from lowest to highest
     use <- intersect(meddra_hierarchy_fields, use)
     for (i in use) {
         operated_idx <- which(is.na(out_code))
@@ -119,7 +122,7 @@ meddra_standardize_pt <- function(terms, meddra_data, use = c("llt", "pt")) {
 
 meddra_hierarchy_infos <- function(use, add_soc_abbrev = TRUE) {
     out <- paste(rep(use, each = 2L),
-        rep(c("code", "name"), times = 5L),
+        rep(c("code", "name"), times = length(use)),
         sep = "_"
     )
     if (add_soc_abbrev) {

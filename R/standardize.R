@@ -11,18 +11,21 @@ methods::setGeneric("faers_standardize", function(object, ...) {
 })
 
 #' @param meddra_path A string, define the path of MedDRA directory.
-#' @param add_smq A bool, indicates whether Standardised MedDRA Queries should
-#' be added. If `TRUE`, "smq_content.asc", and "smq_list.asc" must exist.
 #' @export
 #' @method faers_standardize FAERSascii
 #' @rdname faers_standardize
-methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_path, add_smq = FALSE) {
+methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_path) {
     # standardize PT terms
     # for indi
     assert_string(meddra_path)
-    assert_bool(add_smq)
-    meddra_data <- meddra_hierarchy_data(meddra_path, add_smq = add_smq)
 
+    # @param add_smq A bool, indicates whether Standardised MedDRA Queries
+    # should be added. If `TRUE`, "smq_content.asc", and "smq_list.asc" must
+    # exist.
+    # assert_bool(add_smq)
+    # add SMQ data will increase the usage of memory
+    # don't use it anymore.
+    meddra_data <- meddra_hierarchy_data(meddra_path, add_smq = FALSE)
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
     # fix error: when load a saved FAERS object
     cli::cli_alert("standardize {.field Preferred Term} in indi")
