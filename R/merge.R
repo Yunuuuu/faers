@@ -45,7 +45,7 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL, all
         meddra_columns <- c(
             meddra_hierarchy_infos(meddra_hierarchy_fields),
             "primary_soc_fg", "meddra_hierarchy",
-            "meddra_code", "meddra_pt", "smq"
+            "meddra_code", "meddra_pt"
         )
         lst$indi <- data.table::copy(lst$indi)
         indi_reference <- FALSE
