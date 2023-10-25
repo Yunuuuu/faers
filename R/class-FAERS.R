@@ -155,14 +155,13 @@ methods::setMethod("show", "FAERS", function(object) {
 #' @rdname FAERS-class
 methods::setMethod("show", "FAERSascii", function(object) {
     methods::callNextMethod(object)
+    n_reports <- nrow(object@data$demo)
     if (object@deduplication) {
-        n_unique_reports <- length(unique(object@data$demo$primaryid))
         msg <- sprintf(
             "  Total unique report%s: %s",
-            if (n_unique_reports > 1L) "s" else "", n_unique_reports
+            if (n_reports > 1L) "s" else "", n_reports
         )
     } else {
-        n_reports <- nrow(object@data$demo)
         msg <- sprintf(
             "  Total report%s: %s (with duplicates)",
             if (n_reports > 1L) "s" else "", n_reports
