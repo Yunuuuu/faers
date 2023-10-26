@@ -51,14 +51,12 @@ faers_period(object)
 
 faers_deleted_cases(object, ...)
 
-\S4method{faers_deleted_cases}{FAERSascii}(object, flatten = TRUE)
+\S4method{faers_deleted_cases}{FAERSascii}(object)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
 
 \item{...}{Other arguments passed to specific methods.}
-
-\item{flatten}{If \code{TRUE}, will flatten the \code{deletedCases} list.}
 }
 \description{
 Provide a container for FAERS Quarterly Data file

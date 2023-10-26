@@ -43,17 +43,23 @@ combine_faers_ascii <- function(x) {
         )
     })
     data.table::setattr(out, "names", faers_ascii_file_fields)
-    methods::new("FAERSascii",
-        data = out,
+    period <- data.table::data.table(
         year = unlist(lapply(x, function(obj) obj@year),
             recursive = FALSE, use.names = FALSE
         ),
         quarter = unlist(lapply(x, function(obj) obj@quarter),
             recursive = FALSE, use.names = FALSE
-        ),
-        deletedCases = list_flatten(
-            lapply(x, function(obj) obj@deletedCases)
         )
+    )
+    period <- unique(period)
+    methods::new("FAERSascii",
+        data = out,
+        year = period$year,
+        quarter = period$quarter,
+        deletedCases = unique(unlist(
+            lapply(x, faers_deleted_cases),
+            use.names = FALSE
+        ))
     )
 }
 

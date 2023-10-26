@@ -91,13 +91,9 @@ read_ascii_deleted_cases <- function(path, year, quarter) {
                 keepLeadingZeros = TRUE
             )[[1L]]
         })
-        ids <- str_remove_all(
-            tolower(basename(deleted_cases_files)),
-            "^(delete|adr)|(deletedcases)?\\.txt$"
-        )
-        data.table::setattr(deleted_cases, "names", ids)
+        unique(as.character(unlist(deleted_cases, use.names = FALSE)))
     } else {
-        list()
+        character()
     }
 }
 

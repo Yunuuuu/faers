@@ -99,10 +99,10 @@ methods::setValidity("FAERS", validate_faers)
 #' @rdname FAERS-class
 methods::setClass(
     "FAERSascii",
-    slots = list(data = "list", deletedCases = "list"),
+    slots = list(data = "list", deletedCases = "character"),
     prototype = list(
         data = list(),
-        deletedCases = list(),
+        deletedCases = character(),
         format = "ascii"
     ),
     contains = "FAERS"
@@ -266,18 +266,12 @@ methods::setGeneric("faers_deleted_cases", function(object, ...) {
     methods::makeStandardGeneric("faers_deleted_cases")
 })
 
-#' @param flatten If `TRUE`, will flatten the `deletedCases` list.
 #' @export
 #' @method faers_deleted_cases FAERS
 #' @aliases faers_field
 #' @rdname FAERS-class
-methods::setMethod("faers_deleted_cases", "FAERSascii", function(object, flatten = TRUE) {
-    out <- object@deletedCases
-    if (isTRUE(flatten)) {
-        unique(unlist(out, recursive = FALSE, use.names = FALSE))
-    } else {
-        out
-    }
+methods::setMethod("faers_deleted_cases", "FAERSascii", function(object) {
+    object@deletedCases
 })
 
 #############################################################
