@@ -9,7 +9,7 @@ Imports:
     brio,
     cli,
     curl,
-    data.table,
+    data.table (>= 1.14.9),
     httr2,
     MCMCpack,
     methods,
@@ -20,6 +20,7 @@ Imports:
     xml2
 Suggests: 
     testthat (>= 3.0.0)
+Remotes: Rdatatable/data.table
 Encoding: UTF-8
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
