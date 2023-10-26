@@ -33,7 +33,40 @@ methods::setGeneric("faers_get", function(object, ...) {
 #' @rdname FAERS-methods
 methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     field <- match.arg(field, faers_ascii_file_fields)
-    object@data[[field]]
+    out <- object@data[[field]]
+    if (object@standardization && any(field == c("indi", "reac"))) {
+        out <- cbind(out[, !"meddra_idx"], object@meddra[out$meddra_idx])
+    }
+    out
+})
+
+#######################################################
+#' @param x A [FAERSascii] object.
+#' @param i Indices specifying elements to extract. See `field`. It will be okay
+#' to use integer indices.
+#' @export
+#' @aliases [[,FAERSascii-method
+#' @rdname FAERS-methods
+methods::setMethod("[[", "FAERSascii", function(x, i) {
+    full_nms <- names(x@data)
+    nms <- full_nms[[use_indices(i, full_nms)]]
+    faers_get(x, nms)
+})
+
+#' @export
+#' @aliases [,FAERSascii-method
+#' @rdname FAERS-methods
+methods::setMethod("[", "FAERSascii", function(x, i) {
+    data <- x@data
+    out <- data[use_indices(i, names(data))]
+    if (x@standardization) {
+        ii <- intersect(names(out), c("indi", "reac"))
+        for (i in ii) {
+            meddra_idx <- out[[i]]$meddra_idx
+            out[[i]] <- cbind(out[[i]][, !"meddra_idx"], x@meddra[meddra_idx])
+        }
+    }
+    out
 })
 
 ##############################################################
@@ -197,6 +230,8 @@ methods::setMethod(
     }
 )
 
+utils::globalVariables(c("a", "b", "d", "n.1"))
+
 #' @rdname FAERS-methods
 methods::setMethod(
     "faers_phv_table",
@@ -228,4 +263,33 @@ methods::setMethod("faers_phv_signal", "FAERSascii", function(object, pt = "soc_
     )
 })
 
-utils::globalVariables(c("a", "b", "d", "n.1"))
+#########################################################
+use_indices <- function(i, names, arg = rlang::caller_arg(i), call = rlang::caller_env()) {
+    if (anyNA(i)) {
+        cli::cli_abort(
+            sprintf("%s cannot contain `NA`", style_arg(arg)),
+            call = call
+        )
+    }
+    if (is.character(i)) {
+        outbounded_values <- setdiff(i, names)
+        if (length(outbounded_values)) {
+            cli::cli_abort(sprintf(
+                "%s contains outbounded values: {outbounded_values}",
+                style_arg(arg)
+            ), call = call)
+        }
+    } else if (is.numeric(i)) {
+        if (any(i < 1L) || any(i > length(names))) {
+            cli::cli_abort(sprintf(
+                "%s contains out-of-bounds indices", style_arg(arg)
+            ), call = call)
+        }
+    } else {
+        cli::cli_abort(sprintf(
+            "%s must be an atomic numeric or character",
+            style_arg(arg)
+        ), call = call)
+    }
+    i
+}

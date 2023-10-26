@@ -12,9 +12,6 @@
 \alias{show,FAERSascii-method}
 \alias{faers_header}
 \alias{faers_header,FAERSxml-method}
-\alias{[[,FAERS-method}
-\alias{[,FAERS,ANY,ANY,ANY-method}
-\alias{[,FAERS-method}
 \alias{faers_data}
 \alias{faers_data,FAERS-method}
 \alias{faers_year}
@@ -35,10 +32,6 @@
 faers_header(object)
 
 \S4method{faers_header}{FAERSxml}(object)
-
-\S4method{[[}{FAERS}(x, i)
-
-\S4method{[}{FAERS,ANY,ANY,ANY}(x, i)
 
 faers_data(object, ...)
 
@@ -62,10 +55,6 @@ faers_deleted_cases(object, ...)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
-
-\item{x}{A \link{FAERS} object.}
-
-\item{i}{Indices specifying elements to extract.}
 
 \item{...}{Other arguments passed to specific methods.}
 
@@ -94,9 +83,12 @@ quarter slot).
 \item{\code{data}}{For \code{FAERSxml}, a \link[data.table:data.table]{data.table}. For
 \code{FAERSascii}, a list of \link[data.table:data.table]{data.table}.}
 
-\item{\code{format:}}{A string of "ascii" or "xml" indicates the file format used.}
+\item{\code{meddra}}{A \link[data.table:data.table]{data.table} or \code{NULL} representing
+the meddra data used for standardization.}
 
-\item{\code{deletedCases:}}{A list of integers, as of 2019 Quarter one there are new
+\item{\code{format}}{A string of "ascii" or "xml" indicates the file format used.}
+
+\item{\code{deletedCases}}{A list of integers, as of 2019 Quarter one there are new
 files that lists deleted cases.}
 }}
 

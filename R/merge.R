@@ -35,9 +35,9 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, use = NULL, all
     # for LAERS, caseid only exist in `demo` data.
     # So we just keep the caseid of `demo`
     if (length(use) == 1L) {
-        return(object@data[[use]])
+        return(object[[use]])
     }
-    lst <- object@data[use]
+    lst <- object[use]
     # check if we need copy indi
     # to prevent modify in place (change the input object)
     indi_reference <- TRUE

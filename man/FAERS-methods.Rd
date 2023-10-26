@@ -3,6 +3,9 @@
 \name{faers_get}
 \alias{faers_get}
 \alias{faers_get,FAERSascii-method}
+\alias{[[,FAERSascii-method}
+\alias{[,FAERSascii,ANY,ANY,ANY-method}
+\alias{[,FAERSascii-method}
 \alias{faers_keep}
 \alias{faers_keep,FAERSascii-method}
 \alias{faers_filter}
@@ -19,6 +22,10 @@
 faers_get(object, ...)
 
 \S4method{faers_get}{FAERSascii}(object, field)
+
+\S4method{[[}{FAERSascii}(x, i)
+
+\S4method{[}{FAERSascii,ANY,ANY,ANY}(x, i)
 
 faers_keep(object, ...)
 
@@ -67,6 +74,11 @@ solely used when \code{interested} is \code{NULL}.
 extract primaryid. If \code{NULL}, the object will be passed to \code{.fn} directly.
 For string, only values "demo", "drug", "indi", "ther", "reac", "rpsr", and
 "outc" can be used.}
+
+\item{x}{A \link{FAERSascii} object.}
+
+\item{i}{Indices specifying elements to extract. See \code{field}. It will be okay
+to use integer indices.}
 
 \item{primaryid}{An atomic character or integer specifies the reports to
 keep. If \code{NULL}, will do nothing.}
