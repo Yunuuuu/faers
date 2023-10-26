@@ -17,11 +17,11 @@ faers_meta <- function() {
     out <- data.table::rbindlist(table_list)
     out[, quarter := period2quarter(period)] # nolint
     data.table::setcolorder(out, c(
-        "year", "period", "quarter",
+        "year", "quarter", "period", 
         "urls_ascii", "file_size_ascii", "urls_xml", "file_size_xml"
     ))
     data.table::setnames(out, c(
-        "year", "period", "quarter",
+        "year", "quarter", "period", 
         "ascii_urls", "ascii_file_size", "xml_urls", "xml_file_size"
     ))
     data.table::setorderv(out, c("year", "quarter"), order = c(-1L, -1L))[]
