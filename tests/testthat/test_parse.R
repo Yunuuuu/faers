@@ -1,6 +1,6 @@
 testthat::test_that("Parsing FAERS ascii data works well", {
     suppressWarnings(data <- faers_parse(
-        "../testdata/aers_ascii_2011q4.zip",
+        testthat::test_path("testdata", "aers_ascii_2011q4.zip"),
         compress_dir = tempdir()
     ))
     testthat::expect_s4_class(data, "FAERSascii")
@@ -17,7 +17,7 @@ testthat::test_that("Parsing FAERS ascii data works well", {
     testthat::expect_equal(nrow(data@data$outc), 182057)
 
     suppressWarnings(data2 <- faers_parse(
-        "../testdata/aers_ascii_2012q1.zip",
+        testthat::test_path("testdata", "aers_ascii_2012q1.zip"),
         compress_dir = tempdir()
     ))
     testthat::expect_s4_class(data2, "FAERSascii")

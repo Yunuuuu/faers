@@ -1,9 +1,9 @@
 testthat::test_that("combine FAERS ojbect works as expected", {
     testthat::expect_no_error(data1 <- faers(2004, "q1", "ascii",
-        dir = "../testdata", compress_dir = tempdir()
+        dir = testthat::test_path("testdata"), compress_dir = tempdir()
     ))
     testthat::expect_no_error(data2 <- faers(2004, "q2", "ascii",
-        dir = "../testdata", compress_dir = tempdir()
+        dir = testthat::test_path("testdata"), compress_dir = tempdir()
     ))
     data3 <- faers_combine(list(data1, data2))
     testthat::expect_s4_class(data3, "FAERSascii")
