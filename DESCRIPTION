@@ -5,9 +5,6 @@ Authors@R:
     person("Yun", "Peng", , "yunyunpp96@outlook.com", role = c("aut", "cre"))
 Description: R interface for FDA Adverse Event Reporting System (FAERS).
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
 Imports: 
     brio,
     cli,
@@ -21,3 +18,9 @@ Imports:
     rvest,
     utils,
     xml2
+Suggests: 
+    testthat (>= 3.0.0)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Config/testthat/edition: 3
