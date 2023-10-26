@@ -6,6 +6,16 @@ data <- suppressWarnings(faers(
 ))
 
 testthat::test_that("faers_get works well", {
+    testthat::expect_s3_class(faers_get(data, "drug"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "indi"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "reac"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "demo"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "ther"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "rpsr"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "outc"), "data.table")
+})
+
+testthat::test_that("faers_primaryid works well", {
     x <- faers_primaryid(data)
     testthat::expect_identical(faers_get(data, "demo")$primaryid, x)
     testthat::expect_in(faers_get(data, "drug")$primaryid, x)
@@ -14,16 +24,6 @@ testthat::test_that("faers_get works well", {
     testthat::expect_in(faers_get(data, "ther")$primaryid, x)
     testthat::expect_in(faers_get(data, "rpsr")$primaryid, x)
     testthat::expect_in(faers_get(data, "outc")$primaryid, x)
-})
-
-testthat::test_that("faers_primaryid works well", {
-    testthat::expect_s3_class(faers_get(data, "drug"), "data.table")
-    testthat::expect_s3_class(faers_get(data, "indi"), "data.table")
-    testthat::expect_s3_class(faers_get(data, "reac"), "data.table")
-    testthat::expect_s3_class(faers_get(data, "demo"), "data.table")
-    testthat::expect_s3_class(faers_get(data, "ther"), "data.table")
-    testthat::expect_s3_class(faers_get(data, "rpsr"), "data.table")
-    testthat::expect_s3_class(faers_get(data, "outc"), "data.table")
 })
 
 testthat::test_that("`[` works well", {
