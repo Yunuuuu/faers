@@ -8,14 +8,15 @@
 #' @slot meddra A [data.table][data.table::data.table] or `NULL` representing
 #' the meddra data used for standardization.
 #' @slot format A string of "ascii" or "xml" indicates the file format used.
-#' @slot deletedCases A list of integers, as of 2019 Quarter one there are new
-#' files that lists deleted cases.
+#' @slot deletedCases An atomic character, as of 2019 Quarter one there are new
+#' files that lists deleted cases. [faers_dedup] will remove cases in this slot.
 #' @details
 #'  - `faers_data`: Extract the `data` slot.
 #'  - `faers_year`: Extract the `year` slot.
 #'  - `faers_quarter`: Extract the `quarter` slot.
 #'  - `faers_period`: Extract the `period` slot (just Concatenate the year and
 #'    quarter slot).
+#'  - `faers_meddra`: Extract the `meddra` slot.
 #'  - `faers_deleted_cases`: Extract the `deletedCases` slot.
 #' @aliases FAERS
 #' @name FAERS-class
@@ -180,22 +181,6 @@ methods::setMethod("show", "FAERSascii", function(object) {
 })
 
 #######################################################
-#' @export
-#' @aliases faers_header
-#' @rdname FAERS-class
-methods::setGeneric("faers_header", function(object) {
-    methods::makeStandardGeneric("faers_header")
-})
-
-#' @export
-#' @method faers_header FAERSxml
-#' @aliases faers_header
-#' @rdname FAERS-class
-methods::setMethod("faers_header", "FAERSxml", function(object) {
-    object@header
-})
-
-#######################################################
 #' @param object A [FAERS] object.
 #' @param ... Other arguments passed to specific methods.
 #' @export
@@ -258,6 +243,22 @@ methods::setMethod("faers_period", "FAERS", function(object) {
     paste0(object@year, object@quarter)
 })
 
+#' @param object A [FAERS] object.
+#' @param ... Other arguments passed to specific methods.
+#' @export
+#' @aliases faers_meddra
+#' @rdname FAERS-class
+methods::setGeneric("faers_meddra", function(object, ...) {
+    methods::makeStandardGeneric("faers_meddra")
+})
+
+#' @export
+#' @method faers_meddra FAERS
+#' @rdname FAERS-class
+methods::setMethod("faers_meddra", "FAERS", function(object) {
+    object@meddra
+})
+
 #################################################################
 #' @export
 #' @aliases faers_deleted_cases
@@ -272,6 +273,22 @@ methods::setGeneric("faers_deleted_cases", function(object, ...) {
 #' @rdname FAERS-class
 methods::setMethod("faers_deleted_cases", "FAERSascii", function(object) {
     object@deletedCases
+})
+
+#######################################################
+#' @export
+#' @aliases faers_header
+#' @rdname FAERS-class
+methods::setGeneric("faers_header", function(object) {
+    methods::makeStandardGeneric("faers_header")
+})
+
+#' @export
+#' @method faers_header FAERSxml
+#' @aliases faers_header
+#' @rdname FAERS-class
+methods::setMethod("faers_header", "FAERSxml", function(object) {
+    object@header
 })
 
 #############################################################

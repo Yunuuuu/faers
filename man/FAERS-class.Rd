@@ -10,8 +10,6 @@
 \alias{FAERSxml}
 \alias{show,FAERS-method}
 \alias{show,FAERSascii-method}
-\alias{faers_header}
-\alias{faers_header,FAERSxml-method}
 \alias{faers_data}
 \alias{faers_data,FAERS-method}
 \alias{faers_year}
@@ -20,18 +18,18 @@
 \alias{faers_quarter,FAERS-method}
 \alias{faers_period}
 \alias{faers_period,FAERS-method}
+\alias{faers_meddra}
+\alias{faers_meddra,FAERS-method}
 \alias{faers_deleted_cases}
 \alias{faers_deleted_cases,FAERSascii-method}
 \alias{faers_field}
+\alias{faers_header}
+\alias{faers_header,FAERSxml-method}
 \title{FAERS class}
 \usage{
 \S4method{show}{FAERS}(object)
 
 \S4method{show}{FAERSascii}(object)
-
-faers_header(object)
-
-\S4method{faers_header}{FAERSxml}(object)
 
 faers_data(object, ...)
 
@@ -49,9 +47,17 @@ faers_period(object)
 
 \S4method{faers_period}{FAERS}(object)
 
+faers_meddra(object, ...)
+
+\S4method{faers_meddra}{FAERS}(object)
+
 faers_deleted_cases(object, ...)
 
 \S4method{faers_deleted_cases}{FAERSascii}(object)
+
+faers_header(object)
+
+\S4method{faers_header}{FAERSxml}(object)
 }
 \arguments{
 \item{object}{A \link{FAERS} object.}
@@ -68,6 +74,7 @@ Provide a container for FAERS Quarterly Data file
 \item \code{faers_quarter}: Extract the \code{quarter} slot.
 \item \code{faers_period}: Extract the \code{period} slot (just Concatenate the year and
 quarter slot).
+\item \code{faers_meddra}: Extract the \code{meddra} slot.
 \item \code{faers_deleted_cases}: Extract the \code{deletedCases} slot.
 }
 }
@@ -86,7 +93,7 @@ the meddra data used for standardization.}
 
 \item{\code{format}}{A string of "ascii" or "xml" indicates the file format used.}
 
-\item{\code{deletedCases}}{A list of integers, as of 2019 Quarter one there are new
-files that lists deleted cases.}
+\item{\code{deletedCases}}{An atomic character, as of 2019 Quarter one there are new
+files that lists deleted cases. \link{faers_dedup} will remove cases in this slot.}
 }}
 
