@@ -243,8 +243,6 @@ methods::setMethod("faers_period", "FAERS", function(object) {
     paste0(object@year, object@quarter)
 })
 
-#' @param object A [FAERS] object.
-#' @param ... Other arguments passed to specific methods.
 #' @export
 #' @aliases faers_meddra
 #' @rdname FAERS-class
