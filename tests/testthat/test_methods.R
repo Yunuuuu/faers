@@ -5,29 +5,88 @@ data <- suppressWarnings(faers(
     compress_dir = tempdir()
 ))
 
-testthat::test_that("standardize FAERS ascii data works well", {
-    testthat::expect_no_error(data_std <- faers_standardize(
-        data, "~/WorkSpace/Data/MedDRA/MedDRA_26_1_English"
-    ))
-    testthat::expect_true(data_std@standardization)
-    testthat::expect_true(data.table::is.data.table(data_std@meddra))
-    testthat::expect_true(all(
-        names(data_std@meddra) == c(meddra_hierarchy_infos(meddra_hierarchy_fields), "primary_soc_fg")
-    ))
-    testthat::expect_true(all(
-        setdiff(names(data_std@data$indi), names(data@data$indi)) ==
-            c("meddra_idx", "meddra_hierarchy", "meddra_code", "meddra_pt")
-    ))
-    testthat::expect_true(all(
-        setdiff(names(data_std@data$
-            reac), names(data@data$reac)) ==
-            c("meddra_idx", "meddra_hierarchy", "meddra_code", "meddra_pt")
-    ))
+testthat::test_that("faers_get works well", {
+    testthat::expect_s3_class(faers_get(data, "drug"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "indi"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "reac"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "demo"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "ther"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "rpsr"), "data.table")
+    testthat::expect_s3_class(faers_get(data, "outc"), "data.table")
 })
 
-testthat::test_that("de-duplicating FAERS ascii data works well", {
-    data_std <- faers_standardize(
-        data, "~/WorkSpace/Data/MedDRA/MedDRA_26_1_English"
-    )
-    testthat::expect_no_error(data_dedup <- faers_dedup(data_std))
+testthat::test_that("`[` works well", {
+    testthat::expect_error(data["aa"])
+    data_list <- data[c("indi", "reac", "demo", "drug")]
+    testthat::expect_true(is.list(data_list))
+    testthat::expect_true(all(
+        names(data_list) == c("indi", "reac", "demo", "drug")
+    ))
+    lapply(data_list, function(x) {
+        testthat::expect_s3_class(x, "data.table")
+    })
+
+    data_list <- data[1:3]
+    testthat::expect_true(is.list(data_list))
+    testthat::expect_true(all(names(data_list) == names(data@data[1:3])))
+    lapply(data_list, function(x) {
+        testthat::expect_s3_class(x, "data.table")
+    })
+})
+
+testthat::test_that("`[[` works well", {
+    testthat::expect_error(data[["aa"]])
+    testthat::expect_s3_class(data[["drug"]], "data.table")
+    testthat::expect_s3_class(data[["indi"]], "data.table")
+    testthat::expect_s3_class(data[["reac"]], "data.table")
+    testthat::expect_s3_class(data[["demo"]], "data.table")
+    testthat::expect_s3_class(data[["ther"]], "data.table")
+    testthat::expect_s3_class(data[["rpsr"]], "data.table")
+    testthat::expect_s3_class(data[["outc"]], "data.table")
+
+    testthat::expect_s3_class(data[[1]], "data.table")
+    testthat::expect_s3_class(data[[2]], "data.table")
+    testthat::expect_s3_class(data[[3]], "data.table")
+    testthat::expect_s3_class(data[[4]], "data.table")
+    testthat::expect_s3_class(data[[5]], "data.table")
+    testthat::expect_s3_class(data[[6]], "data.table")
+    testthat::expect_s3_class(data[[7]], "data.table")
+})
+
+testthat::test_that("`$` works well", {
+    testthat::expect_s3_class(data$drug, "data.table")
+    testthat::expect_s3_class(data$indi, "data.table")
+    testthat::expect_s3_class(data$reac, "data.table")
+    testthat::expect_s3_class(data$demo, "data.table")
+    testthat::expect_s3_class(data$ther, "data.table")
+    testthat::expect_s3_class(data$rpsr, "data.table")
+    testthat::expect_s3_class(data$outc, "data.table")
+
+    testthat::expect_error(data$`1`)
+    testthat::expect_error(data$`2`)
+    testthat::expect_error(data$`3`)
+    testthat::expect_error(data$`4`)
+    testthat::expect_error(data$`5`)
+    testthat::expect_error(data$`6`)
+    testthat::expect_error(data$`7`)
+})
+
+testthat::test_that("faers_keep works well", {
+    data <- faers_keep(data, "4204616")
+    testthat::expect_in(data$drug$primaryid, "4204616")
+    testthat::expect_in(data$indi$primaryid, "4204616")
+    testthat::expect_in(data$reac$primaryid, "4204616")
+    testthat::expect_in(data$demo$primaryid, "4204616")
+    testthat::expect_in(data$ther$primaryid, "4204616")
+    testthat::expect_in(data$rpsr$primaryid, "4204616")
+    testthat::expect_in(data$outc$primaryid, "4204616")
+    
+    data <- faers_keep(data, c("4204616", "4261678"))
+    testthat::expect_in(data$drug$primaryid, c("4204616", "4261678"))
+    testthat::expect_in(data$indi$primaryid, c("4204616", "4261678"))
+    testthat::expect_in(data$reac$primaryid, c("4204616", "4261678"))
+    testthat::expect_in(data$demo$primaryid, c("4204616", "4261678"))
+    testthat::expect_in(data$ther$primaryid, c("4204616", "4261678"))
+    testthat::expect_in(data$rpsr$primaryid, c("4204616", "4261678"))
+    testthat::expect_in(data$outc$primaryid, c("4204616", "4261678"))
 })

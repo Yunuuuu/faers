@@ -8,8 +8,9 @@
 #'    solely used when `interested` is `NULL`.
 #'  - `faers_phv_signal`: other arguments passed to `faers_phv_table`.
 #' @details
-#'  - `faers_get`: Extract a specific field [data.table][data.table::data.table]
-#'    from [FAERS] object.
+#'  - `faers_get`, `[[`, `$`, and `[`: Extract a specific field
+#'    [data.table][data.table::data.table] or a list of field
+#'    [data.table][data.table::data.table] from [FAERS] object.
 #'  - `faers_keep`: only keep data from specified `primaryid`. Note: `year`,
 #'    `quarter`, `deletedCases` will be kept as the original. So make sure you
 #'    didn't filter a whole period FAERS quarterly data, in this way, it's much
@@ -26,8 +27,10 @@ methods::setGeneric("faers_get", function(object, ...) {
     methods::makeStandardGeneric("faers_get")
 })
 
-#' @param field A string indicates the FAERS fields to used. Only values "demo",
-#' "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.
+#' @param field A string indicates the FAERS fields to use. Only values "demo",
+#' "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used. For
+#' `faers_filter`, this filed data will be passed to `.fn` to extract primaryid;
+#' if `NULL`, the `object` will be passed to `.fn` directly. 
 #' @export
 #' @method faers_get FAERSascii
 #' @rdname FAERS-methods
@@ -35,24 +38,16 @@ methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     field <- match.arg(field, faers_ascii_file_fields)
     out <- object@data[[field]]
     if (object@standardization && any(field == c("indi", "reac"))) {
-        out <- cbind(out[, !"meddra_idx"], object@meddra[out$meddra_idx])
+        cbind(out[, !"meddra_idx"], object@meddra[out$meddra_idx])
+    } else {
+        out
     }
-    out
 })
 
 #######################################################
 #' @param x A [FAERSascii] object.
-#' @param i Indices specifying elements to extract. See `field`. It will be okay
-#' to use integer indices.
-#' @export
-#' @aliases [[,FAERSascii-method
-#' @rdname FAERS-methods
-methods::setMethod("[[", "FAERSascii", function(x, i) {
-    full_nms <- names(x@data)
-    nms <- full_nms[[use_indices(i, full_nms)]]
-    faers_get(x, nms)
-})
-
+#' @param i,name Indices specifying elements to extract. For `i`, it will be
+#' okay to use integer indices.
 #' @export
 #' @aliases [,FAERSascii-method
 #' @rdname FAERS-methods
@@ -67,6 +62,21 @@ methods::setMethod("[", "FAERSascii", function(x, i) {
         }
     }
     out
+})
+
+#' @export
+#' @aliases [[,FAERSascii-method
+#' @rdname FAERS-methods
+methods::setMethod("[[", "FAERSascii", function(x, i) {
+    assert_length(i, 1L)
+    x[i][[1L]]
+})
+
+#' @export
+#' @aliases $,FAERSascii-method
+#' @rdname FAERS-methods
+methods::setMethod("$", "FAERSascii", function(x, name) {
+    x[[rlang::as_name(rlang::ensym(name))]]
 })
 
 ##############################################################
@@ -101,10 +111,6 @@ methods::setGeneric("faers_filter", function(object, ...) {
     methods::makeStandardGeneric("faers_filter")
 })
 
-#' @param field A string indicates the FAERS fields data applied with `.fn` to
-#' extract primaryid. If `NULL`, the object will be passed to `.fn` directly.
-#' For string, only values "demo", "drug", "indi", "ther", "reac", "rpsr", and
-#' "outc" can be used.
 #' @param .fn A function or formula.
 #'
 #'   If a **function**, it is used as is.
@@ -152,6 +158,9 @@ methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "missing", object2 = "missing"),
     function(object, pt = "soc_name", ..., interested, object2) {
+        if (!object@standardization) {
+            cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
+        }
         interested <- faers_filter(object, ...)
         faers_phv_table(object = object, pt = pt, interested = interested)
     }
@@ -162,6 +171,12 @@ methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "FAERSascii", object2 = "missing"),
     function(object, pt = "soc_name", interested, object2) {
+        if (!object@standardization) {
+            cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
+        }
+        if (!interested@standardization) {
+            cli::cli_abort("{.arg interested} must be standardized using {.fn faers_standardize}")
+        }
         full_primaryids <- faers_get(object, field = "demo")$primaryid
         interested_primaryids <- faers_get(interested, field = "demo")$primaryid
         if (!all(interested_primaryids %in% full_primaryids)) {
@@ -200,6 +215,12 @@ methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "missing", object2 = "FAERSascii"),
     function(object, pt = "soc_name", interested, object2) {
+        if (!object@standardization) {
+            cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
+        }
+        if (!object2@standardization) {
+            cli::cli_abort("{.arg object2} must be standardized using {.fn faers_standardize}")
+        }
         primaryids <- faers_get(object, field = "demo")$primaryid
         primaryids2 <- faers_get(object2, field = "demo")$primaryid
         overlapped_idx <- primaryids %in% primaryids2

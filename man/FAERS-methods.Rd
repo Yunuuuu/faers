@@ -3,9 +3,10 @@
 \name{faers_get}
 \alias{faers_get}
 \alias{faers_get,FAERSascii-method}
-\alias{[[,FAERSascii-method}
 \alias{[,FAERSascii,ANY,ANY,ANY-method}
 \alias{[,FAERSascii-method}
+\alias{[[,FAERSascii-method}
+\alias{$,FAERSascii-method}
 \alias{faers_keep}
 \alias{faers_keep,FAERSascii-method}
 \alias{faers_filter}
@@ -23,9 +24,11 @@ faers_get(object, ...)
 
 \S4method{faers_get}{FAERSascii}(object, field)
 
+\S4method{[}{FAERSascii,ANY,ANY,ANY}(x, i)
+
 \S4method{[[}{FAERSascii}(x, i)
 
-\S4method{[}{FAERSascii,ANY,ANY,ANY}(x, i)
+\S4method{$}{FAERSascii}(x, name)
 
 faers_keep(object, ...)
 
@@ -70,15 +73,15 @@ solely used when \code{interested} is \code{NULL}.
 \item \code{faers_phv_signal}: other arguments passed to \code{faers_phv_table}.
 }}
 
-\item{field}{A string indicates the FAERS fields data applied with \code{.fn} to
-extract primaryid. If \code{NULL}, the object will be passed to \code{.fn} directly.
-For string, only values "demo", "drug", "indi", "ther", "reac", "rpsr", and
-"outc" can be used.}
+\item{field}{A string indicates the FAERS fields to use. Only values "demo",
+"drug", "indi", "ther", "reac", "rpsr", and "outc" can be used. For
+\code{faers_filter}, this filed data will be passed to \code{.fn} to extract primaryid;
+if \code{NULL}, the \code{object} will be passed to \code{.fn} directly.}
 
 \item{x}{A \link{FAERSascii} object.}
 
-\item{i}{Indices specifying elements to extract. See \code{field}. It will be okay
-to use integer indices.}
+\item{i, name}{Indices specifying elements to extract. For \code{i}, it will be
+okay to use integer indices.}
 
 \item{primaryid}{An atomic character or integer specifies the reports to
 keep. If \code{NULL}, will do nothing.}
@@ -129,8 +132,9 @@ Utils function for \link{FAERS} class.
 }
 \details{
 \itemize{
-\item \code{faers_get}: Extract a specific field \link[data.table:data.table]{data.table}
-from \link{FAERS} object.
+\item \code{faers_get}, \code{[[}, \code{$}, and \code{[}: Extract a specific field
+\link[data.table:data.table]{data.table} or a list of field
+\link[data.table:data.table]{data.table} from \link{FAERS} object.
 \item \code{faers_keep}: only keep data from specified \code{primaryid}. Note: \code{year},
 \code{quarter}, \code{deletedCases} will be kept as the original. So make sure you
 didn't filter a whole period FAERS quarterly data, in this way, it's much
