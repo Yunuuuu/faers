@@ -3,6 +3,8 @@
 \name{faers_get}
 \alias{faers_get}
 \alias{faers_get,FAERSascii-method}
+\alias{faers_primaryid}
+\alias{faers_primaryid,FAERSascii-method}
 \alias{[,FAERSascii,ANY,ANY,ANY-method}
 \alias{[,FAERSascii-method}
 \alias{[[,FAERSascii-method}
@@ -23,6 +25,10 @@
 faers_get(object, ...)
 
 \S4method{faers_get}{FAERSascii}(object, field)
+
+faers_primaryid(object, ...)
+
+\S4method{faers_primaryid}{FAERSascii}(object)
 
 \S4method{[}{FAERSascii,ANY,ANY,ANY}(x, i)
 
@@ -135,6 +141,7 @@ Utils function for \link{FAERS} class.
 \item \code{faers_get}, \code{[[}, \code{$}, and \code{[}: Extract a specific field
 \link[data.table:data.table]{data.table} or a list of field
 \link[data.table:data.table]{data.table} from \link{FAERS} object.
+\item \code{faers_primaryid}: Extract the \code{primaryid} from \code{demo} field.
 \item \code{faers_keep}: only keep data from specified \code{primaryid}. Note: \code{year},
 \code{quarter}, \code{deletedCases} will be kept as the original. So make sure you
 didn't filter a whole period FAERS quarterly data, in this way, it's much

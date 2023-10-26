@@ -11,6 +11,7 @@
 #'  - `faers_get`, `[[`, `$`, and `[`: Extract a specific field
 #'    [data.table][data.table::data.table] or a list of field
 #'    [data.table][data.table::data.table] from [FAERS] object.
+#'  - `faers_primaryid`: Extract the `primaryid` from `demo` field.
 #'  - `faers_keep`: only keep data from specified `primaryid`. Note: `year`,
 #'    `quarter`, `deletedCases` will be kept as the original. So make sure you
 #'    didn't filter a whole period FAERS quarterly data, in this way, it's much
@@ -30,7 +31,7 @@ methods::setGeneric("faers_get", function(object, ...) {
 #' @param field A string indicates the FAERS fields to use. Only values "demo",
 #' "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used. For
 #' `faers_filter`, this filed data will be passed to `.fn` to extract primaryid;
-#' if `NULL`, the `object` will be passed to `.fn` directly. 
+#' if `NULL`, the `object` will be passed to `.fn` directly.
 #' @export
 #' @method faers_get FAERSascii
 #' @rdname FAERS-methods
@@ -43,6 +44,21 @@ methods::setMethod("faers_get", "FAERSascii", function(object, field) {
         out
     }
 })
+
+#' @export
+#' @aliases faers_primaryid
+#' @rdname FAERS-methods
+methods::setGeneric("faers_primaryid", function(object, ...) {
+    methods::makeStandardGeneric("faers_primaryid")
+})
+
+#' @export
+#' @method faers_primaryid FAERSascii
+#' @rdname FAERS-methods
+methods::setMethod("faers_primaryid", "FAERSascii", function(object) {
+    object@data$demo$primaryid
+})
+
 
 #######################################################
 #' @param x A [FAERSascii] object.
@@ -177,8 +193,8 @@ methods::setMethod(
         if (!interested@standardization) {
             cli::cli_abort("{.arg interested} must be standardized using {.fn faers_standardize}")
         }
-        full_primaryids <- faers_get(object, field = "demo")$primaryid
-        interested_primaryids <- faers_get(interested, field = "demo")$primaryid
+        full_primaryids <- faers_primaryid(object)
+        interested_primaryids <- faers_primaryid(interested)
         if (!all(interested_primaryids %in% full_primaryids)) {
             cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
         }
@@ -221,8 +237,8 @@ methods::setMethod(
         if (!object2@standardization) {
             cli::cli_abort("{.arg object2} must be standardized using {.fn faers_standardize}")
         }
-        primaryids <- faers_get(object, field = "demo")$primaryid
-        primaryids2 <- faers_get(object2, field = "demo")$primaryid
+        primaryids <- faers_primaryid(object)
+        primaryids2 <- faers_primaryid(object2)
         overlapped_idx <- primaryids %in% primaryids2
         if (any(overlapped_idx)) {
             cli::cli_warn("{.val {overlapped_idx}} report{?s} are overlapped between {.arg object} and {.arg object2}")
