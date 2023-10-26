@@ -16,7 +16,7 @@ unify_ascii <- function(data, field, year, quarter) {
     )
     data[, c("year", "quarter") := list(year, quarter)]
     data.table::setcolorder(data, c("year", "quarter"), before = 1L)
-    data
+    data[!is.na(primaryid)]
 }
 
 unify_ascii_demo <- function(data, year, quarter) {

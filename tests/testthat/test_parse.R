@@ -8,7 +8,16 @@ testthat::test_that("Parsing FAERS ascii data works well", {
     testthat::expect_false(data@deduplication)
     testthat::expect_false(data@standardization)
     testthat::expect_equal(data@format, "ascii")
-    testthat::expect_equal(nrow(data@data$drug), 734094)
+
+    testthat::expect_false(anyNA(data@data$demo$primaryid))
+    testthat::expect_false(anyNA(data@data$drug$primaryid))
+    testthat::expect_false(anyNA(data@data$indi$primaryid))
+    testthat::expect_false(anyNA(data@data$reac$primaryid))
+    testthat::expect_false(anyNA(data@data$ther$primaryid))
+    testthat::expect_false(anyNA(data@data$rpsr$primaryid))
+    testthat::expect_false(anyNA(data@data$outc$primaryid))
+
+    testthat::expect_equal(nrow(data@data$drug), 734093)
     testthat::expect_equal(nrow(data@data$demo), 208489)
     testthat::expect_equal(nrow(data@data$indi), 362256)
     testthat::expect_equal(nrow(data@data$reac), 773537)
