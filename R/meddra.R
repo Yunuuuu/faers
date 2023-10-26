@@ -108,7 +108,7 @@ meddra_standardize_pt <- function(terms, meddra_data, use = c("llt", "pt")) {
         meddra_idx = idx,
         meddra_hierarchy = pt_from,
         meddra_code = as.character(out_code),
-        meddra_pt = meddra_map_code_into_names(meddra_code, meddra_data)
+        meddra_pt = meddra_map_code_into_names(out_code, meddra_data)
     )
 }
 
