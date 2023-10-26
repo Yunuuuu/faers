@@ -1,7 +1,7 @@
 testthat::test_that("Parsing FAERS metadata works well", {
     testthat::skip_if_offline()
     gds <- faers_meta()
-    testthat::expect_true(data.table::is.data.table(gds))
+    testthat::expect_s3_class(gds, "is.data.table")
     testthat::expect_true(
         all(names(gds) == c("year", "quarter", "period", "ascii_urls", "ascii_file_size", "xml_urls", "xml_file_size"))
     )
