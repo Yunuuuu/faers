@@ -4,3 +4,4 @@
 ^\.radian_history$
 ^Scratch\.RConsole$
 ^data-raw$
+^\.github$
