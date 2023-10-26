@@ -14,7 +14,7 @@ testthat::test_that("faers() function works as expected", {
     testthat::expect_equal(data3@format, "ascii")
     testthat::expect_equal(
         nrow(data3@data$drug),
-        nrow(data1@data$drug) + nrow(data2)
+        nrow(data1@data$drug) + nrow(data2@data$drug)
     )
     testthat::expect_equal(
         nrow(data3@data$demo),
