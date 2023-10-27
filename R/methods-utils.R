@@ -18,7 +18,8 @@
 #'    better to run [faers].
 #'  - `faers_filter`: apply a function to extract wanted `primaryid`, then use
 #'    `faers_keep` to filter.
-#'  - `faers_phv_table`: build a contingency table for all events in `pt`
+#'  - `faers_phv_table`: build a contingency table for all events in
+#'    `interested_event`.
 #'    column.
 #'  - `faers_phv_signal`: Pharmacovigilance Analysis used contingency table
 #'    constructed with `faers_phv_table`. Details see [phv_signal].
@@ -163,7 +164,11 @@ methods::setGeneric(
     }
 )
 
-#' @param pt A character specify the events column in `reac` field of object.
+#' @param interested_field A string indicates the interested FAERS fields to
+#' use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
+#' can be used.
+#' @param interested_event A character specify the events column in field of
+#' object specified in `interested_field`.
 #' @param interested A [FAERSascii] object with data from interested drug, must
 #' be a subset of `object`. If `interested` and `object2` are both `missing`,
 #' the `faers_filter` function will be employed to extract data for the drug of
@@ -173,12 +178,16 @@ methods::setGeneric(
 methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "missing", object2 = "missing"),
-    function(object, pt = "soc_name", ..., interested, object2) {
+    function(object, interested_field = "reac", interested_event = "soc_name", ..., interested, object2) {
         if (!object@standardization) {
             cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
         }
         interested <- faers_filter(object, ...)
-        faers_phv_table(object = object, pt = pt, interested = interested)
+        faers_phv_table(
+            object = object, interested_field = interested_field,
+            interested_event = interested_event,
+            interested = interested
+        )
     }
 )
 
@@ -186,7 +195,7 @@ methods::setMethod(
 methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "FAERSascii", object2 = "missing"),
-    function(object, pt = "soc_name", interested, object2) {
+    function(object, interested_field = "reac", interested_event = "soc_name", interested, object2) {
         if (!object@standardization) {
             cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
         }
@@ -198,28 +207,28 @@ methods::setMethod(
         if (!all(interested_primaryids %in% full_primaryids)) {
             cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
         }
-        full_reac <- faers_get(object, field = "reac")
-        interested_reac <- faers_get(interested, field = "reac")
+        full_data <- faers_get(object, field = interested_field)
+        interested_data <- faers_get(interested, field = interested_field)
 
-        n <- nrow(full_reac) # scalar
-        n1. <- nrow(interested_reac) # scalar
+        n <- nrow(full_data) # scalar
+        n1. <- nrow(interested_data) # scalar
         out <- merge(
             eval(substitute(
-                full_reac[, list(n.1 = .N), by = pt],
-                list(pt = pt)
+                full_data[, list(n.1 = .N), by = interested_event],
+                list(interested_event = interested_event)
             )),
             eval(substitute(
-                interested_reac[, list(a = .N), by = pt],
-                list(pt = pt)
+                interested_data[, list(a = .N), by = interested_event],
+                list(interested_event = interested_event)
             )),
-            by = pt, all = TRUE, allow.cartesian = TRUE
+            by = interested_event, all = TRUE, allow.cartesian = TRUE
         )
         out[, a := data.table::fifelse(is.na(a), 0L, a)] # nolint
         out[, b := n1. - a] # nolint
         out[, c := n.1 - a] # nolint
         out[, d := n - (n1. + n.1 - a)] # nolint
         out <- out[, !"n.1"]
-        data.table::setcolorder(out, c(pt, "a", "b", "c", "d"))[]
+        data.table::setcolorder(out, c(interested_event, "a", "b", "c", "d"))[]
     }
 )
 
@@ -230,7 +239,7 @@ methods::setMethod(
 methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "missing", object2 = "FAERSascii"),
-    function(object, pt = "soc_name", interested, object2) {
+    function(object, interested_event = "soc_name", interested, object2) {
         if (!object@standardization) {
             cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
         }
@@ -249,21 +258,21 @@ methods::setMethod(
         n0. <- nrow(interested_reac2)
         out <- merge(
             eval(substitute(
-                interested_reac[, list(a = .N), by = pt],
-                list(pt = pt)
+                interested_reac[, list(a = .N), by = interested_event],
+                list(interested_event = interested_event)
             )),
             eval(substitute(
-                interested_reac2[, list(c = .N), by = pt],
-                list(pt = pt)
+                interested_reac2[, list(c = .N), by = interested_event],
+                list(interested_event = interested_event)
             )),
-            by = pt, all = TRUE, allow.cartesian = TRUE
+            by = interested_event, all = TRUE, allow.cartesian = TRUE
         )
         out[, c("a", "c") := lapply(.SD, function(x) {
             data.table::fifelse(is.na(x), 0L, x)
         }), .SDcols = c("a", "c")]
         out[, b := n1. - a] # nolint
         out[, d := n0. - c] # nolint
-        data.table::setcolorder(out, c(pt, "a", "b", "c", "d"))[]
+        data.table::setcolorder(out, c(interested_event, "a", "b", "c", "d"))[]
     }
 )
 
@@ -289,11 +298,11 @@ methods::setGeneric("faers_phv_signal", function(object, ...) {
 #' @seealso [phv_signal]
 #' @method faers_phv_signal FAERSascii
 #' @rdname FAERS-methods
-methods::setMethod("faers_phv_signal", "FAERSascii", function(object, pt = "soc_name", ..., methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
-    out <- faers_phv_table(object, pt = pt, ...)
+methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
+    out <- faers_phv_table(object, ...)
     cbind(
         out,
-        do.call(phv_signal, c(out[, .SD, .SDcols = -pt], list(
+        do.call(phv_signal, c(out[, .SD, .SDcols = -interested_event], list(
             methods = methods, alpha = alpha, correct = correct,
             n_mcmc = n_mcmc, alpha1 = alpha1, alpha2 = alpha2
         )))

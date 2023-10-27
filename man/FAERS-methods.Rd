@@ -46,11 +46,24 @@ faers_filter(object, ...)
 
 faers_phv_table(object, ..., interested, object2)
 
-\S4method{faers_phv_table}{FAERSascii,missing,missing}(object, pt = "soc_name", ..., interested, object2)
+\S4method{faers_phv_table}{FAERSascii,missing,missing}(
+  object,
+  interested_field = "reac",
+  interested_event = "soc_name",
+  ...,
+  interested,
+  object2
+)
 
-\S4method{faers_phv_table}{FAERSascii,FAERSascii,missing}(object, pt = "soc_name", interested, object2)
+\S4method{faers_phv_table}{FAERSascii,FAERSascii,missing}(
+  object,
+  interested_field = "reac",
+  interested_event = "soc_name",
+  interested,
+  object2
+)
 
-\S4method{faers_phv_table}{FAERSascii,missing,FAERSascii}(object, pt = "soc_name", interested, object2)
+\S4method{faers_phv_table}{FAERSascii,missing,FAERSascii}(object, interested_event = "soc_name", interested, object2)
 
 \S4method{faers_phv_table}{FAERSascii,FAERSascii,FAERSascii}(object, interested, object2)
 
@@ -58,7 +71,6 @@ faers_phv_signal(object, ...)
 
 \S4method{faers_phv_signal}{FAERSascii}(
   object,
-  pt = "soc_name",
   ...,
   methods = NULL,
   alpha = 0.05,
@@ -113,7 +125,12 @@ interest from the \code{object}. The value \code{n11} or \code{a} will be calcul
 In this way, \code{object} and \code{object2} should be not overlapped. The value \code{n11}
 or \code{a} will be calculated from \code{object}}
 
-\item{pt}{A character specify the events column in \code{reac} field of object.}
+\item{interested_field}{A string indicates the interested FAERS fields to
+use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
+can be used.}
+
+\item{interested_event}{A character specify the events column in field of
+object specified in \code{interested_field}.}
 
 \item{methods}{An atomic character, specifies the method used to signal
 mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
@@ -148,7 +165,8 @@ didn't filter a whole period FAERS quarterly data, in this way, it's much
 better to run \link[=FAERS]{faers}.
 \item \code{faers_filter}: apply a function to extract wanted \code{primaryid}, then use
 \code{faers_keep} to filter.
-\item \code{faers_phv_table}: build a contingency table for all events in \code{pt}
+\item \code{faers_phv_table}: build a contingency table for all events in
+\code{interested_event}.
 column.
 \item \code{faers_phv_signal}: Pharmacovigilance Analysis used contingency table
 constructed with \code{faers_phv_table}. Details see \link{phv_signal}.
