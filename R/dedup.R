@@ -36,7 +36,10 @@ methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_
         )
     )
     object@data <- lapply(object@data, function(x) {
-        x[deduplicated_data, on = c("year", "quarter", "primaryid")]
+        x[deduplicated_data,
+            on = c("year", "quarter", "primaryid"),
+            nomatch = NULL
+        ]
     })
     object@deduplication <- TRUE
     # ..__matched_ids__.. <- unique(deduplicated_data$primaryid)
@@ -160,9 +163,9 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
         by = common_keys
     ][out, on = common_keys]
 
-    # meddra_code: indi_pt 
     # should we remove unknown indications or just translate unknown indications
     # into NA ?
+    # meddra_code: indi_pt
     # pt: 10070592 Product used for unknown indication
     # llt: 10057097 Drug use for unknown indication
     out <- data$indi[order(indi_drug_seq, meddra_code),
@@ -193,19 +196,19 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     # round age_in_years to prevent minimal differences in age
     cli::cli_alert("deduplication from multiple sources by matching gender, age, reporting country, event date, start date, drug indications, drugs administered, and adverse reactions")
     out[, age_in_years_round := round(age_in_years, 2L)]
-    out[, c("event_dt", "gender", "country_code", "age_in_years_round") := lapply(.SD, function(x) {
-        idx <- is.na(x) | x == "NA"
-        if (any(idx)) {
-            x[idx] <- paste0("..__na_null__..", seq_len(sum(idx)))
-        }
-        x
-    }), .SDcols = c("event_dt", "gender", "country_code", "age_in_years_round")]
     can_be_ignored_columns <- c(
         "event_dt", "gender", "age_in_years_round", "country_code",
         "aligned_start_dt", "aligned_indi"
     )
     must_matched_columns <- c("aligned_drugs", "aligned_reac")
     all_columns <- c(must_matched_columns, can_be_ignored_columns)
+    out[, (all_columns) := lapply(.SD, function(x) {
+        idx <- is.na(x) | x == "NA"
+        if (any(idx)) {
+            x[idx] <- paste0("..__na_null__..", seq_len(sum(idx)))
+        }
+        x
+    }), .SDcols = all_columns]
     for (i in seq_along(can_be_ignored_columns)) {
         data.table::setorderv(out,
             cols = c("primaryid", "year", "quarter"),

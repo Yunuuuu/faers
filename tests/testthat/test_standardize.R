@@ -33,6 +33,14 @@ testthat::test_that("de-duplicating FAERS ascii data works well", {
     testthat::expect_no_error(data_dedup <- faers_dedup(data_std))
     testthat::expect_true(data_dedup@deduplication)
     testthat::expect_equal(anyDuplicated(faers_primaryid(data_dedup)), 0L)
+    # don't introduce absent primaryid
+    testthat::expect_in(data_dedup$indi$primaryid, data_std$indi$primaryid)
+    testthat::expect_in(data_dedup$ther$primaryid, data_std$ther$primaryid)
+    testthat::expect_in(data_dedup$drug$primaryid, data_std$drug$primaryid)
+    testthat::expect_in(data_dedup$demo$primaryid, data_std$demo$primaryid)
+    testthat::expect_in(data_dedup$reac$primaryid, data_std$reac$primaryid)
+    testthat::expect_in(data_dedup$rpsr$primaryid, data_std$rpsr$primaryid)
+    testthat::expect_in(data_dedup$outc$primaryid, data_std$outc$primaryid)
 })
 
 testthat::test_that("`faers_get` for standardizated data works well", {
