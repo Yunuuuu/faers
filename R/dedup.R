@@ -35,7 +35,6 @@ methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_
             deleted_cases = deleted_cases
         )
     )
-    deduplicated_data <- deduplicated_data[, c("year", "quarter", "primaryid")]
     object@data <- lapply(object@data, function(x) {
         x[deduplicated_data, on = c("year", "quarter", "primaryid")]
     })
