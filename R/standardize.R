@@ -59,13 +59,14 @@ clean_indi_pt <- function(x, meddra_data) {
         x == "AEROMONA INFECTION", "10054205",
         x == "ARTRIAL FIBRILLATION", "10003658",
         x == "ATRIAL FILBRILLATION", "10003658",
-        x == "AUTIOIMMUNE INDUCED RASH", NA_character_,
+        x == "AUTIOIMMUNE INDUCED RASH", "10075689", # Autoimmune dermatitis
         x == "B LYMPHOBLASTIC LEUKEMIA", "10054448",
         x == "BACTERIAL PNEUMONIA", "10060946",
         x == "BIPOLAR DISORDER II", "10004940",
         x == "BLODD PRESSURE", "10005727",
         x == "CARDIAC CATH", "10007527",
         x == "CARDIC DISORDER", "10061024",
+        x == "CORONARY ARTERY DISEASE/HYPERTENSION", "10020772", #  Hypertension
         x == "CHEMOTHERAPY/RECTOSIGMOID CANCER", "10038093",
         x == "CHRONIC NERVE PAIN", "10029181",
         x == "COMPLEX PARTIAL EPILEPSY", "10010145",
@@ -76,8 +77,10 @@ clean_indi_pt <- function(x, meddra_data) {
         x == "DEPRESSION NEC", "10012378",
         x == "DEPRESSON", "10012378",
         x == "DISBACTERIOSIS", "10064389",
+        x == "DRUG", "10063370", # 10063370 Drug therapy
         x == "DRUG INDUCED LIVER INJURY", "10072268",
         x == "DRUG KNOWN FOR UNKNOWN INDICATION", "10057097",
+        x == "DRUG USE", "10063370", # 10063370 Drug therapy
         x == "DRUG USE FO RUNKNOWN INDICATION", "10057097",
         x == "DRUG USE UNKNOWN INDICATION", "10057097",
         x == "DRUG USED FOR UNKNOWN INDICATION", "10057097",
@@ -100,10 +103,12 @@ clean_indi_pt <- function(x, meddra_data) {
         x == "HYPOTHALAMO-PITUITARY DISORDERS", "10021111",
         x == "HYPOTHYROID", "10021114",
         x == "INFECTIVE ENDOCARDITIS", "10014678",
-        # x == "INFLAMATION", "10061218",
-        x == "INHALATION", "10061218",
+        x == "INFECTED MOLE", "10027806", # Mole of skin
+        x == "INFLAMATION", "10061218", # 10061218 Inflammation
+        x == "INHALATION", "10052996", # 10052996 Inhalation therapy
         x == "INR INCREAESD", "10022402",
         x == "INTERVERTEBRAL DISKITIS", "10060738",
+        x == "INTRACTABLE SPASTICITY", "10041416", # Spasticity
         x == "IRREGULAR HEARTBEAT", "10019323",
         x == "LENNOX--GASTAUT SYNDROME", "10048816",
         x == "LUMBAR SPONDYLOSIS WITH SCOLIOSIS AND ARTHRITIS", "10025007",
@@ -119,10 +124,12 @@ clean_indi_pt <- function(x, meddra_data) {
         x == "OSTEOPORISIS", "10031282",
         x == "PAH", "10064911",
         x == "PANIC DISORDER/ DEPRESSION", "10033666",
+        x == "PRECAUTIONARY MEASURE", "10036898", # 10036898 Prophylaxis
         x == "PRODUCT USED FOR UNKNOWN INDCATION", "10070592",
         x == "PTSD", "10036316",
         x == "PULMONARY ARTERY HYPERTENSION", "10064911",
         x == "REACTIVE AIRWAY DISEASE", "10037993",
+        x == "REGULATE HEART RATE", "10019304", # 10019304 Heart rate irregular
         x == "SCHIZOPRENIA", "10039626",
         x == "SEIZURE DISORDER", "10039906",
         x == "SIEZURE", "10039906",
@@ -132,6 +139,8 @@ clean_indi_pt <- function(x, meddra_data) {
         x == "STAGE IV NON-SMALL CELL", "10029522",
         x == "STAGE IV RECTAL ADENOCARCINOMA", "10038029",
         x == "STREPTOCOCCAL IDENTIFICATION TEST", "10067006",
+        x == "STROKE PREVENTION", "10081388", # Nervous system disorder prophylaxis
+        x == "SUNBURN PROPHYLAXIS", "10081391", # Skin disorder prophylaxis
         x == "SUPERIOR VENA CAVAL OCCLUSION", "10042568",
         x == "THYROID CONDITION", "10043710",
         x == "THYROID HORMONE REPLACEMENT", "10068076",
@@ -139,18 +148,7 @@ clean_indi_pt <- function(x, meddra_data) {
         x == "TRAVELLER'S DIARRHEA", "10044552",
         x == "TYPE II DIABETES", "10045242"
         # following items were not mapped
-        # "LLT"
-        # "AUTIOIMMUNE INDUCED RASH",
-        # "STROKE PREVENTION",
-        # "CORONARY ARTERY DISEASE/HYPERTENSION",
-        # "INFECTED MOLE",
-        # "SUNBURN PROPHYLAXIS",
-        # "DRUG USE",
-        # "INTRACTABLE SPASTICITY",
-        # "INFLAMATION",
-        # "PRECAUTIONARY MEASURE",
-        # "DRUG",
-        # "REGULATE HEART RATE",
+        # "LLT" : drug  ACTONEL (RISEDRONATE SODIUM) TABLET, 150MG ?
     )
     operated_idx <- !is.na(code)
     x[operated_idx] <- meddra_map_code_into_names(
