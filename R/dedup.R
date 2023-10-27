@@ -20,16 +20,21 @@ methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_
     if (!object@standardization) {
         cli::cli_abort("{.cls FAERS} object must be standardized using {.fn faers_standardize} firstly")
     }
-    deduplicated_data <- do.call(
-        dedup_faers_ascii,
-        object[c("demo", "drug", "indi", "ther", "reac")]
-    )
     if (isTRUE(remove_deleted_cases)) {
         deleted_cases <- faers_deleted_cases(object)
         if (length(deleted_cases)) {
-            deduplicated_data <- deduplicated_data[!caseid %in% deleted_cases]
+            deleted_cases <- NULL
         }
+    } else {
+        deleted_cases <- NULL
     }
+    deduplicated_data <- do.call(
+        dedup_faers_ascii,
+        list(
+            data = object[c("demo", "drug", "indi", "ther", "reac")],
+            deleted_cases = deleted_cases
+        )
+    )
     deduplicated_data <- deduplicated_data[, c("year", "quarter", "primaryid")]
     object@data <- lapply(object@data, function(x) {
         x[deduplicated_data, on = c("year", "quarter", "primaryid")]
@@ -85,7 +90,7 @@ methods::setMethod("faers_dedup", "ANY", function(object) {
 # reac
 # Perform string aggregation operations
 
-dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
+dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     # As recommended by the FDA, a deduplication step was performed to retain
     # the most recent report for each case with the same case identifier
     # nolint start
@@ -119,11 +124,23 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # There are also duplicate reports where the same report was submitted by a
     # consumer and by the sponsor. we have found some duplicated `primaryid`
     # with different caseid in `demo`, so we remove this by keeping the latest
-    # one
-    out <- unique(
-        demo[order(-year, -quarter, -fda_dt, -i_f_code, -event_dt)],
-        by = "primaryid"
-    )
+    # one, we remove `deleted_cases` firstly if it exist
+    if (is.null(deleted_cases)) {
+        out <- unique(
+            data$demo[
+                order(-year, -quarter, -fda_dt, -i_f_code, -event_dt)
+            ],
+            by = "primaryid"
+        )
+    } else {
+        out <- unique(
+            data$demo[!caseid %in% deleted_cases][
+                order(-year, -quarter, -fda_dt, -i_f_code, -event_dt)
+            ],
+            by = "primaryid"
+        )
+    }
+
     # then we keep the latest informations for the patients
     # Such as caseid "11232882" in 2017q2 2019q2, 2019q3
     data.table::setorderv(out,
@@ -139,56 +156,57 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # match drug, indi, and ther data.
     common_keys <- c("year", "quarter", "primaryid")
     cli::cli_alert("merging `drug`, `indi`, `ther`, and `reac` data")
-    out <- drug[order(drug_seq),
+    out <- data$drug[order(drug_seq),
         list(aligned_drugs = paste0(drugname, collapse = "/")),
         by = common_keys
     ][out, on = common_keys]
-    # meddra_code: indi_pt
-    # 10070592	Product used for unknown indication
-    # 10057097	Drug use for unknown indication
-    out <- indi[!meddra_code %in% c("10070592", "10057097")][
-        order(indi_drug_seq, meddra_code),
+
+    # meddra_code: indi_pt 
+    # should we remove unknown indications or just translate unknown indications
+    # into NA ?
+    # pt: 10070592 Product used for unknown indication
+    # llt: 10057097 Drug use for unknown indication
+    out <- data$indi[order(indi_drug_seq, meddra_code),
         list(aligned_indi = paste0(meddra_code, collapse = "/")),
         by = common_keys
     ][out, on = common_keys]
-    out <- ther[order(dsg_drug_seq, start_dt),
+    out <- data$ther[order(dsg_drug_seq, start_dt),
         list(aligned_start_dt = paste0(start_dt, collapse = "/")),
         by = common_keys
     ][out, on = common_keys]
     # meddra_code: pt
-    out <- reac[order(meddra_code),
+    out <- data$reac[order(meddra_code),
         list(aligned_reac = paste0(meddra_code, collapse = "/")),
         by = common_keys
     ][out, on = common_keys]
 
-    #  consider two cases to be the same if they had a complete match of the
-    #  eight criteria which are gender, age, reporting country, event date,
-    #  start date, drug indications, drugs administered, and adverse reactions.
-    #  Two records were also considered duplicated if they mismatch in only one
-    #  of the gender, age, reporting country, event date, start date, or drug
-    #  indications fields, but not the drug or adverse event fields.
+    # consider two cases to be the same if they had a complete match of the
+    # eight criteria which are gender, age, reporting country, event date, start
+    # date, drug indications, drugs administered, and adverse reactions.  Two
+    # records were also considered duplicated if they mismatch in only one of
+    # the gender, age, reporting country, event date, start date, or drug
+    # indications fields, but not the drug or adverse event fields.
 
     # Notes: always remember NA value in data.table, will be regarded as equal.
-    # but they won't really be the same, so we should convert NA value in
-    # columns used into other differentiated values, like ..__na_null__..1,
-    # ..__na_null__..2, and so on.
+    # but they won't really be the same, so we should convert NA value into
+    # other differentiated values, like ..__na_null__..1, ..__na_null__..2, and
+    # so on.
     # round age_in_years to prevent minimal differences in age
     cli::cli_alert("deduplication from multiple sources by matching gender, age, reporting country, event date, start date, drug indications, drugs administered, and adverse reactions")
     out[, age_in_years_round := round(age_in_years, 2L)]
-    can_be_ignored_columns <- c(
-        "event_dt", "gender", "country_code",
-        "aligned_start_dt", "aligned_indi"
-    )
-    must_matched_columns <- c("aligned_drugs", "aligned_reac")
-    all_columns <- c(must_matched_columns, can_be_ignored_columns)
-    out[, c(all_columns, "age_in_years_round") := lapply(.SD, function(x) {
-        # above `paste0` will coerced NA into "NA"
+    out[, c("event_dt", "gender", "country_code", "age_in_years_round") := lapply(.SD, function(x) {
         idx <- is.na(x) | x == "NA"
         if (any(idx)) {
             x[idx] <- paste0("..__na_null__..", seq_len(sum(idx)))
         }
         x
-    }), .SDcols = c(all_columns, "age_in_years_round")]
+    }), .SDcols = c("event_dt", "gender", "country_code", "age_in_years_round")]
+    can_be_ignored_columns <- c(
+        "event_dt", "gender", "age_in_years_round", "country_code",
+        "aligned_start_dt", "aligned_indi"
+    )
+    must_matched_columns <- c("aligned_drugs", "aligned_reac")
+    all_columns <- c(must_matched_columns, can_be_ignored_columns)
     for (i in seq_along(can_be_ignored_columns)) {
         data.table::setorderv(out,
             cols = c("primaryid", "year", "quarter"),
@@ -198,18 +216,16 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
             by = c(must_matched_columns, can_be_ignored_columns[-i])
         )
     }
-    out[, age_in_years_round := NULL]
+    # out[, age_in_years_round := NULL]
     # nolint end
-    out[, (all_columns) := lapply(.SD, function(x) {
-        x[startsWith(x, "..__na_null__..")] <- NA
-        x
-    }), .SDcols = all_columns]
-    out[, c(
-        "year", "quarter", "primaryid",
-        "caseid", "caseversion", "fda_dt", "i_f_code",
-        "event_dt", "gender", "age_in_years", "country_code",
-        "aligned_drugs", "aligned_reac", "aligned_start_dt", "aligned_indi"
-    )]
+    # out[, (all_columns) := lapply(.SD, function(x) {
+    #     x[startsWith(x, "..__na_null__..")] <- NA
+    #     x
+    # }), .SDcols = all_columns]
+    # "caseversion", "fda_dt", "i_f_code",
+    # "event_dt", "gender", "age_in_years", "country_code",
+    # "aligned_drugs", "aligned_reac", "aligned_start_dt", "aligned_indi"
+    out[, c("year", "quarter", "primaryid")]
 }
 
 utils::globalVariables(c(
