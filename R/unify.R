@@ -12,7 +12,8 @@ unify_ascii <- function(data, field, year, quarter) {
         demo = unify_ascii_demo(data, year, quarter),
         ther = unify_ascii_ther(data, year, quarter),
         indi = unify_ascii_indi(data, year, quarter),
-        drug = unify_ascii_drug(data, year, quarter)
+        drug = unify_ascii_drug(data, year, quarter),
+        outc = unify_ascii_outc(data, year, quarter)
     )
     data[, c("year", "quarter") := list(year, quarter)]
     data.table::setcolorder(data, c("year", "quarter"), before = 1L)
@@ -293,8 +294,10 @@ unify_ascii_indi <- function(data, year, quarter) {
         data.table::setnames(data, "drug_seq", "indi_drug_seq")
     }
 }
-unify_ascii_reac <- function(data, year, quarter) {
-    
+unify_ascii_outc <- function(data, year, quarter) {
+    if (year == 2012L && quarter == "q4") {
+        data.table::setnames(data, "outc_code", "outc_cod")
+    }
 }
 utils::globalVariables(c(
     "age_in_years", "age_cod", "age",
