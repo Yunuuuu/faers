@@ -167,8 +167,9 @@ methods::setGeneric(
 #' @param interested_field A string indicates the interested FAERS fields to
 #' use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
 #' can be used.
-#' @param interested_event A character specify the events column in field of
-#' object specified in `interested_field`.
+#' @param interested_event A character specify the events column(s?) in field of
+#' object specified in `interested_field`. If multiple columns were selected,
+#' the unique combination will define the interested events.
 #' @param interested A [FAERSascii] object with data from interested drug, must
 #' be a subset of `object`. If `interested` and `object2` are both `missing`,
 #' the `faers_filter` function will be employed to extract data for the drug of
@@ -302,10 +303,13 @@ methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., metho
     out <- faers_phv_table(object, ...)
     cbind(
         out,
-        do.call(phv_signal, c(out[, .SD, .SDcols = -interested_event], list(
-            methods = methods, alpha = alpha, correct = correct,
-            n_mcmc = n_mcmc, alpha1 = alpha1, alpha2 = alpha2
-        )))
+        do.call(
+            phv_signal,
+            c(out[, .SD, .SDcols = c("a", "b", "c", "d")], list(
+                methods = methods, alpha = alpha, correct = correct,
+                n_mcmc = n_mcmc, alpha1 = alpha1, alpha2 = alpha2
+            ))
+        )
     )
 })
 

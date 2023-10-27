@@ -129,8 +129,9 @@ or \code{a} will be calculated from \code{object}}
 use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
 can be used.}
 
-\item{interested_event}{A character specify the events column in field of
-object specified in \code{interested_field}.}
+\item{interested_event}{A character specify the events column(s?) in field of
+object specified in \code{interested_field}. If multiple columns were selected,
+the unique combination will define the interested events.}
 
 \item{methods}{An atomic character, specifies the method used to signal
 mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
