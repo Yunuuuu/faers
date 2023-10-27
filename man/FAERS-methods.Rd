@@ -13,13 +13,6 @@
 \alias{faers_keep,FAERSascii-method}
 \alias{faers_filter}
 \alias{faers_filter,FAERSascii-method}
-\alias{faers_phv_table}
-\alias{faers_phv_table,FAERSascii,missing,missing-method}
-\alias{faers_phv_table,FAERSascii,FAERSascii,missing-method}
-\alias{faers_phv_table,FAERSascii,missing,FAERSascii-method}
-\alias{faers_phv_table,FAERSascii,FAERSascii,FAERSascii-method}
-\alias{faers_phv_signal}
-\alias{faers_phv_signal,FAERSascii-method}
 \title{Methods for FAERS class}
 \usage{
 faers_get(object, ...)
@@ -43,53 +36,12 @@ faers_keep(object, ...)
 faers_filter(object, ...)
 
 \S4method{faers_filter}{FAERSascii}(object, .fn, ..., field = NULL)
-
-faers_phv_table(object, ..., interested, object2)
-
-\S4method{faers_phv_table}{FAERSascii,missing,missing}(
-  object,
-  interested_field = "reac",
-  interested_event = "soc_name",
-  ...,
-  interested,
-  object2
-)
-
-\S4method{faers_phv_table}{FAERSascii,FAERSascii,missing}(
-  object,
-  interested_field = "reac",
-  interested_event = "soc_name",
-  interested,
-  object2
-)
-
-\S4method{faers_phv_table}{FAERSascii,missing,FAERSascii}(object, interested_event = "soc_name", interested, object2)
-
-\S4method{faers_phv_table}{FAERSascii,FAERSascii,FAERSascii}(object, interested, object2)
-
-faers_phv_signal(object, ...)
-
-\S4method{faers_phv_signal}{FAERSascii}(
-  object,
-  ...,
-  methods = NULL,
-  alpha = 0.05,
-  correct = TRUE,
-  n_mcmc = 100000L,
-  alpha1 = 0.5,
-  alpha2 = 0.5
-)
 }
 \arguments{
-\item{object}{A \link{FAERS} object.}
+\item{object}{A \link{FAERSascii} object.}
 
-\item{...}{Other arguments passed to specific methods.
-\itemize{
-\item \code{faers_filter}: other arguments passed to \code{.fn}.
-\item \code{faers_phv_table}: other arguments passed to \code{faers_filter} and \code{...} is
-solely used when \code{interested} is \code{NULL}.
-\item \code{faers_phv_signal}: other arguments passed to \code{faers_phv_table}.
-}}
+\item{...}{Other arguments passed to specific methods. For \code{faers_filter}:
+other arguments passed to \code{.fn}.}
 
 \item{field}{A string indicates the FAERS fields to use. Only values "demo",
 "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used. For
@@ -114,45 +66,9 @@ two arguments: \code{.x} (single argument) or \code{.x} and \code{.y} (two argum
 very compact anonymous functions (lambdas) with up to two inputs.
 
 If a \strong{string}, the function is looked up in \code{globalenv()}.}
-
-\item{interested}{A \link{FAERSascii} object with data from interested drug, must
-be a subset of \code{object}. If \code{interested} and \code{object2} are both \code{missing},
-the \code{faers_filter} function will be employed to extract data for the drug of
-interest from the \code{object}. The value \code{n11} or \code{a} will be calculated from
-\code{interested} .}
-
-\item{object2}{A \link{FAERSascii} object with data from another interested drug,
-In this way, \code{object} and \code{object2} should be not overlapped. The value \code{n11}
-or \code{a} will be calculated from \code{object}}
-
-\item{interested_field}{A string indicates the interested FAERS fields to
-use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
-can be used.}
-
-\item{interested_event}{A character specify the events column(s?) in field of
-object specified in \code{interested_field}. If multiple columns were selected,
-the unique combination will define the interested events.}
-
-\item{methods}{An atomic character, specifies the method used to signal
-mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
-"obsexp_shrink", and "fisher" are supported. If \code{NULL}, all supported methods
-will be used.}
-
-\item{alpha}{Level of significance, for construction of the confidence
-intervals.}
-
-\item{correct}{A bool indicating whether to apply Yates's continuity
-correction when computing the chi-squared statistic.}
-
-\item{n_mcmc}{Number of MCMC simulations per \verb{(a,b,c,d)}-tuple to calculate
-confidence intervals.}
-
-\item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.}
-
-\item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.}
 }
 \description{
-Utils function for \link{FAERS} class.
+Utils function for \link{FAERSascii} class.
 }
 \details{
 \itemize{
@@ -166,13 +82,5 @@ didn't filter a whole period FAERS quarterly data, in this way, it's much
 better to run \link[=FAERS]{faers}.
 \item \code{faers_filter}: apply a function to extract wanted \code{primaryid}, then use
 \code{faers_keep} to filter.
-\item \code{faers_phv_table}: build a contingency table for all events in
-\code{interested_event}.
-column.
-\item \code{faers_phv_signal}: Pharmacovigilance Analysis used contingency table
-constructed with \code{faers_phv_table}. Details see \link{phv_signal}.
 }
-}
-\seealso{
-\link{phv_signal}
 }

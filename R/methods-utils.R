@@ -1,12 +1,9 @@
 #' Methods for FAERS class
 #'
-#' Utils function for [FAERS] class.
-#' @param object A [FAERS] object.
-#' @param ... Other arguments passed to specific methods.
-#'  - `faers_filter`: other arguments passed to `.fn`.
-#'  - `faers_phv_table`: other arguments passed to `faers_filter` and `...` is
-#'    solely used when `interested` is `NULL`.
-#'  - `faers_phv_signal`: other arguments passed to `faers_phv_table`.
+#' Utils function for [FAERSascii] class.
+#' @param object A [FAERSascii] object.
+#' @param ... Other arguments passed to specific methods. For `faers_filter`:
+#' other arguments passed to `.fn`.
 #' @details
 #'  - `faers_get`, `[[`, `$`, and `[`: Extract a specific field
 #'    [data.table][data.table::data.table] or a list of field
@@ -18,11 +15,6 @@
 #'    better to run [faers].
 #'  - `faers_filter`: apply a function to extract wanted `primaryid`, then use
 #'    `faers_keep` to filter.
-#'  - `faers_phv_table`: build a contingency table for all events in
-#'    `interested_event`.
-#'    column.
-#'  - `faers_phv_signal`: Pharmacovigilance Analysis used contingency table
-#'    constructed with `faers_phv_table`. Details see [phv_signal].
 #' @export
 #' @rdname FAERS-methods
 methods::setGeneric("faers_get", function(object, ...) {
@@ -152,165 +144,6 @@ methods::setMethod("faers_filter", "FAERSascii", function(object, .fn, ..., fiel
         cli::cli_abort("{.arg .fn} must return an atomic integer or character")
     }
     faers_keep(object, primaryid = ids)
-})
-
-##############################################################
-#' @export
-#' @rdname FAERS-methods
-methods::setGeneric(
-    "faers_phv_table",
-    function(object, ..., interested, object2) {
-        methods::makeStandardGeneric("faers_phv_table")
-    }
-)
-
-#' @param interested_field A string indicates the interested FAERS fields to
-#' use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
-#' can be used.
-#' @param interested_event A character specify the events column(s?) in field of
-#' object specified in `interested_field`. If multiple columns were selected,
-#' the unique combination will define the interested events.
-#' @param interested A [FAERSascii] object with data from interested drug, must
-#' be a subset of `object`. If `interested` and `object2` are both `missing`,
-#' the `faers_filter` function will be employed to extract data for the drug of
-#' interest from the `object`. The value `n11` or `a` will be calculated from
-#' `interested` .
-#' @rdname FAERS-methods
-methods::setMethod(
-    "faers_phv_table",
-    c(object = "FAERSascii", interested = "missing", object2 = "missing"),
-    function(object, interested_field = "reac", interested_event = "soc_name", ..., interested, object2) {
-        if (!object@standardization) {
-            cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
-        }
-        interested <- faers_filter(object, ...)
-        faers_phv_table(
-            object = object, interested_field = interested_field,
-            interested_event = interested_event,
-            interested = interested
-        )
-    }
-)
-
-#' @rdname FAERS-methods
-methods::setMethod(
-    "faers_phv_table",
-    c(object = "FAERSascii", interested = "FAERSascii", object2 = "missing"),
-    function(object, interested_field = "reac", interested_event = "soc_name", interested, object2) {
-        if (!object@standardization) {
-            cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
-        }
-        if (!interested@standardization) {
-            cli::cli_abort("{.arg interested} must be standardized using {.fn faers_standardize}")
-        }
-        full_primaryids <- faers_primaryid(object)
-        interested_primaryids <- faers_primaryid(interested)
-        if (!all(interested_primaryids %in% full_primaryids)) {
-            cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
-        }
-        full_data <- faers_get(object, field = interested_field)
-        interested_data <- faers_get(interested, field = interested_field)
-
-        n <- nrow(full_data) # scalar
-        n1. <- nrow(interested_data) # scalar
-        out <- merge(
-            eval(substitute(
-                full_data[, list(n.1 = .N), by = interested_event],
-                list(interested_event = interested_event)
-            )),
-            eval(substitute(
-                interested_data[, list(a = .N), by = interested_event],
-                list(interested_event = interested_event)
-            )),
-            by = interested_event, all = TRUE, allow.cartesian = TRUE
-        )
-        out[, a := data.table::fifelse(is.na(a), 0L, a)] # nolint
-        out[, b := n1. - a] # nolint
-        out[, c := n.1 - a] # nolint
-        out[, d := n - (n1. + n.1 - a)] # nolint
-        out <- out[, !"n.1"]
-        data.table::setcolorder(out, c(interested_event, "a", "b", "c", "d"))[]
-    }
-)
-
-#' @param object2 A [FAERSascii] object with data from another interested drug,
-#' In this way, `object` and `object2` should be not overlapped. The value `n11`
-#' or `a` will be calculated from `object`
-#' @rdname FAERS-methods
-methods::setMethod(
-    "faers_phv_table",
-    c(object = "FAERSascii", interested = "missing", object2 = "FAERSascii"),
-    function(object, interested_event = "soc_name", interested, object2) {
-        if (!object@standardization) {
-            cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
-        }
-        if (!object2@standardization) {
-            cli::cli_abort("{.arg object2} must be standardized using {.fn faers_standardize}")
-        }
-        primaryids <- faers_primaryid(object)
-        primaryids2 <- faers_primaryid(object2)
-        overlapped_idx <- primaryids %in% primaryids2
-        if (any(overlapped_idx)) {
-            cli::cli_warn("{.val {overlapped_idx}} report{?s} are overlapped between {.arg object} and {.arg object2}")
-        }
-        interested_reac <- faers_get(object, field = "reac")
-        interested_reac2 <- faers_get(object2, field = "reac")
-        n1. <- nrow(interested_reac)
-        n0. <- nrow(interested_reac2)
-        out <- merge(
-            eval(substitute(
-                interested_reac[, list(a = .N), by = interested_event],
-                list(interested_event = interested_event)
-            )),
-            eval(substitute(
-                interested_reac2[, list(c = .N), by = interested_event],
-                list(interested_event = interested_event)
-            )),
-            by = interested_event, all = TRUE, allow.cartesian = TRUE
-        )
-        out[, c("a", "c") := lapply(.SD, function(x) {
-            data.table::fifelse(is.na(x), 0L, x)
-        }), .SDcols = c("a", "c")]
-        out[, b := n1. - a] # nolint
-        out[, d := n0. - c] # nolint
-        data.table::setcolorder(out, c(interested_event, "a", "b", "c", "d"))[]
-    }
-)
-
-utils::globalVariables(c("a", "b", "d", "n.1"))
-
-#' @rdname FAERS-methods
-methods::setMethod(
-    "faers_phv_table",
-    c(object = "FAERSascii", interested = "FAERSascii", object2 = "FAERSascii"),
-    function(object, interested, object2) {
-        cli::cli_abort("{.arg interested} and {.arg object2} are both exclusive, must be provided only one or none")
-    }
-)
-
-##############################################################
-#' @export
-#' @rdname FAERS-methods
-methods::setGeneric("faers_phv_signal", function(object, ...) {
-    methods::makeStandardGeneric("faers_phv_signal")
-})
-
-#' @inheritParams phv_signal
-#' @seealso [phv_signal]
-#' @method faers_phv_signal FAERSascii
-#' @rdname FAERS-methods
-methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
-    out <- faers_phv_table(object, ...)
-    cbind(
-        out,
-        do.call(
-            phv_signal,
-            c(out[, .SD, .SDcols = c("a", "b", "c", "d")], list(
-                methods = methods, alpha = alpha, correct = correct,
-                n_mcmc = n_mcmc, alpha1 = alpha1, alpha2 = alpha2
-            ))
-        )
-    )
 })
 
 #########################################################
