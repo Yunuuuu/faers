@@ -101,36 +101,38 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # Initial ISR and a Follow-up 1 ISR).
     # dt <- data.table::as.data.table(mtcars)
     # bench::mark(
-    #   head = dt[, head(.SD, 1L), cyl],
-    #   SD = dt[, .SD[1L], cyl],
-    #   I = dt[dt[, .I[1L], cyl]$V1],
-    #   unique = unique(dt, by = "cyl"),
-    #   check = FALSE
+    #   head = dt[order(mpg, gear), head(.SD, 1L), cyl],
+    #   SD = dt[order(mpg, gear), .SD[1L], cyl],
+    #   I = dt[dt[, .I[1L], cyl]$V1], # should be order firstly
+    #   unique = unique(dt[order(mpg, gear)], by = "cyl"),
+    #   unique2 = dt[order(mpg, gear), unique(.SD, by = "cyl")],
+    #   check = FALSE, iterations = 100L
     # )
-    # expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc
+    #  expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc
     #   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>
-    # 1 head        541.5µs  618.6µs     1294.    49.9KB     12.4   628
-    # 2 SD          543.2µs  618.8µs     1307.    52.4KB     14.5   630
-    # 3 I           416.1µs  480.9µs     1964.      50KB     10.4   945
-    # 4 unique       12.4µs   14.2µs    63664.    40.6KB     44.6  9993
-    # transform use unique ?
+    # 1 head        645.4µs  763.7µs      903.    66.6KB     9.12    99     1
+    # 2 SD          648.8µs  721.7µs     1344.    66.6KB    27.4     98
+    # 3 I             408µs    476µs     2012.      50KB     0      100
+    # 4 unique       64.1µs   76.2µs    12337.    36.1KB   125.      99
+    # 5 unique2     165.8µs  177.6µs     5363.    52.6KB     0      100
 
     # There are also duplicate reports where the same report was submitted by a
     # consumer and by the sponsor. we have found some duplicated `primaryid`
     # with different caseid in `demo`, so we remove this by keeping the latest
     # one
-    out <- demo[order(-year, -quarter, -fda_dt, -i_f_code, -event_dt),
-        .SD[1L],
+    out <- unique(
+        demo[order(-year, -quarter, -fda_dt, -i_f_code, -event_dt)],
         by = "primaryid"
-    ][
-        # then we keep the latest informations for the patients
-        # Such as caseid "11232882" in 2017q2 2019q2, 2019q3
-        order(
-            -year, -quarter,
-            -caseversion, -fda_dt, -i_f_code, -event_dt
-        ), .SD[1L],
-        by = "caseid"
-    ]
+    )
+    # then we keep the latest informations for the patients
+    # Such as caseid "11232882" in 2017q2 2019q2, 2019q3
+    data.table::setorderv(out,
+        cols = c(
+            "year", "quarter", "caseversion", "fda_dt", "i_f_code", "event_dt"
+        ),
+        order = -1L
+    )
+    out <- unique(out, by = "caseid")
 
     # collapse all used drugs, indi, ther states, use it as a whole to identify
     # same cases.
@@ -188,9 +190,13 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
         x
     }), .SDcols = c(all_columns, "age_in_years_round")]
     for (i in seq_along(can_be_ignored_columns)) {
-        out <- out[order(-primaryid, -year, -quarter), .SD[1L],
+        data.table::setorderv(out,
+            cols = c("primaryid", "year", "quarter"),
+            order = -1L
+        )
+        out <- unique(out,
             by = c(must_matched_columns, can_be_ignored_columns[-i])
-        ]
+        )
     }
     out[, age_in_years_round := NULL]
     # nolint end
