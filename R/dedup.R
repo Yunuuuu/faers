@@ -91,10 +91,6 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # nolint start
     cli::cli_alert("deduplication from the same source by retain the most recent report")
 
-    # There are also duplicate reports where the same report was submitted by a
-    # consumer and by the sponsor. we have found some duplicated `primaryid`
-    # with different caseid in `demo`, so we remove this by keeping the latest
-    # one
     # While the previous Legacy AERS (LAERS) database was Individual Safety
     # Report (ISR) based, the new FAERS database is Case/Version based. In
     # LAERS, a Case consisted of one or more ISRs (Initial and Follow-up
@@ -103,6 +99,26 @@ dedup_faers_ascii <- function(demo, drug, indi, ther, reac) {
     # current information about a particular case. (For example, Follow-up 1
     # would have the most up-to-date information about a case containing both an
     # Initial ISR and a Follow-up 1 ISR).
+    # dt <- data.table::as.data.table(mtcars)
+    # bench::mark(
+    #   head = dt[, head(.SD, 1L), cyl],
+    #   SD = dt[, .SD[1L], cyl],
+    #   I = dt[dt[, .I[1L], cyl]$V1],
+    #   unique = unique(dt, by = "cyl"),
+    #   check = FALSE
+    # )
+    # expression      min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc
+    #   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>
+    # 1 head        541.5µs  618.6µs     1294.    49.9KB     12.4   628
+    # 2 SD          543.2µs  618.8µs     1307.    52.4KB     14.5   630
+    # 3 I           416.1µs  480.9µs     1964.      50KB     10.4   945
+    # 4 unique       12.4µs   14.2µs    63664.    40.6KB     44.6  9993
+    # transform use unique ?
+
+    # There are also duplicate reports where the same report was submitted by a
+    # consumer and by the sponsor. we have found some duplicated `primaryid`
+    # with different caseid in `demo`, so we remove this by keeping the latest
+    # one
     out <- demo[order(-year, -quarter, -fda_dt, -i_f_code, -event_dt),
         .SD[1L],
         by = "primaryid"
