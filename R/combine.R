@@ -43,7 +43,7 @@ combine_faers_ascii <- function(x) {
         )
     })
     data.table::setattr(out, "names", faers_ascii_file_fields)
-    period <- data.table::data.table(
+    period <- data.table(
         year = unlist(lapply(x, function(obj) obj@year),
             recursive = FALSE, use.names = FALSE
         ),

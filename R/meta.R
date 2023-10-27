@@ -17,11 +17,11 @@ faers_meta <- function() {
     out <- data.table::rbindlist(table_list)
     out[, quarter := period2quarter(period)] # nolint
     data.table::setcolorder(out, c(
-        "year", "quarter", "period", 
+        "year", "quarter", "period",
         "urls_ascii", "file_size_ascii", "urls_xml", "file_size_xml"
     ))
     data.table::setnames(out, c(
-        "year", "quarter", "period", 
+        "year", "quarter", "period",
         "ascii_urls", "ascii_file_size", "xml_urls", "xml_file_size"
     ))
     data.table::setorderv(out, c("year", "quarter"), order = c(-1L, -1L))[]
@@ -50,7 +50,7 @@ parse_year_xml_table <- function(year_xml) {
         period <- rvest::html_text2(rvest::html_elements(quarter_xml, "p"))
         file_xmls <- rvest::html_elements(quarter_xml, "td a")
         files <- rvest::html_text2(file_xmls)
-        out <- data.table::data.table(
+        out <- data.table(
             period = str_remove(period, "\\s*\\d*(\\s*posted.*\\s*)?$"),
             urls = rvest::html_attr(file_xmls, "href"),
             file_format = tolower(str_extract(files, "XML|ASCII")),

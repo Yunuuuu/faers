@@ -104,7 +104,7 @@ meddra_standardize_pt <- function(terms, meddra_data, use = c("llt", "pt")) {
         idx[operated_idx] <- mapped_idx
         if (!anyNA(idx)) break
     }
-    data.table::data.table(
+    data.table(
         meddra_idx = idx,
         meddra_hierarchy = pt_from,
         meddra_code = as.character(out_code),

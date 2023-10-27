@@ -159,7 +159,7 @@ safely_read_ascii <- function(file, year, quarter) {
 
 read_text <- function(text, ...) {
     if (!length(text)) {
-        return(data.table::data.table())
+        return(data.table())
     }
     file <- tempfile()
     data.table::fwrite(list(text),

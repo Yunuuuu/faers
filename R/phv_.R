@@ -54,7 +54,7 @@ phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE,
     )
     assert_inclusive(methods, allowed_methods, null_ok = TRUE)
     methods <- unique(methods %||% allowed_methods)
-    out <- data.table::data.table(
+    out <- data.table(
         expected = (a + b) / (a + b + c + d) * (a + c)
     )
     args <- list(a = a, b = b, c = c, d = d, alpha = alpha)
@@ -101,7 +101,7 @@ phv_ror <- function(a, b, c, d, alpha = 0.05) {
     ci_low <- exp(stats::qnorm(half, log_ror, var_log_ror))
     ci_high <- exp(stats::qnorm(1L - half, log_ror, var_log_ror))
 
-    data.table::data.table(ror = ror, ci_low = ci_low, ci_high = ci_high)
+    data.table(ror = ror, ci_low = ci_low, ci_high = ci_high)
 }
 
 #' @export
@@ -121,7 +121,7 @@ phv_prr <- function(a, b, c, d, alpha = 0.05) {
     half <- alpha / 2L
     ci_low <- exp(stats::qnorm(half, log_prr, sd_log_prr))
     ci_high <- exp(stats::qnorm(1 - half, log_prr, sd_log_prr))
-    data.table::data.table(prr = prr, ci_low = ci_low, ci_high = ci_high)
+    data.table(prr = prr, ci_low = ci_low, ci_high = ci_high)
 }
 
 #' @param correct A bool indicating whether to apply Yates's continuity
@@ -187,7 +187,7 @@ phv_bcpnn_norm <- function(a, b, c, d, alpha = 0.05) {
     half <- alpha / 2L
     ci_low <- stats::qnorm(half, ic, sqrt(var_ic))
     ci_high <- stats::qnorm(1 - half, ic, sqrt(var_ic))
-    data.table::data.table(ic = ic, ci_low = ci_low, ci_high = ci_high)
+    data.table(ic = ic, ci_low = ci_low, ci_high = ci_high)
 }
 
 #' @param n_mcmc Number of MCMC simulations per `(a,b,c,d)`-tuple to calculate
@@ -307,7 +307,7 @@ phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0
         ci_low[need_exact_lims] <- ic$ci_low
         ci_high[need_exact_lims] <- ic$ci_high
     }
-    data.table::data.table(
+    data.table(
         oe_ratio = oe_ratio,
         ci_low = ci_low, ci_high = ci_high
     )
