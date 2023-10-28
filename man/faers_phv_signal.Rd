@@ -58,13 +58,14 @@ faers_phv_signal(object, ...)
 \item \code{faers_phv_signal}: other arguments passed to \code{faers_phv_table}.
 }}
 
-\item{interested}{A \link{FAERSascii} object with data from interested exposure
-(usually drug), must be a subset of \code{object}. If \code{interested} and \code{object2}
-are both \code{missing}, the \link{faers_filter} function will be employed to extract
-data for the exposure of interest from the \code{object}. Then the extracted
-\code{interested} will be passed again to \code{faers_phv_table} in the method of
-\link{FAERSascii} object in \code{interested}. The value \code{n11} or \code{a} will be
-calculated from \code{interested}.}
+\item{interested}{A \link{FAERSascii} object, containing information pertaining to
+the relevant exposure, typically involving pharmaceutical substances, should
+constitute a subset of the overarching "object". In the event that both
+"interested" and "object2" are absent, the \link{faers_filter} function will be
+invoked to selectively procure data concerning the interested exposure from
+the "object". Subsequently, the acquired "interested" subset will be once
+again channeled into \code{faers_phv_table}. The parameters "n11" or "a" will then
+be computed based on the contents of "interested".}
 
 \item{object2}{A \link{FAERSascii} object with data from another interested drug,
 In this way, \code{object} and \code{object2} should be not overlapped. The value \code{n11}

@@ -39,13 +39,14 @@ methods::setGeneric(
 #'   very compact anonymous functions (lambdas) with up to two inputs.
 #'
 #'   If a **string**, the function is looked up in `globalenv()`.
-#' @param interested A [FAERSascii] object with data from interested exposure
-#' (usually drug), must be a subset of `object`. If `interested` and `object2`
-#' are both `missing`, the [faers_filter] function will be employed to extract
-#' data for the exposure of interest from the `object`. Then the extracted
-#' `interested` will be passed again to `faers_phv_table` in the method of
-#' [FAERSascii] object in `interested`. The value `n11` or `a` will be
-#' calculated from `interested`.
+#' @param interested A [FAERSascii] object, containing information pertaining to
+#' the relevant exposure, typically involving pharmaceutical substances, should
+#' constitute a subset of the overarching "object". In the event that both
+#' "interested" and "object2" are absent, the [faers_filter] function will be
+#' invoked to selectively procure data concerning the interested exposure from
+#' the "object". Subsequently, the acquired "interested" subset will be once
+#' again channeled into `faers_phv_table`. The parameters "n11" or "a" will then
+#' be computed based on the contents of "interested".
 #' @rdname faers_phv_signal
 methods::setMethod(
     "faers_phv_table",
