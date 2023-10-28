@@ -20,9 +20,7 @@ faers_download <- function(years, quarters, format = NULL, dir = getwd(), ...) {
     assert_string(dir, empty_ok = FALSE)
     data_available <- faers_available(years, quarters)
     if (!all(data_available)) {
-        out_pairs <- paste(years, quarters, sep = ":")[ # nolint
-            !data_available
-        ]
+        out_pairs <- paste0(years, quarters)[!data_available] # nolint
         cli::cli_abort(c(
             "Not all data specified in {.arg years} and {.arg quarters} are available",
             x = "Missed pair{?s}: {.val {out_pairs}}"
@@ -32,9 +30,7 @@ faers_download <- function(years, quarters, format = NULL, dir = getwd(), ...) {
         # only faers database has xml data files
         is_aers_pairs <- is_from_laers(years, quarters)
         if (any(is_aers_pairs)) {
-            aers_pairs <- paste(years, quarters, sep = ":")[ # nolint
-                is_aers_pairs
-            ]
+            aers_pairs <- paste0(years, quarters)[is_aers_pairs] # nolint
             cli::cli_abort(c(
                 "Only FAERS (from 2012q4) has {.field xml} files",
                 x = "Legacy AERS (before 2012q3) pair{?s}: {.val {aers_pairs}}"
