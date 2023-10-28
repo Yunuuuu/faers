@@ -5,9 +5,17 @@
 #' @param ... Other arguments passed to specific methods. For `faers_filter`:
 #' other arguments passed to `.fn`.
 #' @details
-#'  - `faers_get`, `[[`, `$`, and `[`: Extract a specific field
+#'  - `faers_get`: Extract a specific field
+#'    [data.table][data.table::data.table]. For `reac` and `indi` field, meddra
+#'    data will be automatically added if avaliable.
+#'  - `faers_mget`: Extract a list of field
+#'    [data.table][data.table::data.table]. For `reac` and `indi` field, meddra
+#'    data will be automatically added if avaliable.
+#'  - `[[`, `$`, and `[`: Extract a specific field
 #'    [data.table][data.table::data.table] or a list of field
-#'    [data.table][data.table::data.table] from [FAERS] object.
+#'    [data.table][data.table::data.table] from [FAERS] object. Note: this just
+#'    extract field data from `@data` slot directly. For usual usage, just use
+#'    `faers_get` or `faers_mget`.
 #'  - `faers_primaryid`: Extract the `primaryid` from `demo` field.
 #'  - `faers_keep`: only keep data from specified `primaryid`. Note: `year`,
 #'    `quarter`, `deletedCases` will be kept as the original. So make sure you
@@ -23,7 +31,7 @@ methods::setGeneric("faers_get", function(object, ...) {
 
 #' @param field A string indicates the FAERS fields to use. Only values "demo",
 #' "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used. For
-#' `faers_filter`, this filed data will be passed to `.fn` to extract primaryid;
+#' `faers_filter`, this field data will be passed to `.fn` to extract primaryid;
 #' if `NULL`, the `object` will be passed to `.fn` directly.
 #' @export
 #' @method faers_get FAERSascii
@@ -38,6 +46,35 @@ methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     }
 })
 
+#######################################################
+#' @export
+#' @rdname FAERS-methods
+methods::setGeneric("faers_mget", function(object, ...) {
+    methods::makeStandardGeneric("faers_mget")
+})
+
+#' @param fields A character vector specifying the fields to use. Only values
+#' "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.
+#' @export
+#' @method faers_mget FAERSascii
+#' @rdname FAERS-methods
+methods::setMethod("faers_mget", "FAERSascii", function(object, fields) {
+    assert_inclusive(fields, faers_ascii_file_fields)
+    out <- object@data[fields]
+    if (object@standardization) {
+        ii <- intersect(names(out), c("indi", "reac"))
+        for (i in ii) {
+            meddra_idx <- out[[i]]$meddra_idx
+            out[[i]] <- cbind(
+                out[[i]][, !"meddra_idx"],
+                object@meddra[meddra_idx]
+            )
+        }
+    }
+    out
+})
+
+#######################################################
 #' @export
 #' @aliases faers_primaryid
 #' @rdname FAERS-methods
@@ -61,31 +98,21 @@ methods::setMethod("faers_primaryid", "FAERSascii", function(object) {
 #' @aliases [,FAERSascii-method
 #' @rdname FAERS-methods
 methods::setMethod("[", "FAERSascii", function(x, i) {
-    data <- x@data
-    out <- data[use_indices(i, names(data))]
-    if (x@standardization) {
-        ii <- intersect(names(out), c("indi", "reac"))
-        for (i in ii) {
-            meddra_idx <- out[[i]]$meddra_idx
-            out[[i]] <- cbind(out[[i]][, !"meddra_idx"], x@meddra[meddra_idx])
-        }
-    }
-    out
+    x@data[i]
 })
 
 #' @export
 #' @aliases [[,FAERSascii-method
 #' @rdname FAERS-methods
 methods::setMethod("[[", "FAERSascii", function(x, i) {
-    assert_length(i, 1L)
-    x[i][[1L]]
+    x@data[[i]]
 })
 
 #' @export
 #' @aliases $,FAERSascii-method
 #' @rdname FAERS-methods
 methods::setMethod("$", "FAERSascii", function(x, name) {
-    x[[rlang::as_name(rlang::ensym(name))]]
+    eval(substitute(x@data$name, list(name = rlang::ensym(name))))
 })
 
 ##############################################################

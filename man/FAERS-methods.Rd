@@ -3,6 +3,8 @@
 \name{faers_get}
 \alias{faers_get}
 \alias{faers_get,FAERSascii-method}
+\alias{faers_mget}
+\alias{faers_mget,FAERSascii-method}
 \alias{faers_primaryid}
 \alias{faers_primaryid,FAERSascii-method}
 \alias{[,FAERSascii,ANY,ANY,ANY-method}
@@ -18,6 +20,10 @@
 faers_get(object, ...)
 
 \S4method{faers_get}{FAERSascii}(object, field)
+
+faers_mget(object, ...)
+
+\S4method{faers_mget}{FAERSascii}(object, fields)
 
 faers_primaryid(object, ...)
 
@@ -45,8 +51,11 @@ other arguments passed to \code{.fn}.}
 
 \item{field}{A string indicates the FAERS fields to use. Only values "demo",
 "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used. For
-\code{faers_filter}, this filed data will be passed to \code{.fn} to extract primaryid;
+\code{faers_filter}, this field data will be passed to \code{.fn} to extract primaryid;
 if \code{NULL}, the \code{object} will be passed to \code{.fn} directly.}
+
+\item{fields}{A character vector specifying the fields to use. Only values
+"demo", "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.}
 
 \item{x}{A \link{FAERSascii} object.}
 
@@ -72,9 +81,17 @@ Utils function for \link{FAERSascii} class.
 }
 \details{
 \itemize{
-\item \code{faers_get}, \code{[[}, \code{$}, and \code{[}: Extract a specific field
+\item \code{faers_get}: Extract a specific field
+\link[data.table:data.table]{data.table}. For \code{reac} and \code{indi} field, meddra
+data will be automatically added if avaliable.
+\item \code{faers_mget}: Extract a list of field
+\link[data.table:data.table]{data.table}. For \code{reac} and \code{indi} field, meddra
+data will be automatically added if avaliable.
+\item \code{[[}, \code{$}, and \code{[}: Extract a specific field
 \link[data.table:data.table]{data.table} or a list of field
-\link[data.table:data.table]{data.table} from \link{FAERS} object.
+\link[data.table:data.table]{data.table} from \link{FAERS} object. Note: this just
+extract field data from \verb{@data} slot directly. For usual usage, just use
+\code{faers_get} or \code{faers_mget}.
 \item \code{faers_primaryid}: Extract the \code{primaryid} from \code{demo} field.
 \item \code{faers_keep}: only keep data from specified \code{primaryid}. Note: \code{year},
 \code{quarter}, \code{deletedCases} will be kept as the original. So make sure you

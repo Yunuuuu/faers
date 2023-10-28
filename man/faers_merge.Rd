@@ -9,7 +9,7 @@
 \usage{
 faers_merge(object, ...)
 
-\S4method{faers_merge}{FAERSascii}(object, use = NULL, all = TRUE, all.x = all, all.y = all)
+\S4method{faers_merge}{FAERSascii}(object, fields = NULL, all = TRUE, all.x = all, all.y = all)
 
 \S4method{faers_merge}{FAERSxml}(object)
 
@@ -20,9 +20,8 @@ faers_merge(object, ...)
 
 \item{...}{Other arguments passed to specific methods.}
 
-\item{use}{A character vector specifying the fields to use. If \code{NULL}, all
-fields will be used. Note: You'd better only merge necessary data, otherwise
-all fields will consume a lot of memory.}
+\item{fields}{A character vector specifying the fields to use. Only values
+"demo", "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.}
 
 \item{all}{logical; \code{all = TRUE} is shorthand to save setting both
 \code{all.x = TRUE} and \code{all.y = TRUE}.}
@@ -44,8 +43,12 @@ Merge all FAERS field data into one
 Each pair of field data are merged based on "year", "quarter" and
 "primaryid". In cases where any pair of data contains information related to
 "drug_seq" elements, such as "drug_seq", "indi_drug_seq", or "dsg_drug_seq",
-"drug_seq" will be aligned as well. \code{use} shall be organized in the
+"drug_seq" will be aligned as well. \code{fields} shall be organized in the
 subsequent sequence: 'demo', 'drug', 'indi', 'reac', 'ther', 'rpsr', and
 'outc' and the merging sequence will correspondingly adhere to this order.
 Only the initial instance, of the "caseid" column will be preserved.
+}
+\note{
+You'd better only merge necessary data, otherwise a lot of memory will
+be consumed to merge all fields data.
 }

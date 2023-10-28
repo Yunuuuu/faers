@@ -27,7 +27,6 @@ testthat::test_that("faers_primaryid works well", {
 })
 
 testthat::test_that("`[` works well", {
-    testthat::expect_error(data["aa"])
     data_list <- data[c("indi", "reac", "demo", "drug")]
     testthat::expect_true(is.list(data_list))
     testthat::expect_true(all(
@@ -46,7 +45,6 @@ testthat::test_that("`[` works well", {
 })
 
 testthat::test_that("`[[` works well", {
-    testthat::expect_error(data[["aa"]])
     testthat::expect_s3_class(data[["drug"]], "data.table")
     testthat::expect_s3_class(data[["indi"]], "data.table")
     testthat::expect_s3_class(data[["reac"]], "data.table")
@@ -73,13 +71,13 @@ testthat::test_that("`$` works well", {
     testthat::expect_s3_class(data$rpsr, "data.table")
     testthat::expect_s3_class(data$outc, "data.table")
 
-    testthat::expect_error(data$`1`)
-    testthat::expect_error(data$`2`)
-    testthat::expect_error(data$`3`)
-    testthat::expect_error(data$`4`)
-    testthat::expect_error(data$`5`)
-    testthat::expect_error(data$`6`)
-    testthat::expect_error(data$`7`)
+    testthat::expect_null(data$`1`)
+    testthat::expect_null(data$`2`)
+    testthat::expect_null(data$`3`)
+    testthat::expect_null(data$`4`)
+    testthat::expect_null(data$`5`)
+    testthat::expect_null(data$`6`)
+    testthat::expect_null(data$`7`)
 })
 
 testthat::test_that("faers_keep works well", {

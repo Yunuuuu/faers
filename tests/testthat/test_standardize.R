@@ -57,32 +57,50 @@ testthat::test_that("`faers_get` for standardizated data works well", {
     )
 })
 
-testthat::test_that("`$` for standardizated data works well", {
+testthat::test_that("`faers_mget` for standardizated data works well", {
     meddra_cols <- names(data_std@meddra)
-    testthat::expect_s3_class(data_std$indi, "data.table")
-    testthat::expect_s3_class(data_std$reac, "data.table")
+    data_list <- faers_mget(data_std, c("indi", "reac", "demo", "drug"))
+    testthat::expect_true(is.list(data_list))
+    testthat::expect_true(all(
+        names(data_list) == c("indi", "reac", "demo", "drug")
+    ))
+    lapply(data_list, function(x) {
+        testthat::expect_s3_class(x, "data.table")
+    })
     testthat::expect_identical(
-        data_std$indi[, .SD, .SDcols = meddra_cols],
+        data_list$indi[, .SD, .SDcols = meddra_cols],
         data_std@meddra[data_std@data$indi$meddra_idx]
     )
     testthat::expect_identical(
-        data_std$reac[, .SD, .SDcols = meddra_cols],
+        data_list$reac[, .SD, .SDcols = meddra_cols],
         data_std@meddra[data_std@data$reac$meddra_idx]
     )
 })
 
+testthat::test_that("`$` for standardizated data works well", {
+    testthat::expect_s3_class(data_std$indi, "data.table")
+    testthat::expect_s3_class(data_std$reac, "data.table")
+    testthat::expect_in("meddra_idx", names(data_std$indi))
+    testthat::expect_in("meddra_idx", names(data_std$reac))
+    data_std$indi[, .temp := 1L]
+    testthat::expect_in(".temp", names(data_std$indi))
+    data_std$indi[, .temp := NULL]
+    data_std$drug[, .temp := 1L]
+    testthat::expect_in(".temp", names(data_std$drug))
+    data_std$drug[, .temp := NULL]
+})
+
 testthat::test_that("`[[` for standardizated data works well", {
-    meddra_cols <- names(data_std@meddra)
     testthat::expect_s3_class(data_std[["indi"]], "data.table")
     testthat::expect_s3_class(data_std[["reac"]], "data.table")
-    testthat::expect_identical(
-        data_std[["indi"]][, .SD, .SDcols = meddra_cols],
-        data_std@meddra[data_std@data$indi$meddra_idx]
-    )
-    testthat::expect_identical(
-        data_std[["reac"]][, .SD, .SDcols = meddra_cols],
-        data_std@meddra[data_std@data$reac$meddra_idx]
-    )
+    testthat::expect_in("meddra_idx", names(data_std[["indi"]]))
+    testthat::expect_in("meddra_idx", names(data_std[["reac"]]))
+    data_std[["indi"]][, .temp := 1L]
+    testthat::expect_in(".temp", names(data_std[["indi"]]))
+    data_std[["indi"]][, .temp := NULL]
+    data_std[["drug"]][, .temp := 1L]
+    testthat::expect_in(".temp", names(data_std[["drug"]]))
+    data_std[["drug"]][, .temp := NULL]
 })
 
 testthat::test_that("`[` for standardizated data works well", {
@@ -95,12 +113,6 @@ testthat::test_that("`[` for standardizated data works well", {
     lapply(data_list, function(x) {
         testthat::expect_s3_class(x, "data.table")
     })
-    for (i in c("indi", "reac")) {
-        testthat::expect_identical(
-            data_list[[i]][, .SD, .SDcols = meddra_cols],
-            data_std@meddra[data_std@data[[i]]$meddra_idx]
-        )
-    }
 })
 
 testthat::test_that("`faers_merge` for standardizated data works well", {

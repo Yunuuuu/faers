@@ -31,7 +31,10 @@ methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_
     deduplicated_data <- do.call(
         dedup_faers_ascii,
         list(
-            data = object[c("demo", "drug", "indi", "ther", "reac")],
+            data = faers_mget(
+                object,
+                c("demo", "drug", "indi", "ther", "reac")
+            ),
             deleted_cases = deleted_cases
         )
     )
