@@ -38,6 +38,7 @@ is_before_period <- function(years, quarters, y, q, inclusive = TRUE) {
 }
 
 # file or path utils function --------------
+# name used: rxnorm, athena
 faers_cache_dir <- function(name) {
     path <- faers_cache_env[[name]]
     if (is.null(path)) {
@@ -51,7 +52,7 @@ faers_user_cache_dir <- function() {
     dir_create2(rappdirs::user_cache_dir("faers"))
 }
 
-#' Used by `is_installed` and `faers_meta_doc`
+#' Used by `faers_cache_dir` and `faers_meta_doc`
 #' @noRd
 faers_cache_env <- new.env()
 
