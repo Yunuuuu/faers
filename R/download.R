@@ -18,14 +18,6 @@
 faers_download <- function(years, quarters, format = NULL, dir = getwd(), ...) {
     format <- match.arg(format, faers_file_format)
     assert_string(dir, empty_ok = FALSE)
-    data_available <- faers_available(years, quarters)
-    if (!all(data_available)) {
-        out_pairs <- paste0(years, quarters)[!data_available] # nolint
-        cli::cli_abort(c(
-            "Not all data specified in {.arg years} and {.arg quarters} are available",
-            x = "Missed pair{?s}: {.val {out_pairs}}"
-        ))
-    }
     if (format == "xml") {
         # only faers database has xml data files
         is_aers_pairs <- is_from_laers(years, quarters)
@@ -58,6 +50,7 @@ download_inform <- function(urls, file_paths, handle_opts = list()) {
         file_paths <- file_paths[!is_existed]
     }
     if (length(urls)) {
+        assert_internet()
         cli::cli_inform("Downloading {.val {length(urls)}} file{?s}")
         arg_list <- c(
             list(

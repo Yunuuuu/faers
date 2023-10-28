@@ -3,6 +3,10 @@
 #' The function lists the metadata for the FAERS databases currently
 #' available to download.
 #'
+#' @param force A bool. [faers_meta] retrieve information about all records
+#' metadata in the FAERS Quarterly Data Extract Files Site. If a user wants to
+#' download the metadata again and not use the cache version add the argument
+#' `force=TRUE`. 
 #' @return A [data.table][data.table::data.table] reporting years, period,
 #' quarter, and file urls and file sizes.
 #' @examples
@@ -10,10 +14,54 @@
 #' @seealso
 #' <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
 #' @export
-faers_meta <- function() {
-    html <- faers_meta_doc()
+faers_meta <- function(force = FALSE) {
+    assert_bool(force)
+    if (force || is.null(out <- faers_meta_cache_read())) {
+        out <- faers_meta_parse()
+        faers_meta_cache_save(out)
+        # save the data in the cached environment for the usage of next time
+        # like faers_available() or faers_download()
+        faers_cache_env[[".faers_meta_data"]] <- out
+    }
+    out
+}
+
+faers_meta_cache_read <- function() {
+    if (exists(".faers_meta_data", where = faers_cache_env, inherits = FALSE)) {
+        return(get(".faers_meta_data", pos = faers_cache_env, inherits = FALSE))
+    }
+    file <- faers_meta_cache_file()
+    if (file.exists(file)) {
+        cli::cli_alert("Reading FAERS metadata from cached {.file {file}}")
+        out <- readRDS(file)
+        cli::cli_inform("Snapshot time: {out$date}")
+        out <- out$data
+        # save the data in the cached environment for the usage of next time
+        # like faers_available() or faers_download()
+        faers_cache_env[[".faers_meta_data"]] <- out
+    } else {
+        out <- NULL
+    }
+    out
+}
+
+faers_meta_cache_save <- function(data) {
+    file <- faers_meta_cache_file()
+    cli::cli_alert("Writing FAERS metadata into cached {.file {file}}")
+    saveRDS(list(data = data, date = Sys.time()), file = file)
+}
+
+faers_meta_cache_file <- function(dir = faers_cache_dir("metadata")) {
+    file.path(dir, "faers_meta_data")
+}
+
+faers_meta_parse <- function(call = rlang::caller_env()) {
+    assert_internet(call = call)
+    url <- sprintf("%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_host)
+    cli::cli_alert("Reading html: {.url {url}}")
+    html <- xml2::read_html(url)
     table_xml_list <- rvest::html_elements(html, ".panel.panel-default")
-    table_list <- lapply(table_xml_list, parse_year_xml_table)
+    table_list <- lapply(table_xml_list, parse_xml_table)
     out <- data.table::rbindlist(table_list)
     out[, quarter := period2quarter(period)] # nolint
     data.table::setcolorder(out, c(
@@ -27,21 +75,9 @@ faers_meta <- function() {
     data.table::setorderv(out, c("year", "quarter"), order = c(-1L, -1L))[]
 }
 
-faers_meta_doc <- function() {
-    if (!exists(".faers_meta_doc", where = faers_cache_env, inherits = FALSE)) {
-        assert_internet()
-        url <- sprintf(
-            "%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_host
-        )
-        cli::cli_alert("Reading html: {.url {url}}")
-        faers_cache_env[[".faers_meta_doc"]] <- xml2::read_html(url)
-    }
-    get(".faers_meta_doc", pos = faers_cache_env, inherits = FALSE)
-}
-
 utils::globalVariables(c("period", "quarter"))
 
-parse_year_xml_table <- function(year_xml) {
+parse_xml_table <- function(year_xml) {
     year <- rvest::html_text2(rvest::html_element(year_xml, ".panel-title"))
     if (!str_detect(year, "^20\\d+$")) {
         return(NULL)

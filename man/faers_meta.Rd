@@ -4,7 +4,13 @@
 \alias{faers_meta}
 \title{List of FAERS data}
 \usage{
-faers_meta()
+faers_meta(force = FALSE)
+}
+\arguments{
+\item{force}{A bool. \link{faers_meta} retrieve information about all records
+metadata in the FAERS Quarterly Data Extract Files Site. If a user wants to
+download the metadata again and not use the cache version add the argument
+\code{force=TRUE}.}
 }
 \value{
 A \link[data.table:data.table]{data.table} reporting years, period,

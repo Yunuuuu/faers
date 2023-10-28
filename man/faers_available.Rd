@@ -4,13 +4,18 @@
 \alias{faers_available}
 \title{Check if FAERS year}
 \usage{
-faers_available(years, quarters)
+faers_available(years, quarters, force = FALSE)
 }
 \arguments{
 \item{years}{An atomic integer indicates years for which data are required.}
 
 \item{quarters}{An atomic character, only "q1", "q2", "q3", and "q4" are
 allowed.}
+
+\item{force}{A bool. \link{faers_meta} retrieve information about all records
+metadata in the FAERS Quarterly Data Extract Files Site. If a user wants to
+download the metadata again and not use the cache version add the argument
+\code{force=TRUE}.}
 }
 \value{
 A logical indicates FAERS can have data for the \code{years} and
