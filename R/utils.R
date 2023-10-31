@@ -49,7 +49,7 @@ faers_cache_dir <- function(name) {
 }
 
 faers_user_cache_dir <- function() {
-    dir_create2(rappdirs::user_cache_dir("faers"))
+    dir_create2(rappdirs::user_cache_dir("faers"), recursive = TRUE)
 }
 
 #' Used by `faers_cache_dir` and `faers_meta_doc`
@@ -105,9 +105,9 @@ locate_files <- function(path, pattern, ignore.case = TRUE) {
     files
 }
 
-dir_create2 <- function(dir) {
+dir_create2 <- function(dir, ...) {
     if (!dir.exists(dir)) {
-        if (!dir.create(dir, showWarnings = FALSE)) {
+        if (!dir.create(dir, showWarnings = FALSE, ...)) {
             cli::cli_abort("Cannot create directory {.path {dir}}")
         }
     }
