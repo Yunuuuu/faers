@@ -11,6 +11,12 @@
 #' Only the initial instance, of the "caseid" column will be preserved.
 #'
 #' @return A [data.table][data.table::data.table] object.
+#' @examples 
+#' \dontrun{
+#'  data <- faers(c(2012, 2013), c("q1", "q3"))
+#'  faers_merge(data, "indi")
+#'  faers_merge(data, c("demo", "indi"))
+#' }
 #' @export
 #' @name faers_merge
 methods::setGeneric("faers_merge", function(object, ...) {

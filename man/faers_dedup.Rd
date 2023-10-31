@@ -29,3 +29,9 @@ A \link{FAERSascii} object.
 \description{
 Tidy up FAERS Quarterly Data with duplicate records removed
 }
+\examples{
+\dontrun{
+ data <- faers(c(2012, 2013), c("q1", "q3"))
+ faers_dedup(data)
+}
+}

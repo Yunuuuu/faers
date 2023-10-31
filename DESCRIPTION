@@ -3,7 +3,7 @@ Title: R interface for FDA Adverse Event Reporting System
 Version: 0.0.0.9000
 Authors@R: 
     person("Yun", "Peng", , "yunyunpp96@outlook.com", role = c("aut", "cre"))
-Description: R interface for FDA Adverse Event Reporting System (FAERS).
+Description: FAERS is a database for the spontaneous reporting of adverse events and medication errors involving human drugs and therapeutic biological products. faers is the bridge between FAERS and R.
 License: MIT + file LICENSE
 Depends: 
     R (>= 3.5.0)
@@ -11,7 +11,7 @@ Imports:
     brio,
     cli,
     curl,
-    data.table (>= 1.14.9),
+    data.table,
     httr2,
     MCMCpack,
     methods,
@@ -22,7 +22,7 @@ Imports:
     xml2
 Suggests: 
     testthat (>= 3.0.0)
-Remotes: Rdatatable/data.table
+biocViews: Software, DataImport
 Encoding: UTF-8
 ByteCompile: true
 Roxygen: list(markdown = TRUE)

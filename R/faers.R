@@ -4,6 +4,10 @@
 #' @param handle_opts Extra handle options passed to each request
 #' [new_handle][curl::new_handle].
 #' @return A [FAERSxml] or [FAERSascii] object.
+#' @examples 
+#' \dontrun{
+#'  data <- faers(c(2012, 2013), c("q1", "q3"))
+#' }
 #' @export
 faers <- function(years, quarters, format = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
     format <- match.arg(format, faers_file_format)

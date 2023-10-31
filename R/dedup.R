@@ -2,6 +2,11 @@
 #' @param object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods.
 #' @return A [FAERSascii] object.
+#' @examples 
+#' \dontrun{
+#'  data <- faers(c(2012, 2013), c("q1", "q3"))
+#'  faers_dedup(data)
+#' }
 #' @export
 #' @name faers_dedup
 methods::setGeneric("faers_dedup", function(object, ...) {

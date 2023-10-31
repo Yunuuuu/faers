@@ -25,3 +25,6 @@ and \code{quarters}.
 \description{
 Test whether years and quarters are before specified period
 }
+\examples{
+faers_before_period(c(2011, 2012), c("q1", "q3"), 2011, "q2")
+}

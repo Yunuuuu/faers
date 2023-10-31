@@ -16,3 +16,10 @@ A \link{FAERSxml} or \link{FAERSascii} object.
 Packed all \link{FAERSascii} or \link{FAERSxml} objects into a single \link{FAERSascii} or
 \link{FAERSxml} object
 }
+\examples{
+\dontrun{
+ data1 <- faers(2012, "q1")
+ data2 <- faers(2013, "q4")
+ faers_combine(list(data1, data2))
+}
+}

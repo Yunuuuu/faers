@@ -37,3 +37,8 @@ A \link{FAERSxml} or \link{FAERSascii} object.
 \description{
 Download and parse FAERS Quarterly Data files
 }
+\examples{
+\dontrun{
+ data <- faers(c(2012, 2013), c("q1", "q3"))
+}
+}

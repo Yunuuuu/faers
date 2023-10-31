@@ -249,7 +249,7 @@ phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
     out <- data.table::as.data.table(do.call("rbind", out))
     data.table::setnames(out, c("ci_low", "ci_high"))
     out[, ic := ic]
-    data.table::setcolorder(out, "ic", before = 1L)
+    data.table::setcolorder(out, c("ic", "ci_low", "ci_high"))
     out[]
 }
 

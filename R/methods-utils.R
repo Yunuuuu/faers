@@ -24,6 +24,14 @@
 #'  - `faers_filter`: apply a function to extract wanted `primaryid`, then use
 #'    `faers_keep` to filter.
 #' @export
+#' @examples 
+#' \dontrun{
+#'  data <- faers(2012, "q1")
+#'  faers_get(data, "indi")
+#'  data[["indi"]]
+#'  faers_get(data, "demo")
+#'  data[["demo"]]
+#' }
 #' @rdname FAERS-methods
 methods::setGeneric("faers_get", function(object, ...) {
     methods::makeStandardGeneric("faers_get")

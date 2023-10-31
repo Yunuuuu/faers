@@ -6,7 +6,7 @@
 \alias{_PACKAGE}
 \title{faers: R interface for FDA Adverse Event Reporting System}
 \description{
-R interface for FDA Adverse Event Reporting System (FAERS).
+FAERS is a database for the spontaneous reporting of adverse events and medication errors involving human drugs and therapeutic biological products. faers is the bridge between FAERS and R.
 }
 \author{
 \strong{Maintainer}: Yun Peng \email{yunyunpp96@outlook.com}

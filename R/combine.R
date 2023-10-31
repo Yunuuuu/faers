@@ -4,6 +4,13 @@
 #' [FAERSxml] object
 #' @param x A list of [FAERSxml] or [FAERSascii] objects.
 #' @return A [FAERSxml] or [FAERSascii] object.
+#' @examples 
+#' \dontrun{
+#'  data1 <- faers(2012, "q1")
+#'  data2 <- faers(2013, "q4")
+#'  faers_combine(list(data1, data2))
+#' }
+#' @export 
 faers_combine <- function(x) {
     assert_(x, is.list, "a list")
     l <- length(x)
