@@ -5,8 +5,8 @@
 #' [new_handle][curl::new_handle].
 #' @return A [FAERSxml] or [FAERSascii] object.
 #' @examples 
-#' \dontrun{
-#'  data <- faers(c(2012, 2013), c("q1", "q3"))
+#' \donttest{
+#'  data <- faers(2004, "q1")
 #' }
 #' @export
 faers <- function(years, quarters, format = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {

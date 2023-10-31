@@ -38,7 +38,7 @@ A \link{FAERSxml} or \link{FAERSascii} object.
 Download and parse FAERS Quarterly Data files
 }
 \examples{
-\dontrun{
- data <- faers(c(2012, 2013), c("q1", "q3"))
+\donttest{
+ data <- faers(2004, "q1")
 }
 }

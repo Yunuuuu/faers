@@ -25,12 +25,15 @@
 #'    `faers_keep` to filter.
 #' @export
 #' @examples 
-#' \dontrun{
-#'  data <- faers(2012, "q1")
+#' \donttest{
+#'  data <- faers(2004, "q1")
 #'  faers_get(data, "indi")
 #'  data[["indi"]]
 #'  faers_get(data, "demo")
 #'  data[["demo"]]
+#'  faers_mget(data, c("indi", "drug"))
+#'  faers_mget(data, c("indi", "demo"))
+#'  faers_primaryid(data)
 #' }
 #' @rdname FAERS-methods
 methods::setGeneric("faers_get", function(object, ...) {

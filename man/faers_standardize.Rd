@@ -22,6 +22,13 @@ A \link{FAERSascii} object.
 \description{
 Standardize FAERS Quarterly Data for Preferred Term and drug names
 }
+\examples{
+\dontrun{
+ data <- faers(2004, "q1")
+# you should replace `meddra_path` with yours
+ data <- faers_standardize(data, meddra_path)
+}
+}
 \seealso{
 \url{https://www.meddra.org/}
 }

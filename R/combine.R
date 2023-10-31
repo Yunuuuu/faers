@@ -4,13 +4,13 @@
 #' [FAERSxml] object
 #' @param x A list of [FAERSxml] or [FAERSascii] objects.
 #' @return A [FAERSxml] or [FAERSascii] object.
-#' @examples 
-#' \dontrun{
-#'  data1 <- faers(2012, "q1")
-#'  data2 <- faers(2013, "q4")
-#'  faers_combine(list(data1, data2))
+#' @examples
+#' \donttest{
+#' data1 <- faers(2004, "q1")
+#' data2 <- faers(2004, "q2")
+#' faers_combine(list(data1, data2))
 #' }
-#' @export 
+#' @export
 faers_combine <- function(x) {
     assert_(x, is.list, "a list")
     l <- length(x)
@@ -58,15 +58,17 @@ combine_faers_ascii <- function(x) {
             recursive = FALSE, use.names = FALSE
         )
     )
+    if (anyDuplicated(period)) {
+        cli::cli_warn("Duplicated periods combined")
+    }
     period <- unique(period)
     methods::new("FAERSascii",
         data = out,
         year = period$year,
         quarter = period$quarter,
-        deletedCases = unique(unlist(
-            lapply(x, faers_deleted_cases),
-            use.names = FALSE
-        ))
+        deletedCases = unique(
+            unlist(lapply(x, faers_deleted_cases), use.names = FALSE)
+        )
     )
 }
 

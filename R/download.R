@@ -11,8 +11,8 @@
 #'  [new_handle][curl::new_handle].
 #' @return An atomic character for the path of downloaded files.
 #' @examples
-#' \dontrun{
-#' faers_download(year = 2018, quarter = "q4", dir = tempdir())
+#' \donttest{
+#' faers_download(year = 2004, quarter = "q1", dir = tempdir())
 #' }
 #' @export
 faers_download <- function(years, quarters, format = NULL, dir = getwd(), ...) {

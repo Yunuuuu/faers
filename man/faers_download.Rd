@@ -28,7 +28,7 @@ An atomic character for the path of downloaded files.
 This function downloads the FAERS data for selected years and quarters.
 }
 \examples{
-\dontrun{
-faers_download(year = 2018, quarter = "q4", dir = tempdir())
+\donttest{
+faers_download(year = 2004, quarter = "q1", dir = tempdir())
 }
 }

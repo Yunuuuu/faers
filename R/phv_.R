@@ -46,6 +46,15 @@
 #' - `phv_bcpnn_mcmc`: information component (`ic`).
 #' - `phv_obsexp_shrink`: observed to expected ratio (`oe_ratio`).
 #' @export
+#' @examples 
+#' phv_signal(122, 1320, 381, 31341, "ror")
+#' phv_signal(122, 1320, 381, 31341, "prr")
+#' phv_signal(122, 1320, 381, 31341, "chisq")
+#' phv_signal(122, 1320, 381, 31341, "bcpnn_norm")
+#' phv_signal(122, 1320, 381, 31341, "bcpnn_mcmc")
+#' phv_signal(122, 1320, 381, 31341, "obsexp_shrink")
+#' phv_signal(122, 1320, 381, 31341, "fisher")
+#' phv_signal(122, 1320, 381, 31341)
 #' @name phv_signal
 phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
     allowed_methods <- c(
@@ -54,9 +63,7 @@ phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE,
     )
     assert_inclusive(methods, allowed_methods, null_ok = TRUE)
     methods <- unique(methods %||% allowed_methods)
-    out <- data.table(
-        expected = (a + b) / (a + b + c + d) * (a + c)
-    )
+    out <- data.table(expected = (a + b) / (a + b + c + d) * (a + c))
     args <- list(a = a, b = b, c = c, d = d, alpha = alpha)
     for (method in methods) {
         phv_fn <- sprintf("phv_%s", method)

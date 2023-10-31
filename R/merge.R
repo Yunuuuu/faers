@@ -12,8 +12,8 @@
 #'
 #' @return A [data.table][data.table::data.table] object.
 #' @examples 
-#' \dontrun{
-#'  data <- faers(c(2012, 2013), c("q1", "q3"))
+#' \donttest{
+#'  data <- faers(2004, "q1")
 #'  faers_merge(data, "indi")
 #'  faers_merge(data, c("demo", "indi"))
 #' }

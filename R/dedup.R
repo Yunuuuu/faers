@@ -4,7 +4,9 @@
 #' @return A [FAERSascii] object.
 #' @examples 
 #' \dontrun{
-#'  data <- faers(c(2012, 2013), c("q1", "q3"))
+#'  data <- faers(2004, c("q1", "q2"))
+#'  # you should replace `meddra_path` with yours
+#'  data <- faers_standardize(data, meddra_path)
 #'  faers_dedup(data)
 #' }
 #' @export

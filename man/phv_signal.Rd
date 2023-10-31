@@ -135,6 +135,16 @@ is the confidence intervals as implemented in \code{phv_bcpnn_mcmc} (Norén et a
 network information component (IC) with reasonable accuracy when \code{alpha1 = alpha2 = 0.5} (Norén et al., 2013).
 }
 
+\examples{
+phv_signal(122, 1320, 381, 31341, "ror")
+phv_signal(122, 1320, 381, 31341, "prr")
+phv_signal(122, 1320, 381, 31341, "chisq")
+phv_signal(122, 1320, 381, 31341, "bcpnn_norm")
+phv_signal(122, 1320, 381, 31341, "bcpnn_mcmc")
+phv_signal(122, 1320, 381, 31341, "obsexp_shrink")
+phv_signal(122, 1320, 381, 31341, "fisher")
+phv_signal(122, 1320, 381, 31341)
+}
 \references{
 \itemize{
 \item Evans, S.J.W., Waller, P.C. and Davis, S. (2001), Use of proportional

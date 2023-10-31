@@ -4,6 +4,12 @@
 #' @return A [FAERSascii] object.
 #' @seealso
 #' <https://www.meddra.org/>
+#' @examples 
+#' \dontrun{
+#'  data <- faers(2004, "q1")
+#' # you should replace `meddra_path` with yours
+#'  data <- faers_standardize(data, meddra_path)
+#' }
 #' @export
 #' @name faers_standardize
 methods::setGeneric("faers_standardize", function(object, ...) {
