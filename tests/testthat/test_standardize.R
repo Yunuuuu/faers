@@ -7,9 +7,7 @@ data <- suppressWarnings(faers(
     compress_dir = tempdir()
 ))
 
-data_std <- faers_standardize(
-    data, "~/WorkSpace/Data/MedDRA/MedDRA_26_1_English"
-)
+data_std <- faers_standardize(data, "~/Data/MedDRA/MedDRA_26_1_English")
 
 testthat::test_that("standardize FAERS ascii data works well", {
     testthat::expect_true(data_std@standardization)
@@ -22,8 +20,7 @@ testthat::test_that("standardize FAERS ascii data works well", {
             c("meddra_idx", "meddra_hierarchy", "meddra_code", "meddra_pt")
     ))
     testthat::expect_true(all(
-        setdiff(names(data_std@data$
-            reac), names(data@data$reac)) ==
+        setdiff(names(data_std@data$reac), names(data@data$reac)) ==
             c("meddra_idx", "meddra_hierarchy", "meddra_code", "meddra_pt")
     ))
 })

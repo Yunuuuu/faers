@@ -5,6 +5,8 @@ Authors@R:
     person("Yun", "Peng", , "yunyunpp96@outlook.com", role = c("aut", "cre"))
 Description: R interface for FDA Adverse Event Reporting System (FAERS).
 License: MIT + file LICENSE
+Depends: 
+    R (>= 3.5.0)
 Imports: 
     brio,
     cli,

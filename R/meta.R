@@ -3,10 +3,11 @@
 #' The function lists the metadata for the FAERS databases currently
 #' available to download.
 #'
-#' @param force A bool. [faers_meta] retrieve information about all records
-#' metadata in the FAERS Quarterly Data Extract Files Site. If a user wants to
-#' download the metadata again and not use the cache version add the argument
-#' `force=TRUE`. 
+#' @param force A boolean value. If set to `TRUE`, it indicates the retrieval of
+#' information about all records' metadata in the FAERS Quarterly Data Extract
+#' Files Site, bypassing the cache.
+#' @param internal A boolean value. It determines whether to use the internal
+#' data associated with the package when no cached file is available.
 #' @return A [data.table][data.table::data.table] reporting years, period,
 #' quarter, and file urls and file sizes.
 #' @examples
@@ -14,51 +15,59 @@
 #' @seealso
 #' <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
 #' @export
-faers_meta <- function(force = FALSE) {
+faers_meta <- function(force = FALSE, internal = FALSE) {
     assert_bool(force)
-    if (force || is.null(out <- faers_meta_cache_read())) {
+    if (force || is.null(out <- faers_meta_cache_read(internal = internal))) {
         out <- faers_meta_parse()
         faers_meta_cache_save(out)
         # save the data in the cached environment for the usage of next time
-        # like faers_available() or faers_download()
+        # like faers_available()
         faers_cache_env[[".faers_meta_data"]] <- out
     }
     out
 }
 
-faers_meta_cache_read <- function() {
+faers_meta_cache_read <- function(internal = FALSE) {
     if (exists(".faers_meta_data", where = faers_cache_env, inherits = FALSE)) {
         return(get(".faers_meta_data", pos = faers_cache_env, inherits = FALSE))
     }
     file <- faers_meta_cache_file()
     if (file.exists(file)) {
-        cli::cli_alert("Reading FAERS metadata from cached {.file {file}}")
         out <- readRDS(file)
-        cli::cli_inform("Snapshot time: {out$date}")
-        out <- out$data
+        msg <- "Using FAERS metadata from cached {.file {file}}"
         # save the data in the cached environment for the usage of next time
-        # like faers_available() or faers_download()
-        faers_cache_env[[".faers_meta_data"]] <- out
+        # like faers_available()
+        faers_cache_env[[".faers_meta_data"]] <- out$data
     } else {
-        out <- NULL
+        if (internal) {
+            out <- readRDS(system.file("extdata", "faers_meta_data.rds",
+                package = "faers"
+            ))
+            msg <- "Using internal FAERS metadata"
+        } else {
+            return(NULL)
+        }
     }
-    out
+    cli::cli_inform(c(">" = msg, " " = "Snapshot time: {out$date}"))
+    out$data
 }
 
 faers_meta_cache_save <- function(data) {
     file <- faers_meta_cache_file()
-    cli::cli_alert("Writing FAERS metadata into cached {.file {file}}")
+    cli::cli_inform(
+        c(">" = "Writing FAERS metadata into cached {.file {file}}")
+    )
     saveRDS(list(data = data, date = Sys.time()), file = file)
 }
 
 faers_meta_cache_file <- function(dir = faers_cache_dir("metadata")) {
-    file.path(dir, "faers_meta_data")
+    file.path(dir, "faers_meta_data.rds")
 }
 
 faers_meta_parse <- function(call = rlang::caller_env()) {
     assert_internet(call = call)
     url <- sprintf("%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_host)
-    cli::cli_alert("Reading html: {.url {url}}")
+    cli::cli_inform(c(">" = "Reading html: {.url {url}}"))
     html <- xml2::read_html(url)
     table_xml_list <- rvest::html_elements(html, ".panel.panel-default")
     table_list <- lapply(table_xml_list, parse_xml_table)

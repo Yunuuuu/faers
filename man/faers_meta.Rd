@@ -4,13 +4,15 @@
 \alias{faers_meta}
 \title{List of FAERS data}
 \usage{
-faers_meta(force = FALSE)
+faers_meta(force = FALSE, internal = FALSE)
 }
 \arguments{
-\item{force}{A bool. \link{faers_meta} retrieve information about all records
-metadata in the FAERS Quarterly Data Extract Files Site. If a user wants to
-download the metadata again and not use the cache version add the argument
-\code{force=TRUE}.}
+\item{force}{A boolean value. If set to \code{TRUE}, it indicates the retrieval of
+information about all records' metadata in the FAERS Quarterly Data Extract
+Files Site, bypassing the cache.}
+
+\item{internal}{A boolean value. It determines whether to use the internal
+data associated with the package when no cached file is available.}
 }
 \value{
 A \link[data.table:data.table]{data.table} reporting years, period,
