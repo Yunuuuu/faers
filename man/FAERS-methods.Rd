@@ -76,6 +76,9 @@ very compact anonymous functions (lambdas) with up to two inputs.
 
 If a \strong{string}, the function is looked up in \code{globalenv()}.}
 }
+\value{
+See details.
+}
 \description{
 Utils function for \link{FAERSascii} class.
 }
@@ -102,13 +105,19 @@ better to run \link[=FAERS]{faers}.
 }
 }
 \examples{
- # you must change `dir`, as the file included in the package is sampled
- data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
- faers_get(data, "indi")
- data[["indi"]]
- faers_get(data, "demo")
- data[["demo"]]
- faers_mget(data, c("indi", "drug"))
- faers_mget(data, c("indi", "demo"))
- faers_primaryid(data)
+# you must change `dir`, as the file included in the package is sampled
+data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
+faers_get(data, "indi")
+data[["indi"]]
+data$indi
+faers_get(data, "demo")
+data[["demo"]]
+data$demo
+faers_mget(data, c("indi", "drug"))
+faers_mget(data, c("indi", "demo"))
+faers_primaryid(data)
+faers_keep(data, primaryid = sample(faers_primaryid(data), 20L))
+faers_filter(data, .fn = function(x) {
+    sample(x$primaryid, 100L)
+}, field = "demo")
 }

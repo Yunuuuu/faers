@@ -8,6 +8,28 @@
 #' @param ... Other arguments passed to specific methods.
 #'  - `faers_phv_table`: other arguments passed to `interested_fn`.
 #'  - `faers_phv_signal`: other arguments passed to `faers_phv_table`.
+#' @return A [data.table][data.table::data.table] object.
+#' @examples
+#' \dontrun{
+#' # you must change `dir`, as the files included in the package are sampled
+#' data <- faers(c(2004, 2017), c("q1", "q2"),
+#'     dir = system.file("extdata", package = "faers")
+#' )
+#' # you must standardize and deduplication before disproportionality analysis
+#' # you should replace `meddra_path` with yours
+#' data <- faers_standardize(data, meddra_path)
+#' data <- faers_dedup(data)
+#' faers_phv_table(data,
+#'     filter_params = list(field = "demo", .fn = function(x) {
+#'        sample(x$primaryid, 100L)
+#'     })
+#' )
+#' faers_phv_signal(data,
+#'     filter_params = list(field = "demo", .fn = function(x) {
+#'        sample(x$primaryid, 100L)
+#'     })
+#' )
+#' }
 #' @export
 #' @aliases faers_phv_table
 #' @name faers_phv_signal

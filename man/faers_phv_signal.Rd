@@ -113,6 +113,9 @@ confidence intervals.}
 
 \item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.}
 }
+\value{
+A \link[data.table:data.table]{data.table} object.
+}
 \description{
 Create contingency table and run disproportionality analysis
 }
@@ -122,6 +125,28 @@ Create contingency table and run disproportionality analysis
 \code{interested_event}.
 \item \code{faers_phv_signal}: Pharmacovigilance Analysis used contingency table
 constructed with \code{faers_phv_table}. Details see \link{phv_signal}.
+}
+}
+\examples{
+\dontrun{
+# you must change `dir`, as the files included in the package are sampled
+data <- faers(c(2004, 2017), c("q1", "q2"),
+    dir = system.file("extdata", package = "faers")
+)
+# you must standardize and deduplication before disproportionality analysis
+# you should replace `meddra_path` with yours
+data <- faers_standardize(data, meddra_path)
+data <- faers_dedup(data)
+faers_phv_table(data,
+    filter_params = list(field = "demo", .fn = function(x) {
+       sample(x$primaryid, 100L)
+    })
+)
+faers_phv_signal(data,
+    filter_params = list(field = "demo", .fn = function(x) {
+       sample(x$primaryid, 100L)
+    })
+)
 }
 }
 \seealso{

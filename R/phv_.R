@@ -47,14 +47,21 @@
 #' - `phv_obsexp_shrink`: observed to expected ratio (`oe_ratio`).
 #' @export
 #' @examples 
-#' phv_signal(122, 1320, 381, 31341, "ror")
-#' phv_signal(122, 1320, 381, 31341, "prr")
-#' phv_signal(122, 1320, 381, 31341, "chisq")
-#' phv_signal(122, 1320, 381, 31341, "bcpnn_norm")
-#' phv_signal(122, 1320, 381, 31341, "bcpnn_mcmc")
-#' phv_signal(122, 1320, 381, 31341, "obsexp_shrink")
-#' phv_signal(122, 1320, 381, 31341, "fisher")
 #' phv_signal(122, 1320, 381, 31341)
+#' phv_signal(122, 1320, 381, 31341, "ror")
+#' phv_ror(122, 1320, 381, 31341)
+#' phv_signal(122, 1320, 381, 31341, "prr")
+#' phv_prr(122, 1320, 381, 31341)
+#' phv_signal(122, 1320, 381, 31341, "chisq")
+#' phv_chisq(122, 1320, 381, 31341)
+#' phv_signal(122, 1320, 381, 31341, "bcpnn_norm")
+#' phv_bcpnn_norm(122, 1320, 381, 31341)
+#' phv_signal(122, 1320, 381, 31341, "bcpnn_mcmc")
+#' phv_bcpnn_mcmc(122, 1320, 381, 31341)
+#' phv_signal(122, 1320, 381, 31341, "obsexp_shrink")
+#' phv_obsexp_shrink(122, 1320, 381, 31341)
+#' phv_signal(122, 1320, 381, 31341, "fisher")
+#' phv_fisher(122, 1320, 381, 31341)
 #' @name phv_signal
 phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
     allowed_methods <- c(

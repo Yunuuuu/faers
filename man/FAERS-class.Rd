@@ -64,6 +64,9 @@ faers_header(object)
 
 \item{...}{Other arguments passed to specific methods.}
 }
+\value{
+A \link{FAERSascii} or \link{FAERSxml} object.
+}
 \description{
 Provide a container for FAERS Quarterly Data file
 }
@@ -97,3 +100,8 @@ the meddra data used for standardization.}
 files that lists deleted cases. \link{faers_dedup} will remove cases in this slot.}
 }}
 
+\examples{
+# ususaly we use faers() function to create a `FAERS` object
+# you must change `dir`, as the file included in the package is sampled
+data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
+}

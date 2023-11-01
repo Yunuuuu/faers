@@ -18,6 +18,11 @@
 #'    quarter slot).
 #'  - `faers_meddra`: Extract the `meddra` slot.
 #'  - `faers_deleted_cases`: Extract the `deletedCases` slot.
+#' @return A [FAERSascii] or [FAERSxml] object.
+#' @examples 
+#' # ususaly we use faers() function to create a `FAERS` object
+#' # you must change `dir`, as the file included in the package is sampled
+#' data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
 #' @aliases FAERS
 #' @name FAERS-class
 NULL

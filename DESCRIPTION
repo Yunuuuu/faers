@@ -1,6 +1,6 @@
 Package: faers
 Title: R interface for FDA Adverse Event Reporting System
-Version: 0.0.0.9000
+Version: 0.99.0
 Authors@R: 
     person("Yun", "Peng", , "yunyunpp96@outlook.com", role = c("aut", "cre"))
 Description: FAERS is a database for the spontaneous reporting of adverse events and medication errors involving human drugs and therapeutic biological products. faers is the bridge between FAERS and R.

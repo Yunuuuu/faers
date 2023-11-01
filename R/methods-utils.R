@@ -23,17 +23,24 @@
 #'    better to run [faers].
 #'  - `faers_filter`: apply a function to extract wanted `primaryid`, then use
 #'    `faers_keep` to filter.
+#' @return See details.
+#' @examples
+#' # you must change `dir`, as the file included in the package is sampled
+#' data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
+#' faers_get(data, "indi")
+#' data[["indi"]]
+#' data$indi
+#' faers_get(data, "demo")
+#' data[["demo"]]
+#' data$demo
+#' faers_mget(data, c("indi", "drug"))
+#' faers_mget(data, c("indi", "demo"))
+#' faers_primaryid(data)
+#' faers_keep(data, primaryid = sample(faers_primaryid(data), 20L))
+#' faers_filter(data, .fn = function(x) {
+#'     sample(x$primaryid, 100L)
+#' }, field = "demo")
 #' @export
-#' @examples 
-#'  # you must change `dir`, as the file included in the package is sampled
-#'  data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
-#'  faers_get(data, "indi")
-#'  data[["indi"]]
-#'  faers_get(data, "demo")
-#'  data[["demo"]]
-#'  faers_mget(data, c("indi", "drug"))
-#'  faers_mget(data, c("indi", "demo"))
-#'  faers_primaryid(data)
 #' @rdname FAERS-methods
 methods::setGeneric("faers_get", function(object, ...) {
     methods::makeStandardGeneric("faers_get")
