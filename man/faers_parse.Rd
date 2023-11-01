@@ -36,3 +36,10 @@ A \link{FAERSxml} or \link{FAERSascii} object.
 \description{
 Parse FAERS Quarterly Data
 }
+\examples{
+# the files included in the package are sampled
+data <- faers_parse(
+    system.file("extdata", "aers_ascii_2004q1.zip", package = "faers"),
+    compress_dir = tempdir()
+)
+}

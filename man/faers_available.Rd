@@ -28,5 +28,5 @@ This function check if data for the years and quarters selected are
 available at FAERS to be downloaded.
 }
 \examples{
-faers_available(c(2011, 2023), c("q1", "q2"))
+ faers_available(c(2011, 2023), c("q1", "q2"))
 }

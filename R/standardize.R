@@ -6,9 +6,12 @@
 #' <https://www.meddra.org/>
 #' @examples 
 #' \dontrun{
-#'  data <- faers(2004, "q1")
+#' #' # you must change `dir`, as the files included in the package are sampled
+#' data <- faers(c(2004, 2017), c("q1", "q2"),
+#'     dir = system.file("extdata", package = "faers")
+#' )
 #' # you should replace `meddra_path` with yours
-#'  data <- faers_standardize(data, meddra_path)
+#' data <- faers_standardize(data, meddra_path)
 #' }
 #' @export
 #' @name faers_standardize

@@ -31,9 +31,16 @@ Tidy up FAERS Quarterly Data with duplicate records removed
 }
 \examples{
 \dontrun{
- data <- faers(2004, c("q1", "q2"))
- # you should replace `meddra_path` with yours
- data <- faers_standardize(data, meddra_path)
- faers_dedup(data)
+# you must change `dir`, as the files included in the package are sampled
+data <- faers(c(2004, 2017), c("q1", "q2"),
+    dir = system.file("extdata", package = "faers")
+)
+# we must standardize firstly
+# you should replace `meddra_path` with yours
+data <- faers_standardize(data, meddra_path)
+faers_dedup(data)
 }
+}
+\seealso{
+\link{faers_standardize}
 }

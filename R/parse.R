@@ -11,6 +11,12 @@
 #' @param compress_dir A string specifies the directory to extract files to. It
 #' will be created if necessary.
 #' @return A [FAERSxml] or [FAERSascii] object.
+#' @examples 
+#' # the files included in the package are sampled
+#' data <- faers_parse(
+#'     system.file("extdata", "aers_ascii_2004q1.zip", package = "faers"),
+#'     compress_dir = tempdir()
+#' )
 #' @export
 faers_parse <- function(path, format = NULL, year = NULL, quarter = NULL, compress_dir = getwd()) {
     assert_string(path, empty_ok = FALSE)

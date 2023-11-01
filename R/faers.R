@@ -4,10 +4,9 @@
 #' @param handle_opts Extra handle options passed to each request
 #' [new_handle][curl::new_handle].
 #' @return A [FAERSxml] or [FAERSascii] object.
-#' @examples 
-#' \donttest{
-#'  data <- faers(2004, "q1")
-#' }
+#' @examples
+#' # you must change `dir`, as the file included in the package is sampled
+#' data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
 #' @export
 faers <- function(years, quarters, format = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
     format <- match.arg(format, faers_file_format)

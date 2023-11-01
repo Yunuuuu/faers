@@ -28,7 +28,10 @@ An atomic character for the path of downloaded files.
 This function downloads the FAERS data for selected years and quarters.
 }
 \examples{
-\donttest{
-faers_download(year = 2004, quarter = "q1", dir = tempdir())
-}
+# you must change `dir`, as the file included in the package is sampled
+# in this way, the file will downloaded from FAERS
+faers_download(
+    year = 2004, quarter = "q1",
+    dir = system.file("extdata", package = "faers")
+)
 }

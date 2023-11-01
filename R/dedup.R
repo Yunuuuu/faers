@@ -2,12 +2,17 @@
 #' @param object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods.
 #' @return A [FAERSascii] object.
-#' @examples 
+#' @seealso [faers_standardize]
+#' @examples
 #' \dontrun{
-#'  data <- faers(2004, c("q1", "q2"))
-#'  # you should replace `meddra_path` with yours
-#'  data <- faers_standardize(data, meddra_path)
-#'  faers_dedup(data)
+#' # you must change `dir`, as the files included in the package are sampled
+#' data <- faers(c(2004, 2017), c("q1", "q2"),
+#'     dir = system.file("extdata", package = "faers")
+#' )
+#' # we must standardize firstly
+#' # you should replace `meddra_path` with yours
+#' data <- faers_standardize(data, meddra_path)
+#' faers_dedup(data)
 #' }
 #' @export
 #' @name faers_dedup

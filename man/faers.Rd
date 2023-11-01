@@ -38,7 +38,6 @@ A \link{FAERSxml} or \link{FAERSascii} object.
 Download and parse FAERS Quarterly Data files
 }
 \examples{
-\donttest{
- data <- faers(2004, "q1")
-}
+# you must change `dir`, as the file included in the package is sampled
+data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
 }

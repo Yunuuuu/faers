@@ -5,11 +5,16 @@
 #' @param x A list of [FAERSxml] or [FAERSascii] objects.
 #' @return A [FAERSxml] or [FAERSascii] object.
 #' @examples
-#' \donttest{
-#' data1 <- faers(2004, "q1")
-#' data2 <- faers(2004, "q2")
+#' # the files included in the package are sampled
+#' data1 <- faers_parse(
+#'     system.file("extdata", "aers_ascii_2004q1.zip", package = "faers"),
+#'     compress_dir = tempdir()
+#' )
+#' data2 <- faers_parse(
+#'     system.file("extdata", "faers_ascii_2017q2.zip", package = "faers"),
+#'     compress_dir = tempdir()
+#' )
 #' faers_combine(list(data1, data2))
-#' }
 #' @export
 faers_combine <- function(x) {
     assert_(x, is.list, "a list")
