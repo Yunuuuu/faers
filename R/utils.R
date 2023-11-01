@@ -16,7 +16,7 @@ is_from_laers <- function(years, quarters) {
 #' @param inclusive A bool, whether to include the period specifid.
 #' @return An atomic logical with the same length of the max length of `years`
 #' and `quarters`.
-#' @examples 
+#' @examples
 #' faers_before_period(c(2011, 2012), c("q1", "q3"), 2011, "q2")
 #' @export
 faers_before_period <- function(years, quarters, y, q, inclusive = TRUE) {
@@ -51,7 +51,7 @@ faers_cache_dir <- function(name) {
 }
 
 faers_user_cache_dir <- function() {
-    dir_create2(rappdirs::user_cache_dir("faers"), recursive = TRUE)
+    dir_create2(rappdirs::user_cache_dir(pkg_nm()), recursive = TRUE)
 }
 
 #' Used by `faers_cache_dir` and `faers_meta_doc`
@@ -72,6 +72,15 @@ dir_or_unzip <- function(path, compress_dir, pattern, none_msg, ignore.case = TR
     } else {
         cli::cli_abort("{.path {path}} doesn't exist")
     }
+}
+
+# Path root in archive starts at current dir, so if /a/b/c/file and current
+#    dir is /a/b, 'zip -r archive .' puts c/file in archive
+zip2 <- function(zipfile, files, ..., root = getwd()) {
+    old_dir <- getwd()
+    on.exit(setwd(old_dir))
+    setwd(root)
+    utils::zip(zipfile, files, ...)
 }
 
 #' Will always add the basename into the compress_dir
@@ -114,6 +123,14 @@ dir_create2 <- function(dir, ...) {
         }
     }
     dir
+}
+
+internal_file <- function(...) {
+    system.file(..., package = pkg_nm(), mustWork = TRUE)
+}
+
+pkg_nm <- function() {
+    packageName(topenv(environment()))
 }
 
 assert_internet <- function(call = rlang::caller_env()) {
