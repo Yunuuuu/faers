@@ -107,13 +107,25 @@ individual \verb{(a,b,c,d)}-tuple moving across the vectors.
 It is assumed that the contingency table under consideration has
 drugs/exposures in the rows and outcomes/events in the columns. See
 contingency table section.
+
+We use the \code{distinct} patient count method to obtain the frequency counts of
+patients exposed to each interested drug, those reporting interested event.
+As illustrated in the Contingency table, \code{n} equals the total number of
+patients in the database, \code{n11} is the number of patients with exposure to
+the interested drug during the model period and reporting interested events,
+\code{n10} is the number of patients that have used the interested drug but did
+not experience interested event during any of the model periods associated
+with the drug, \code{n01} is the number of patients that did not use the
+interested drug but experienced interested event, and \code{n00} is the number of
+patients that were not exposed to the interested drug and did not report
+interested condition.
 }
 \section{Contingency table}{
 \tabular{llll}{
     \tab ADR of interest \tab Other ADRs \tab Total \cr
-   Drug of interest \tab a=n11 \tab b=n10 \tab a + b \cr
-   Other drugs \tab c=n01 \tab d=n00 \tab c + d \cr
-   Total \tab a+c \tab b+d \tab a+b+c+d \cr
+   Drug of interest \tab a=n11 \tab b=n10 \tab a+b=n1. \cr
+   Other drugs \tab c=n01 \tab d=n00 \tab c+d=n0. \cr
+   Total \tab a+c=n.1 \tab b+d=n.0 \tab a+b+c+d=n \cr
 }
 }
 
@@ -157,6 +169,9 @@ phv_fisher(122, 1320, 381, 31341)
 \item Evans, S.J.W., Waller, P.C. and Davis, S. (2001), Use of proportional
 reporting ratios (PRRs) for signal generation from spontaneous adverse drug
 reaction reports. Pharmacoepidem. Drug Safe., 10: 483-486.
-https://doi.org/10.1002/pds.677
+\url{https://doi.org/10.1002/pds.677}
+\item David Olaleye, SAS Institute Inc. (2019), Real-World Evidence and
+Population Health Analytics: Intersection and Application,
+\url{https://support.sas.com/resources/papers/proceedings19/3361-2019.pdf}
 }
 }

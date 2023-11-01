@@ -78,9 +78,10 @@ when \code{interested} and \code{object2} are both \code{missing}}
 use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
 can be used.}
 
-\item{interested_event}{A character specify the events column(s?) in field of
-object specified in \code{interested_field}. If multiple columns were selected,
-the unique combination will define the interested events.}
+\item{interested_event}{A character specify the events column(s?) in the
+\code{interested_field} of object to count the unique \code{primaryid}. If multiple
+columns were selected, the unique combination will define the interested
+events.}
 
 \item{interested_fn}{A function or formula defined the preprocessing function
 before creating contingency table, with the \code{interested_field} data as the
@@ -139,12 +140,12 @@ data <- faers_standardize(data, meddra_path)
 data <- faers_dedup(data)
 faers_phv_table(data,
     filter_params = list(field = "demo", .fn = function(x) {
-       sample(x$primaryid, 100L)
+        sample(x$primaryid, 100L)
     })
 )
 faers_phv_signal(data,
     filter_params = list(field = "demo", .fn = function(x) {
-       sample(x$primaryid, 100L)
+        sample(x$primaryid, 100L)
     })
 )
 }

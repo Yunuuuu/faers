@@ -28,12 +28,25 @@
 #' It is assumed that the contingency table under consideration has
 #' drugs/exposures in the rows and outcomes/events in the columns. See
 #' contingency table section.
+#' 
+#' We use the `distinct` patient count method to obtain the frequency counts of
+#' patients exposed to each interested drug, those reporting interested event.
+#' As illustrated in the Contingency table, `n` equals the total number of
+#' patients in the database, `n11` is the number of patients with exposure to
+#' the interested drug during the model period and reporting interested events,
+#' `n10` is the number of patients that have used the interested drug but did
+#' not experience interested event during any of the model periods associated
+#' with the drug, `n01` is the number of patients that did not use the
+#' interested drug but experienced interested event, and `n00` is the number of
+#' patients that were not exposed to the interested drug and did not report
+#' interested condition. 
+#' 
 #' @section Contingency table:
-#' |                   | ADR of interest | Other ADRs | Total |
-#' |-------------------|-----------------|------------|-------|
-#' | Drug of interest  |      a=n11      |    b=n10   | a + b |
-#' | Other drugs       |      c=n01      |    d=n00   | c + d |
-#' | Total             |       a+c       |    b+d     |a+b+c+d|
+#' |                   | ADR of interest | Other ADRs |  Total  |
+#' |-------------------|-----------------|------------|---------|
+#' | Drug of interest  |      a=n11      |    b=n10   | a+b=n1. |
+#' | Other drugs       |      c=n01      |    d=n00   | c+d=n0. |
+#' | Total             |     a+c=n.1     |   b+d=n.0  |a+b+c+d=n|
 #' @return A [data.table][data.table::data.table] with columns of estimated
 #' value and it's confidence interval (`ci_low` and `ci_high`). Estimated column
 #' are as follows:
@@ -45,7 +58,6 @@
 #' - `phv_bcpnn_norm`: information component (`ic`).
 #' - `phv_bcpnn_mcmc`: information component (`ic`).
 #' - `phv_obsexp_shrink`: observed to expected ratio (`oe_ratio`).
-#' @export
 #' @examples 
 #' phv_signal(122, 1320, 381, 31341)
 #' phv_signal(122, 1320, 381, 31341, "ror")
@@ -62,6 +74,15 @@
 #' phv_obsexp_shrink(122, 1320, 381, 31341)
 #' phv_signal(122, 1320, 381, 31341, "fisher")
 #' phv_fisher(122, 1320, 381, 31341)
+#' @references
+#' - Evans, S.J.W., Waller, P.C. and Davis, S. (2001), Use of proportional
+#'   reporting ratios (PRRs) for signal generation from spontaneous adverse drug
+#'   reaction reports. Pharmacoepidem. Drug Safe., 10: 483-486.
+#'   <https://doi.org/10.1002/pds.677>
+#' - David Olaleye, SAS Institute Inc. (2019), Real-World Evidence and
+#'   Population Health Analytics: Intersection and Application,
+#'   <https://support.sas.com/resources/papers/proceedings19/3361-2019.pdf>   
+#' @export
 #' @name phv_signal
 phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
     allowed_methods <- c(
@@ -120,11 +141,6 @@ phv_ror <- function(a, b, c, d, alpha = 0.05) {
 
 #' @export
 #' @rdname phv_signal
-#' @references
-#' - Evans, S.J.W., Waller, P.C. and Davis, S. (2001), Use of proportional
-#'   reporting ratios (PRRs) for signal generation from spontaneous adverse drug
-#'   reaction reports. Pharmacoepidem. Drug Safe., 10: 483-486.
-#'   https://doi.org/10.1002/pds.677
 phv_prr <- function(a, b, c, d, alpha = 0.05) {
     assert_phv_table(a, b, c, d)
 

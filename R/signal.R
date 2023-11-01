@@ -21,12 +21,12 @@
 #' data <- faers_dedup(data)
 #' faers_phv_table(data,
 #'     filter_params = list(field = "demo", .fn = function(x) {
-#'        sample(x$primaryid, 100L)
+#'         sample(x$primaryid, 100L)
 #'     })
 #' )
 #' faers_phv_signal(data,
 #'     filter_params = list(field = "demo", .fn = function(x) {
-#'        sample(x$primaryid, 100L)
+#'         sample(x$primaryid, 100L)
 #'     })
 #' )
 #' }
@@ -44,9 +44,10 @@ methods::setGeneric(
 #' @param interested_field A string indicates the interested FAERS fields to
 #' use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
 #' can be used.
-#' @param interested_event A character specify the events column(s?) in field of
-#' object specified in `interested_field`. If multiple columns were selected,
-#' the unique combination will define the interested events.
+#' @param interested_event A character specify the events column(s?) in the
+#' `interested_field` of object to count the unique `primaryid`. If multiple
+#' columns were selected, the unique combination will define the interested
+#' events.
 #' @param filter_params Other arguments passed to [faers_filter], solely used
 #' when `interested` and `object2` are both `missing`
 #' @param interested_fn A function or formula defined the preprocessing function
@@ -112,6 +113,11 @@ methods::setMethod(
                 cli::cli_abort("{.fn interested_fn} must return an {.cls data.table}")
             }
         }
+        groups <- c("primaryid", interested_event)
+        full_data <- unique(full_data, by = groups, cols = groups)
+        interested_data <- unique(interested_data,
+            by = groups, cols = groups
+        )
         n <- nrow(full_data) # scalar
         n1. <- nrow(interested_data) # scalar
         out <- merge(
@@ -165,6 +171,9 @@ methods::setMethod(
                 cli::cli_abort("{.arg interested_fn} must return an {.cls data.table}")
             }
         }
+        groups <- c("primaryid", interested_event)
+        interested_reac <- unique(interested_reac, by = groups, cols = groups)
+        interested_reac2 <- unique(interested_reac2, by = groups, cols = groups)
         n1. <- nrow(interested_reac)
         n0. <- nrow(interested_reac2)
         out <- merge(
