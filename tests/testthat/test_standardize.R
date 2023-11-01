@@ -1,12 +1,10 @@
 testthat::skip_on_ci()
 
-data <- suppressWarnings(faers(
-    c(2004, 2004, 2011, 2012),
-    c("q1", "q2", "q4", "q1"), "ascii",
-    dir = testthat::test_path("testdata"),
+data <- faers(c(2004, 2017),
+    c("q1", "q2"), "ascii",
+    dir = internal_file("extdata"),
     compress_dir = tempdir()
-))
-
+)
 data_std <- faers_standardize(data, "~/Data/MedDRA/MedDRA_26_1_English")
 
 testthat::test_that("standardize FAERS ascii data works well", {

@@ -40,9 +40,7 @@ faers_meta_cache_read <- function(internal = FALSE) {
         faers_cache_env[[".faers_meta_data"]] <- out$data
     } else {
         if (internal) {
-            out <- readRDS(system.file("extdata", "faers_meta_data.rds",
-                package = "faers"
-            ))
+            out <- readRDS(internal_file("extdata", "faers_meta_data.rds"))
             msg <- "Using internal FAERS metadata"
         } else {
             return(NULL)

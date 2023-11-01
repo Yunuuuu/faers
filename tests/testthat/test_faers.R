@@ -1,12 +1,16 @@
 testthat::test_that("faers() function works as expected", {
     testthat::expect_no_error(data1 <- faers(2004, "q1", "ascii",
-        dir = testthat::test_path("testdata"), compress_dir = tempdir()
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
     ))
-    testthat::expect_no_error(data2 <- faers(2004, "q2", "ascii",
-        dir = testthat::test_path("testdata"), compress_dir = tempdir()
+    testthat::expect_no_error(data2 <- faers(2017, "q2", "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
     ))
-    testthat::expect_no_error(data3 <- faers(2004, c("q1", "q2"), "ascii",
-        dir = testthat::test_path("testdata"), compress_dir = tempdir()
+    testthat::expect_no_error(data3 <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
     ))
     testthat::expect_s4_class(data3, "FAERSascii")
     testthat::expect_false(data3@deduplication)

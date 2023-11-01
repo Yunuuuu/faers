@@ -1,12 +1,9 @@
-data <- suppressWarnings(faers(
-    c(2004, 2004, 2011, 2012),
-    c("q1", "q2", "q4", "q1"), "ascii",
-    dir = testthat::test_path("testdata"),
-    compress_dir = tempdir()
-))
-
 testthat::test_that("`faers_merge` for FAERS ascii data works well", {
-
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
     # internal don't modify data by reference and drug_seq match well
     raw_indi <- data.table::copy(data$indi)
     raw_ther <- data.table::copy(data$ther)

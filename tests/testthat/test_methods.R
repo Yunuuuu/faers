@@ -1,9 +1,8 @@
-data <- suppressWarnings(faers(
-    c(2004, 2004, 2011, 2012),
-    c("q1", "q2", "q4", "q1"), "ascii",
-    dir = testthat::test_path("testdata"),
+data <- faers(c(2004, 2017),
+    c("q1", "q2"), "ascii",
+    dir = internal_file("extdata"),
     compress_dir = tempdir()
-))
+)
 
 testthat::test_that("faers_get works well", {
     testthat::expect_s3_class(faers_get(data, "drug"), "data.table")
@@ -81,21 +80,23 @@ testthat::test_that("`$` works well", {
 })
 
 testthat::test_that("faers_keep works well", {
-    data1 <- faers_keep(data, "4204616")
-    testthat::expect_setequal(data1$drug$primaryid, "4204616")
-    testthat::expect_setequal(data1$indi$primaryid, "4204616")
-    testthat::expect_setequal(data1$reac$primaryid, "4204616")
-    testthat::expect_setequal(data1$demo$primaryid, "4204616")
-    testthat::expect_setequal(data1$ther$primaryid, "4204616")
-    testthat::expect_setequal(data1$rpsr$primaryid, "4204616")
-    testthat::expect_setequal(data1$outc$primaryid, "4204616")
+    ids1 <- sample(faers_primaryid(data), 1L)
+    data1 <- faers_keep(data, ids1)
+    testthat::expect_setequal(data1$drug$primaryid, ids1)
+    testthat::expect_in(data1$indi$primaryid, ids1)
+    testthat::expect_in(data1$reac$primaryid, ids1)
+    testthat::expect_in(data1$demo$primaryid, ids1)
+    testthat::expect_in(data1$ther$primaryid, ids1)
+    testthat::expect_in(data1$rpsr$primaryid, ids1)
+    testthat::expect_in(data1$outc$primaryid, ids1)
 
-    data <- faers_keep(data, c("4204616", "4261678"))
-    testthat::expect_setequal(data$demo$primaryid, c("4204616", "4261678"))
-    testthat::expect_setequal(data$drug$primaryid, c("4204616", "4261678"))
-    testthat::expect_setequal(data$indi$primaryid, c("4204616", "4261678"))
-    testthat::expect_setequal(data$reac$primaryid, c("4204616", "4261678"))
-    testthat::expect_setequal(data$ther$primaryid, c("4204616", "4261678"))
-    testthat::expect_setequal(data$rpsr$primaryid, c("4204616", "4261678"))
-    testthat::expect_setequal(data$outc$primaryid, c("4204616", "4261678"))
+    ids2 <- sample(faers_primaryid(data), 2L)
+    data2 <- faers_keep(data, ids2)
+    testthat::expect_setequal(data2$demo$primaryid, ids2)
+    testthat::expect_in(data2$drug$primaryid, ids2)
+    testthat::expect_in(data2$indi$primaryid, ids2)
+    testthat::expect_in(data2$reac$primaryid, ids2)
+    testthat::expect_in(data2$ther$primaryid, ids2)
+    testthat::expect_in(data2$rpsr$primaryid, ids2)
+    testthat::expect_in(data2$outc$primaryid, ids2)
 })

@@ -1,10 +1,8 @@
 testthat::test_that("FAERS object and extractor works well", {
-    data <- suppressWarnings(faers(
-        c(2004, 2004, 2011, 2012),
-        c("q1", "q2", "q4", "q1"), "ascii",
-        dir = testthat::test_path("testdata"),
+    data <- faers_parse(
+        internal_file("extdata", "aers_ascii_2004q1.zip"),
         compress_dir = tempdir()
-    ))
+    )
     data_list <- faers_data(data)
     testthat::expect_true(is.list(data_list))
     lapply(data_list, function(x) {

@@ -130,7 +130,7 @@ internal_file <- function(...) {
 }
 
 pkg_nm <- function() {
-    packageName(topenv(environment()))
+    utils::packageName(topenv(environment()))
 }
 
 assert_internet <- function(call = rlang::caller_env()) {
