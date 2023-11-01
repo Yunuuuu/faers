@@ -114,9 +114,9 @@ methods::setMethod(
             }
         }
         groups <- c("primaryid", interested_event)
-        full_data <- unique(full_data, by = groups, cols = groups)
+        full_data <- unique(full_data, by = groups, cols = character())
         interested_data <- unique(interested_data,
-            by = groups, cols = groups
+            by = groups, cols = character()
         )
         n <- nrow(full_data) # scalar
         n1. <- nrow(interested_data) # scalar
@@ -172,8 +172,12 @@ methods::setMethod(
             }
         }
         groups <- c("primaryid", interested_event)
-        interested_reac <- unique(interested_reac, by = groups, cols = groups)
-        interested_reac2 <- unique(interested_reac2, by = groups, cols = groups)
+        interested_reac <- unique(interested_reac,
+            by = groups, cols = character()
+        )
+        interested_reac2 <- unique(interested_reac2,
+            by = groups, cols = character()
+        )
         n1. <- nrow(interested_reac)
         n0. <- nrow(interested_reac2)
         out <- merge(
