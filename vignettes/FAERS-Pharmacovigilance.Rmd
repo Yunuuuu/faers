@@ -1,0 +1,140 @@
+---
+title: "FAERS-Pharmacovigilance"
+output: 
+  rmarkdown::html_vignette: default
+  github_document: default
+vignette: >
+  %\VignetteIndexEntry{FAERS-Pharmacovigilance}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_format = "github_document",
+      output_file = "README.md",
+      output_dir = getwd()
+    )
+  })
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Installation
+
+You can install the development version of `faers` from [GitHub](https://github.com/) with:
+
+```{r, eval=FALSE}
+if (!requireNamespace("pak")) {
+  install.packages("pak",
+    repos = sprintf(
+      "https://r-lib.github.io/p/pak/devel/%s/%s/%s",
+      .Platform$pkgType, R.Version()$os, R.Version()$arch
+    )
+  )
+}
+pak::pkg_install("Yunuuuu/faers")
+```
+
+## Pharmacovigilance Analysis using FAERS
+
+FAERS is a database for the spontaneous reporting of adverse events and
+medication errors involving human drugs and therapeutic biological products.
+This package accelarate the process of Pharmacovigilance Analysis using FAERS.
+
+```{r setup}
+library(faers)
+```
+
+### check metadata of FAERS
+This will return a data.table reporting years, period, quarter, and file urls
+and file sizes. By default, this will use the cached file in
+`rappdirs::user_cache_dir("faers")`.  If it doesn't exist, the internal will
+parse metadata in <`r sprintf("%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html",
+faers:::fda_host)`> 
+```{r}
+faers_meta()
+```
+
+An metadata copy was associated with the package, just set `internal = TRUE`.
+```{r}
+faers_meta(internal = TRUE)
+```
+
+#### download and parse quarterly data files from FAERS
+The FAERS Quarterly Data files contain raw data extracted from the AERS database
+for the indicated time ranges. The quarterly data files, which are available in ASCII or SGML formats, include: 
+
+- demographic and administrative information (demo);
+- drug information from the case reports (drug);
+- reaction information from the reports (reac);
+- patient outcome information from the reports (outc);
+- information on the source of the reports (rpsr); 
+- drug therapy start dates and end dates for the reported drugs (ther); 
+- Medical Dictionary for Regulatory Activities (indi)
+
+Generally, we can use `faers()` function to download and parse all quarterly
+data files from FAERS. Internally, the `faers()` function seamlessly utilizes
+`faers_download()` and `faers_parse()` to preprocess each quarterly data file
+from the FAERS repository. The
+default `format` was `ascii` and will return a `FAERSascii` object. (xml format
+would also be okay , but presently, the XML file receives only minimal support
+in the following process.)
+
+```{r}
+# # you must change `dir`, as the file included in the package is sampled
+data1 <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
+data1
+```
+
+Furthermore, in cases where multiple quarterly data files are requisite, the
+`faers_combine()` function is judiciously employed. 
+```{r}
+data2 <- faers(c(2004, 2017), c("q1", "q2"),
+  dir = system.file("extdata", package = "faers")
+)
+data2
+```
+
+#### standardize and De-duplication
+The `reac` file provides the adverse drug reactions, where it includes the
+“P.T.” field or the “Preferred Term” level terminology from the Medical
+Dictionary for Regulatory Activities (MedDRA). The `indi` file contains the drug
+indications, which also uses the “P.T.” level of MedDRA as a descriptor for the
+drug indication. In this way, `MedDRA` was necessary to standardize this field
+and add additional informations, such as `System Organ Classes`. 
+
+One limitation of FAERS database is Duplicate and incomplete reports. There are
+many instances of duplicative reports and some reports do not contain all the
+necessary information. We deemed two cases to be identical if they exhibited a
+full concordance across drugs administered, and adverse reactions and but showed
+discrepancies in one or none of the following fields: gender, age, reporting
+country, event date, start date, and drug indications. 
+
+```{r, eval=FALSE}
+# you should replace `meddra_path` with the directory of meddra data
+data <- faers_standardize(data2, meddra_path)
+data <- faers_dedup(data)
+```
+
+#### Pharmacovigilance analysis
+Pharmacovigilance is the science and activities relating to the detection,
+assessment, understanding and prevention of adverse effects or any other
+medicine/vaccine related problem. 
+
+```{r, eval=FALSE}
+faers_phv_signal(data,
+  filter_params = list(field = "demo", .fn = function(x) {
+    sample(x$primaryid, 100L)
+  })
+)
+```
+
+#### sessionInfo
+```{r}
+sessionInfo()
+```

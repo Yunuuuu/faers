@@ -10,11 +10,11 @@
 #'  - `faers_phv_signal`: other arguments passed to `faers_phv_table`.
 #' @return A [data.table][data.table::data.table] object.
 #' @examples
-#' \dontrun{
 #' # you must change `dir`, as the files included in the package are sampled
 #' data <- faers(c(2004, 2017), c("q1", "q2"),
 #'     dir = system.file("extdata", package = "faers")
 #' )
+#' \dontrun{
 #' # you must standardize and deduplication before disproportionality analysis
 #' # you should replace `meddra_path` with yours
 #' data <- faers_standardize(data, meddra_path)

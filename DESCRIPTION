@@ -2,7 +2,7 @@ Package: faers
 Title: R interface for FDA Adverse Event Reporting System
 Version: 0.99.0
 Authors@R: 
-    person("Yun", "Peng", , "yunyunpp96@outlook.com", role = c("aut", "cre"))
+    person("Yun", "Peng", , "yunyunp96@gmail.com", role = c("aut", "cre"))
 Description: FAERS is a database for the spontaneous reporting of adverse events and medication errors involving human drugs and therapeutic biological products. faers is the bridge between FAERS and R.
 License: MIT + file LICENSE
 Depends: 
@@ -21,6 +21,8 @@ Imports:
     utils,
     xml2
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 biocViews: Software, DataImport
 Encoding: UTF-8
@@ -29,3 +31,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 Config/testthat/parallel: true
+VignetteBuilder: knitr
