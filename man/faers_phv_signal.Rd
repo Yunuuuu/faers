@@ -16,9 +16,7 @@ faers_phv_table(object, ..., interested, object2)
 
 \S4method{faers_phv_table}{FAERSascii,FAERSascii,missing}(
   object,
-  interested_field = "reac",
   interested_event = "soc_name",
-  interested_fn = NULL,
   ...,
   interested,
   object2
@@ -26,9 +24,7 @@ faers_phv_table(object, ..., interested, object2)
 
 \S4method{faers_phv_table}{FAERSascii,missing,FAERSascii}(
   object,
-  interested_field = "reac",
   interested_event = "soc_name",
-  interested_fn = NULL,
   ...,
   interested,
   object2
@@ -54,7 +50,7 @@ faers_phv_signal(object, ...)
 
 \item{...}{Other arguments passed to specific methods.
 \itemize{
-\item \code{faers_phv_table}: other arguments passed to \code{interested_fn}.
+\item \code{faers_phv_table}: other arguments passed to \link{faers_counts}.
 \item \code{faers_phv_signal}: other arguments passed to \code{faers_phv_table}.
 }}
 
@@ -74,27 +70,10 @@ or \code{a} will be calculated from \code{object}}
 \item{filter_params}{Other arguments passed to \link{faers_filter}, solely used
 when \code{interested} and \code{object2} are both \code{missing}}
 
-\item{interested_field}{A string indicates the interested FAERS fields to
-use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
-can be used.}
-
 \item{interested_event}{A character specify the events column(s?) in the
 \code{interested_field} of object to count the unique \code{primaryid}. If multiple
-columns were selected, the unique combination will define the interested
-events.}
-
-\item{interested_fn}{A function or formula defined the preprocessing function
-before creating contingency table, with the \code{interested_field} data as the
-input and return a \link[data.table:data.table]{data.table}.
-
-If a \strong{function}, it is used as is.
-
-If a \strong{formula}, e.g. \code{~ .x + 2}, it is converted to a function with up to
-two arguments: \code{.x} (single argument) or \code{.x} and \code{.y} (two arguments). The
-\code{.} placeholder can be used instead of \code{.x}.  This allows you to create
-very compact anonymous functions (lambdas) with up to two inputs.
-
-If a \strong{string}, the function is looked up in \code{globalenv()}.}
+columns were selected, the combination for all columns will define the
+interested events.}
 
 \item{methods}{An atomic character, specifies the method used to signal
 mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",

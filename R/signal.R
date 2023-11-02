@@ -6,7 +6,7 @@
 #'    constructed with `faers_phv_table`. Details see [phv_signal].
 #' @param object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods.
-#'  - `faers_phv_table`: other arguments passed to `interested_fn`.
+#'  - `faers_phv_table`: other arguments passed to [faers_counts].
 #'  - `faers_phv_signal`: other arguments passed to `faers_phv_table`.
 #' @return A [data.table][data.table::data.table] object.
 #' @examples
@@ -41,27 +41,8 @@ methods::setGeneric(
 )
 
 
-#' @param interested_field A string indicates the interested FAERS fields to
-#' use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
-#' can be used.
-#' @param interested_event A character specify the events column(s?) in the
-#' `interested_field` of object to count the unique `primaryid`. If multiple
-#' columns were selected, the unique combination will define the interested
-#' events.
 #' @param filter_params Other arguments passed to [faers_filter], solely used
 #' when `interested` and `object2` are both `missing`
-#' @param interested_fn A function or formula defined the preprocessing function
-#' before creating contingency table, with the `interested_field` data as the
-#' input and return a [data.table][data.table::data.table].
-#'
-#'   If a **function**, it is used as is.
-#'
-#'   If a **formula**, e.g. `~ .x + 2`, it is converted to a function with up to
-#'   two arguments: `.x` (single argument) or `.x` and `.y` (two arguments). The
-#'   `.` placeholder can be used instead of `.x`.  This allows you to create
-#'   very compact anonymous functions (lambdas) with up to two inputs.
-#'
-#'   If a **string**, the function is looked up in `globalenv()`.
 #' @param interested A [FAERSascii] object, containing information pertaining to
 #' the relevant exposure, typically involving pharmaceutical substances, should
 #' constitute a subset of the overarching "object". In the event that both
@@ -86,11 +67,12 @@ methods::setMethod(
     }
 )
 
+#' @inheritParams faers_counts
 #' @rdname faers_phv_signal
 methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "FAERSascii", object2 = "missing"),
-    function(object, interested_field = "reac", interested_event = "soc_name", interested_fn = NULL, ..., interested, object2) {
+    function(object, interested_event = "soc_name", ..., interested, object2) {
         if (!object@standardization) {
             cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
         }
@@ -102,33 +84,18 @@ methods::setMethod(
         if (!all(interested_primaryids %in% full_primaryids)) {
             cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg object}")
         }
-        full_data <- faers_get(object, field = interested_field)
-        interested_data <- faers_get(interested, field = interested_field)
-        if (!is.null(interested_fn)) {
-            interested_fn <- rlang::as_function(interested_fn)
-            full_data <- interested_fn(full_data, ...)
-            interested_data <- interested_fn(interested_data, ...)
-            if (!(data.table::is.data.table(interested_data) ||
-                data.table::is.data.table(full_data))) {
-                cli::cli_abort("{.fn interested_fn} must return an {.cls data.table}")
-            }
-        }
-        groups <- c("primaryid", interested_event)
-        full_data <- unique(full_data, by = groups, cols = character())
-        interested_data <- unique(interested_data,
-            by = groups, cols = character()
+        full_counts <- faers_counts(
+            object,
+            interested_event = interested_event, ...
         )
-        n <- nrow(full_data) # scalar
-        n1. <- nrow(interested_data) # scalar
-        out <- merge(
-            eval(substitute(
-                full_data[, list(n.1 = .N), by = interested_event],
-                list(interested_event = interested_event)
-            )),
-            eval(substitute(
-                interested_data[, list(a = .N), by = interested_event],
-                list(interested_event = interested_event)
-            )),
+        interested_counts <- faers_counts(interested,
+            interested_event = interested_event, ...
+        )
+        n <- sum(full_counts$N) # scalar
+        n1. <- sum(interested_counts$N) # scalar
+        data.table::setnames(full_counts, "N", "n.1")
+        data.table::setnames(interested_counts, "N", "a")
+        out <- merge(full_counts, interested_counts,
             by = interested_event, all = TRUE, allow.cartesian = TRUE
         )
         out[, a := data.table::fifelse(is.na(a), 0L, a)] # nolint
@@ -147,7 +114,7 @@ methods::setMethod(
 methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "missing", object2 = "FAERSascii"),
-    function(object, interested_field = "reac", interested_event = "soc_name", interested_fn = NULL, ..., interested, object2) {
+    function(object, interested_event = "soc_name", ..., interested, object2) {
         if (!object@standardization) {
             cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
         }
@@ -160,35 +127,17 @@ methods::setMethod(
         if (any(overlapped_idx)) {
             cli::cli_warn("{.val {overlapped_idx}} report{?s} are overlapped between {.arg object} and {.arg object2}")
         }
-        interested_reac <- faers_get(object, field = interested_field)
-        interested_reac2 <- faers_get(object2, field = interested_field)
-        if (!is.null(interested_fn)) {
-            interested_fn <- rlang::as_function(interested_fn)
-            interested_reac <- interested_fn(interested_reac, ...)
-            interested_reac2 <- interested_fn(interested_reac2, ...)
-            if (!(data.table::is.data.table(interested_reac) ||
-                data.table::is.data.table(interested_reac2))) {
-                cli::cli_abort("{.arg interested_fn} must return an {.cls data.table}")
-            }
-        }
-        groups <- c("primaryid", interested_event)
-        interested_reac <- unique(interested_reac,
-            by = groups, cols = character()
+        interested_counts <- faers_counts(object,
+            interested_event = interested_event, ...
         )
-        interested_reac2 <- unique(interested_reac2,
-            by = groups, cols = character()
+        interested_counts2 <- faers_counts(object2,
+            interested_event = interested_event, ...
         )
-        n1. <- nrow(interested_reac)
-        n0. <- nrow(interested_reac2)
-        out <- merge(
-            eval(substitute(
-                interested_reac[, list(a = .N), by = interested_event],
-                list(interested_event = interested_event)
-            )),
-            eval(substitute(
-                interested_reac2[, list(c = .N), by = interested_event],
-                list(interested_event = interested_event)
-            )),
+        n1. <- sum(interested_counts$N)
+        n0. <- sum(interested_counts2$N)
+        data.table::setnames(interested_counts, "N", "a")
+        data.table::setnames(interested_counts2, "N", "c")
+        out <- merge(interested_counts, interested_counts2,
             by = interested_event, all = TRUE, allow.cartesian = TRUE
         )
         out[, c("a", "c") := lapply(.SD, function(x) {

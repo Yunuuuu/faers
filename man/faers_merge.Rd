@@ -26,10 +26,11 @@ faers_merge(object, ...)
 \item{all}{logical; \code{all = TRUE} is shorthand to save setting both
 \code{all.x = TRUE} and \code{all.y = TRUE}.}
 
-\item{all.x}{logical; if \code{TRUE}, rows from \code{x} which have no matching row
-in \code{y} are included. These rows will have 'NA's in the columns that are usually
-filled with values from \code{y}. The default is \code{FALSE} so that only rows with
-data from both \code{x} and \code{y} are included in the output.}
+\item{all.x}{logical; if \code{TRUE}, then extra rows will be added to the
+output, one for each row in \code{x} that has no matching row in \code{y}.
+These rows will have 'NA's in those columns that are usually filled with values
+from \code{y}.  The default is \code{FALSE}, so that only rows with data from both
+\code{x} and \code{y} are included in the output.}
 
 \item{all.y}{logical; analogous to \code{all.x} above.}
 }
