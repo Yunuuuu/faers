@@ -11,11 +11,11 @@
 #' Only the initial instance, of the "caseid" column will be preserved.
 #'
 #' @return A [data.table][data.table::data.table] object.
-#' @examples 
-#'  # you must change `dir`, as the file included in the package is sampled
-#'  data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
-#'  faers_merge(data, "indi") # only one field is just like faers_get()
-#'  faers_merge(data, c("demo", "indi"))
+#' @examples
+#' # you must change `dir`, as the file included in the package is sampled
+#' data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
+#' faers_merge(data, "indi") # only one field is just like faers_get()
+#' faers_merge(data, c("demo", "indi"))
 #' @export
 #' @name faers_merge
 methods::setGeneric("faers_merge", function(object, ...) {
@@ -43,28 +43,28 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, fields = NULL, 
         return(faers_get(object, field = fields))
     }
     lst <- faers_mget(object, fields = fields)
-    # check if we need copy indi
+    # indi_reference: check if we need copy indi
     # to prevent modify in place (change the input object)
-    indi_reference <- TRUE
     if (object@standardization && all(c("indi", "reac") %in% fields)) {
-        meddra_columns <- c(
-            meddra_hierarchy_infos(meddra_hierarchy_fields),
-            "primary_soc_fg", "meddra_hierarchy",
-            "meddra_code", "meddra_pt"
+        hierarchy_columns <- c(
+            meddra_columns(meddra_hierarchy_fields),
+            "meddra_hierarchy_from", "meddra_code", "meddra_pt"
         )
         lst$indi <- data.table::copy(lst$indi)
         indi_reference <- FALSE
         data.table::setnames(
-            lst$indi, meddra_columns,
+            lst$indi, hierarchy_columns,
             function(x) paste("indi", x, sep = "_"),
             skip_absent = TRUE
         )
         lst$reac <- data.table::copy(lst$reac)
         data.table::setnames(
-            lst$reac, meddra_columns,
+            lst$reac, hierarchy_columns,
             function(x) paste("reac", x, sep = "_"),
             skip_absent = TRUE
         )
+    } else {
+        indi_reference <- TRUE
     }
 
     # check if drug_seq should be matched

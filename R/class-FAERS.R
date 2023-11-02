@@ -19,7 +19,7 @@
 #'  - `faers_meddra`: Extract the `meddra` slot.
 #'  - `faers_deleted_cases`: Extract the `deletedCases` slot.
 #' @return A [FAERSascii] or [FAERSxml] object.
-#' @examples 
+#' @examples
 #' # ususaly we use faers() function to create a `FAERS` object
 #' # you must change `dir`, as the file included in the package is sampled
 #' data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
@@ -33,22 +33,21 @@
 #' @name FAERS-class
 NULL
 
-#' @importClassesFrom data.table data.table
-methods::setClassUnion("DTOrNull", c("NULL", "data.table"))
-
+#' @include meddra.R
 methods::setClass(
     "FAERS",
     slots = list(
         year = "integer",
         quarter = "character",
         data = "ANY",
-        meddra = "DTOrNull",
+        meddra = "MedDRA",
         deduplication = "logical",
         standardization = "logical",
         format = "character"
     ),
     prototype = list(
-        data = NULL, meddra = NULL,
+        data = NULL,
+        meddra = methods::new("MedDRA"),
         deduplication = FALSE,
         standardization = FALSE
     )
@@ -261,11 +260,18 @@ methods::setGeneric("faers_meddra", function(object, ...) {
     methods::makeStandardGeneric("faers_meddra")
 })
 
+#' @param use A string, what meddra data to use, "hierarchy" or "smq". If
+#' `NULL`, a `list` will be returned.
 #' @export
 #' @method faers_meddra FAERS
 #' @rdname FAERS-class
-methods::setMethod("faers_meddra", "FAERS", function(object) {
-    object@meddra
+methods::setMethod("faers_meddra", "FAERS", function(object, use = NULL) {
+    out <- object@meddra
+    if (!is.null(use)) {
+        methods::slot(out, match.arg(use, c("hierarchy", "smq")))
+    } else {
+        out
+    }
 })
 
 #################################################################
