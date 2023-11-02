@@ -142,18 +142,25 @@ methods::setGeneric("faers_keep", function(object, ...) {
 #' @export
 #' @param primaryid An atomic character or integer specifies the reports to
 #' keep. If `NULL`, will do nothing.
+#' @param invert A bool. If `TRUE`, will keep reports no in `primaryid`.
 #' @method faers_keep FAERSascii
 #' @rdname FAERS-methods
-methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL) {
+methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL, invert = FALSE) {
     if (is.null(primaryid)) {
         return(object)
     }
     # as all data has a column primaryid, we just rename the variable to use it
     # in the data.table `i`
     .__primaryid__. <- primaryid
-    object@data <- lapply(object@data, function(x) {
-        x[primaryid %in% .__primaryid__.]
-    })
+    if (isTRUE(invert)) {
+        object@data <- lapply(object@data, function(x) {
+            x[!primaryid %in% .__primaryid__.]
+        })
+    } else {
+        object@data <- lapply(object@data, function(x) {
+            x[primaryid %in% .__primaryid__.]
+        })
+    }
     object
 })
 

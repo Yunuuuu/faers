@@ -37,7 +37,7 @@ faers_primaryid(object, ...)
 
 faers_keep(object, ...)
 
-\S4method{faers_keep}{FAERSascii}(object, primaryid = NULL)
+\S4method{faers_keep}{FAERSascii}(object, primaryid = NULL, invert = FALSE)
 
 faers_filter(object, ...)
 
@@ -64,6 +64,8 @@ okay to use integer indices.}
 
 \item{primaryid}{An atomic character or integer specifies the reports to
 keep. If \code{NULL}, will do nothing.}
+
+\item{invert}{A bool. If \code{TRUE}, will keep reports no in \code{primaryid}.}
 
 \item{.fn}{A function or formula.
 

@@ -179,3 +179,26 @@ testthat::test_that("`faers_merge` for standardizated data works well", {
         ) == 1L
     )
 })
+
+testthat::test_that("`faers_counts` for standardizated data works well", {
+    testthat::expect_error(faers_counts(data))
+    testthat::expect_no_error(counts <- faers_counts(data_std))
+    testthat::expect_true(is.integer(counts$N))
+    testthat::expect_true(all(names(counts) == c("soc_name", "N")))
+})
+
+testthat::test_that("`faers_phv_table` for standardizated data works well", {
+    testthat::expect_error(faers_phv_table(data))
+    interested_ids <- sample(faers_primaryid(data_std), 100L)
+    obj1 <- faers_keep(data_std, interested_ids)
+    obj2 <- faers_keep(data_std, interested_ids, invert = TRUE)
+    testthat::expect_no_error(phv_table <- faers_phv_table(data_std,
+        filter_params = list(field = "demo", .fn = function(x) {
+            interested_ids
+        })
+    ))
+    phv_table1 <- faers_phv_table(data_std, interested = obj1)
+    testthat::expect_true(data.table::fsetequal(phv_table, phv_table1))
+    phv_table2 <- faers_phv_table(obj1, object2 = obj2)
+    testthat::expect_true(data.table::fsetequal(phv_table, phv_table2))
+})
