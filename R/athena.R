@@ -18,9 +18,8 @@ athena_standardize_drug <- function(terms, path = NULL, force = FALSE) {
         )))
     )]
     out <- data$concept[match(..__mapped_concept_ids__.., concept_id)] # nolint
-    old_nms <- data.table::copy(names(out))
     out[, athena_drug_names := terms] # nolint
-    data.table::setcolorder(out, c("athena_drug_names", old_nms))
+    data.table::setcolorder(out, "athena_drug_names")
 }
 
 utils::globalVariables(c("domain_id", "concept_id", "athena_drug_names"))

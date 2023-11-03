@@ -15,9 +15,8 @@ unify_ascii <- function(data, field, year, quarter) {
         drug = unify_ascii_drug(data, year, quarter),
         outc = unify_ascii_outc(data, year, quarter)
     )
-    old_nms <- data.table::copy(names(data))
     data[, c("year", "quarter") := list(year, quarter)]
-    data.table::setcolorder(data, c("year", "quarter", old_nms))
+    data.table::setcolorder(data, c("year", "quarter"))
     data[!is.na(primaryid)]
 }
 
