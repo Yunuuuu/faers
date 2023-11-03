@@ -14,7 +14,7 @@ faers_before_period(years, quarters, y, q, inclusive = TRUE)
 
 \item{y}{An integer, specified period year.}
 
-\item{q}{An string, specified period quarter.}
+\item{q}{A string, specified period quarter.}
 
 \item{inclusive}{A bool, whether to include the period specifid.}
 }

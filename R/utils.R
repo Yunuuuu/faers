@@ -12,7 +12,7 @@ is_from_laers <- function(years, quarters) {
 #' @param quarters An atomic character indicates quarters to test, only "q1",
 #' "q2", "q3", and "q4" are allowed.
 #' @param y An integer, specified period year.
-#' @param q An string, specified period quarter.
+#' @param q A string, specified period quarter.
 #' @param inclusive A bool, whether to include the period specifid.
 #' @return An atomic logical with the same length of the max length of `years`
 #' and `quarters`.
@@ -23,7 +23,9 @@ faers_before_period <- function(years, quarters, y, q, inclusive = TRUE) {
     periods <- recycle_scalar(years = years, quarters = quarters)
     assert_inclusive(quarters, faers_file_quarters)
     assert_length(y, 1L)
-    assert_length(q, 1L)
+    if (!rlang::is_string(q, string = faers_file_quarters)) {
+        cli::cli_abort("{.arg q} must be a string in {.val {faers_file_quarters}}")
+    }
     assert_bool(inclusive, 1L)
     do.call(
         is_before_period,
