@@ -1,3 +1,41 @@
+
+rxnorm_standardize_drug <- function(terms, exact = TRUE, approximate = TRUE, search = 2, pool = 5L) {
+    assert_bool(exact)
+    assert_bool(approximate)
+    rxnorm_map_to_rxcui(terms,
+        exact = exact, approximate = approximate,
+        search = search, pool = pool
+    )
+    # get other drug details from rxnorm
+}
+
+rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc = NULL, srclist = NULL, search = NULL, pool = 5L) {
+    if (exact) {
+        cli::cli_alert("Running Exact Match")
+        out <- rxnorm_findRxcuiByString(terms,
+            allsrc = allsrc,
+            srclist = srclist, search = search,
+            pool = pool
+        )
+    } else {
+        out <- rep_len(NA_character_, length(terms))
+    }
+    if (anyNA(out) && approximate) {
+        cli::cli_alert("Running Approximate Match")
+        out2 <- rxnorm_getApproximateMatch(terms[is.na(out)],
+            max_entries = 1L, pool = pool
+        )
+        out[is.na(out)] <- vapply(out2, function(x) {
+            if (is.null(x)) {
+                NA_character_
+            } else {
+                x$rxcui[[1L]] %||% NA_character_
+            }
+        }, character(1L))
+    }
+    out
+}
+
 rxnorm_getRxNormName <- function(terms, pool = 5L, retry = 3L) {
     resps <- rxnorm_query("rxcui/%s",
         rxnorm_ids = terms,

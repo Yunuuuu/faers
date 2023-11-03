@@ -1,3 +1,30 @@
+athena_standardize_drug <- function(terms, path = NULL, force = FALSE) {
+    data <- athena_parse(
+        c("concept", "concept_synonym"),
+        path = path, force = force
+    )
+    data$concept <- data$concept[domain_id == "Drug"] # nolint
+    data$concept_synonym <- data$concept_synonym[
+        concept_id %in% data$concept$concept_id # nolint
+    ]
+    mapped_concept_ids <- c(
+        data$concept$concept_id,
+        data$concept_synonym$concept_id
+    )
+    ..__mapped_concept_ids__.. <- mapped_concept_ids[data.table::chmatch(
+        str_trim(tolower(terms)), str_trim(tolower(c(
+            data$concept$concept_name,
+            data$concept_synonym$concept_synonym_name
+        )))
+    )]
+    out <- data$concept[match(..__mapped_concept_ids__.., concept_id)] # nolint
+    old_nms <- data.table::copy(names(out))
+    out[, athena_drug_names := terms] # nolint
+    data.table::setcolorder(out, c("athena_drug_names", old_nms))
+}
+
+utils::globalVariables(c("domain_id", "concept_id", "athena_drug_names"))
+
 #' @param use An atomic character specifying the files to use with values in
 #' "concept", "domain", "concept_class", "concept_relationship",
 #' "concept_ancestor", "concept_synonym", "drug_strength", "relationship",
