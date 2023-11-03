@@ -36,5 +36,5 @@ data <- faers_standardize(data, meddra_path)
 }
 }
 \seealso{
-\url{https://www.meddra.org/}
+\link{MedDRA}
 }

@@ -5,20 +5,25 @@
 #' @slot quarter A string specifies the quarter information.
 #' @slot data For `FAERSxml`, a [data.table][data.table::data.table]. For
 #' `FAERSascii`, a list of [data.table][data.table::data.table].
-#' @slot meddra A [data.table][data.table::data.table] or `NULL` representing
-#' the meddra data used for standardization.
+#' @slot meddra A [MedDRA] or `NULL` representing the meddra data used for
+#' standardization.
 #' @slot format A string of "ascii" or "xml" indicates the file format used.
 #' @slot deletedCases An atomic character, as of 2019 Quarter one there are new
 #' files that lists deleted cases. [faers_dedup] will remove cases in this slot.
+#' @slot standardization A bool, indicates whether standardization has been
+#' performed.
+#' @slot deduplication A bool, indicates whether deduplication has been
+#' performed.
 #' @details
 #'  - `faers_data`: Extract the `data` slot.
 #'  - `faers_year`: Extract the `year` slot.
 #'  - `faers_quarter`: Extract the `quarter` slot.
 #'  - `faers_period`: Extract the `period` slot (just Concatenate the year and
 #'    quarter slot).
-#'  - `faers_meddra`: Extract the `meddra` slot.
+#'  - `faers_meddra`: Extract the `meddra` slot. If `object` have never been
+#'    standardized, always return `NULL`.
 #'  - `faers_deleted_cases`: Extract the `deletedCases` slot.
-#' @return A [FAERSascii] or [FAERSxml] object.
+#' @return See details.
 #' @examples
 #' # ususaly we use faers() function to create a `FAERS` object
 #' # you must change `dir`, as the file included in the package is sampled
@@ -34,20 +39,21 @@
 NULL
 
 #' @include meddra.R
+methods::setClassUnion("MedDRAOrNull", c("NULL", "MedDRA"))
 methods::setClass(
     "FAERS",
     slots = list(
         year = "integer",
         quarter = "character",
         data = "ANY",
-        meddra = "MedDRA",
+        meddra = "MedDRAOrNull",
         deduplication = "logical",
         standardization = "logical",
         format = "character"
     ),
     prototype = list(
         data = NULL,
-        meddra = methods::new("MedDRA"),
+        meddra = NULL,
         deduplication = FALSE,
         standardization = FALSE
     )
@@ -191,7 +197,7 @@ methods::setMethod("show", "FAERSascii", function(object) {
 })
 
 #######################################################
-#' @param object A [FAERS] object.
+#' @param object A `FAERS` object.
 #' @param ... Other arguments passed to specific methods.
 #' @export
 #' @aliases faers_data
@@ -261,17 +267,21 @@ methods::setGeneric("faers_meddra", function(object, ...) {
 })
 
 #' @param use A string, what meddra data to use, "hierarchy" or "smq". If
-#' `NULL`, a `list` will be returned.
+#' `NULL`, a [MedDRA] will be returned. Only used when `object` has been
+#' standardized
 #' @export
 #' @method faers_meddra FAERS
 #' @rdname FAERS-class
 methods::setMethod("faers_meddra", "FAERS", function(object, use = NULL) {
-    out <- object@meddra
-    if (!is.null(use)) {
-        methods::slot(out, match.arg(use, c("hierarchy", "smq")))
+    if (object@standardization) {
+        out <- object@meddra
+        if (!is.null(use)) {
+            out <- methods::slot(out, match.arg(use, c("hierarchy", "smq")))
+        }
     } else {
-        out
+        out <- NULL
     }
+    out
 })
 
 #################################################################

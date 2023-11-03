@@ -60,15 +60,16 @@ faers_header(object)
 \S4method{faers_header}{FAERSxml}(object)
 }
 \arguments{
-\item{object}{A \link{FAERS} object.}
+\item{object}{A \code{FAERS} object.}
 
 \item{...}{Other arguments passed to specific methods.}
 
 \item{use}{A string, what meddra data to use, "hierarchy" or "smq". If
-\code{NULL}, a \code{list} will be returned.}
+\code{NULL}, a \link{MedDRA} will be returned. Only used when \code{object} has been
+standardized}
 }
 \value{
-A \link{FAERSascii} or \link{FAERSxml} object.
+See details.
 }
 \description{
 Provide a container for FAERS Quarterly Data file
@@ -80,7 +81,8 @@ Provide a container for FAERS Quarterly Data file
 \item \code{faers_quarter}: Extract the \code{quarter} slot.
 \item \code{faers_period}: Extract the \code{period} slot (just Concatenate the year and
 quarter slot).
-\item \code{faers_meddra}: Extract the \code{meddra} slot.
+\item \code{faers_meddra}: Extract the \code{meddra} slot. If \code{object} have never been
+standardized, always return \code{NULL}.
 \item \code{faers_deleted_cases}: Extract the \code{deletedCases} slot.
 }
 }
@@ -94,13 +96,19 @@ quarter slot).
 \item{\code{data}}{For \code{FAERSxml}, a \link[data.table:data.table]{data.table}. For
 \code{FAERSascii}, a list of \link[data.table:data.table]{data.table}.}
 
-\item{\code{meddra}}{A \link[data.table:data.table]{data.table} or \code{NULL} representing
-the meddra data used for standardization.}
+\item{\code{meddra}}{A \link{MedDRA} or \code{NULL} representing the meddra data used for
+standardization.}
 
 \item{\code{format}}{A string of "ascii" or "xml" indicates the file format used.}
 
 \item{\code{deletedCases}}{An atomic character, as of 2019 Quarter one there are new
 files that lists deleted cases. \link{faers_dedup} will remove cases in this slot.}
+
+\item{\code{standardization}}{A bool, indicates whether standardization has been
+performed.}
+
+\item{\code{deduplication}}{A bool, indicates whether deduplication has been
+performed.}
 }}
 
 \examples{

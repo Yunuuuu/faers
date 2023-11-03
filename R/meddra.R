@@ -1,8 +1,37 @@
+#' MedDRA class
+#'
+#' @description Provide a container for MedDRA Data file
+#' @slot hierarchy A [data.table][data.table::data.table] or `NULL` representing
+#' the meddra hierarchy data. There are five levels to the MedDRA hierarchy,
+#' arranged from very specific to very general.
+#' @slot smq A [data.table][data.table::data.table] or `NULL` representing the
+#' meddra smq data. Standardised MedDRA Queries (SMQs) are used to support
+#' signal detection and monitoring. SMQs are validated, standard sets of MedDRA
+#' terms. These sets of terms have undergone extensive review, testing, analysis
+#' and expert discussion. SMQs represent a variety of safety topics of
+#' regulatory interest (e.g., SMQ Severe cutaneous adverse reactions, SMQ
+#' Anaphylactic reaction).
+#' @return 
+#' - `meddra_data`: A `MedDRA` object.
+#' - `meddra_hierarchy`: Extract the `hierarchy` slot.
+#' - `meddra_smq`: Extract the `smq` slot.
+#' @seealso
+#' - <https://www.meddra.org/>
+#' - <https://www.meddra.org/how-to-use/basics/hierarchy>
+#' - <https://www.meddra.org/how-to-use/tools/smqs>
+#' @aliases MedDRA
+#' @name MedDRA-class
+NULL
+
+#' @param path A string, define the path of MedDRA directory.
+#' @param add_smq A bool, indicates whether Standardised MedDRA Queries (SMQ)
+#' should be added. If `TRUE`, "smq_content.asc", and "smq_list.asc" must exist.
+#' @export
+#' @rdname MedDRA-class
 meddra_data <- function(path, add_smq = FALSE) {
     hierarchy <- meddra_load_hierarchy(path, primary_soc = TRUE)
     if (add_smq) {
         smq_data <- meddra_load_smq(path)
-        # format(object.size(smq_data), units = "Mb")
         smq_code <- unique(smq_data$smq_code)
         smq_code <- smq_code[
             meddra_hierarchy_match(
@@ -19,12 +48,49 @@ meddra_data <- function(path, add_smq = FALSE) {
 
 #' @importClassesFrom data.table data.table
 methods::setClassUnion("DTOrNull", c("NULL", "data.table"))
+
+#' @export
+#' @rdname MedDRA-class
 methods::setClass(
     "MedDRA",
     slots = list(hierarchy = "DTOrNull", smq = "DTOrNull"),
     prototype = list(hierarchy = NULL, smq = NULL)
 )
 
+
+#######################################################
+#' @param object A `MedDRA` object.
+#' @param ... Other arguments passed to specific methods.
+#' @export
+#' @aliases meddra_hierarchy
+#' @rdname MedDRA-class
+methods::setGeneric("meddra_hierarchy", function(object, ...) {
+    methods::makeStandardGeneric("meddra_hierarchy")
+})
+
+#' @export
+#' @method meddra_hierarchy MedDRA
+#' @rdname MedDRA-class
+methods::setMethod("meddra_hierarchy", "MedDRA", function(object) {
+    object@hierarchy
+})
+
+#######################################################
+#' @export
+#' @aliases meddra_smq
+#' @rdname MedDRA-class
+methods::setGeneric("meddra_smq", function(object, ...) {
+    methods::makeStandardGeneric("meddra_smq")
+})
+
+#' @export
+#' @method meddra_smq MedDRA
+#' @rdname MedDRA-class
+methods::setMethod("meddra_smq", "MedDRA", function(object) {
+    object@smq
+})
+
+##########################################################
 meddra_load_smq <- function(path) {
     data <- meddra_load(path, use = c("smq_content", "smq_list"))
     out <- data$smq_content[, c("smq_code", "term_code")]
@@ -217,7 +283,4 @@ meddra_names <- function(field) {
     )
 }
 
-utils::globalVariables(c(
-    "meddra_hierarchy", "meddra_pt",
-    "primary_soc_fg", "smq"
-))
+utils::globalVariables(c("primary_soc_fg"))

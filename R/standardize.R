@@ -2,8 +2,7 @@
 #' @param object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods.
 #' @return A [FAERSascii] object.
-#' @seealso
-#' <https://www.meddra.org/>
+#' @seealso [MedDRA]
 #' @examples
 #' #' # you must change `dir`, as the files included in the package are sampled
 #' data <- faers(c(2004, 2017), c("q1", "q2"),
@@ -20,8 +19,7 @@ methods::setGeneric("faers_standardize", function(object, ...) {
 })
 
 #' @param meddra_path A string, define the path of MedDRA directory.
-#' @param add_smq A bool, indicates whether Standardised MedDRA Queries (SMQ)
-#' should be added. If `TRUE`, "smq_content.asc", and "smq_list.asc" must exist.
+#' @inheritParams meddra_data
 #' @export
 #' @method faers_standardize FAERSascii
 #' @rdname faers_standardize
@@ -29,16 +27,9 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
     # standardize PT terms
     # for indi
     assert_string(meddra_path)
-
-    # @param add_smq A bool, indicates whether Standardised MedDRA Queries
-    # should be added. If `TRUE`, "smq_content.asc", and "smq_list.asc" must
-    # exist.
-    # assert_bool(add_smq)
-    # add SMQ data will increase the usage of memory
-    # don't use it anymore.
     meddra <- meddra_data(meddra_path, add_smq = add_smq)
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
-    # fix error: when load a saved FAERS object
+    # fix error: when load a saved FAERS object, don't change by reference
     cli::cli_alert("standardize {.field Preferred Term} in indi")
     object@data$indi$cleaned_pt <- clean_indi_pt(
         object@data$indi$indi_pt, meddra@hierarchy
