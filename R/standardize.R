@@ -4,7 +4,7 @@
 #' @return A [FAERSascii] object.
 #' @seealso
 #' <https://www.meddra.org/>
-#' @examples 
+#' @examples
 #' #' # you must change `dir`, as the files included in the package are sampled
 #' data <- faers(c(2004, 2017), c("q1", "q2"),
 #'     dir = system.file("extdata", package = "faers")
@@ -20,10 +20,12 @@ methods::setGeneric("faers_standardize", function(object, ...) {
 })
 
 #' @param meddra_path A string, define the path of MedDRA directory.
+#' @param add_smq A bool, indicates whether Standardised MedDRA Queries (SMQ)
+#' should be added. If `TRUE`, "smq_content.asc", and "smq_list.asc" must exist.
 #' @export
 #' @method faers_standardize FAERSascii
 #' @rdname faers_standardize
-methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_path) {
+methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_path, add_smq = FALSE) {
     # standardize PT terms
     # for indi
     assert_string(meddra_path)
@@ -34,33 +36,33 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
     # assert_bool(add_smq)
     # add SMQ data will increase the usage of memory
     # don't use it anymore.
-    meddra_data <- meddra_hierarchy_data(meddra_path)
+    meddra <- meddra_data(meddra_path, add_smq = add_smq)
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
     # fix error: when load a saved FAERS object
     cli::cli_alert("standardize {.field Preferred Term} in indi")
     object@data$indi$cleaned_pt <- clean_indi_pt(
-        object@data$indi$indi_pt, meddra_data
+        object@data$indi$indi_pt, meddra@hierarchy
     )
     object@data$indi <- cbind(
         object@data$indi,
-        meddra_standardize_pt(object@data$indi$cleaned_pt, meddra_data)
+        meddra_standardize_pt(object@data$indi$cleaned_pt, meddra@hierarchy)
     )
     object@data$indi[, cleaned_pt := NULL]
     cli::cli_alert("standardize {.field Preferred Term} in reac")
     object@data$reac$cleaned_pt <- clean_reac_pt(
-        object@data$reac$pt, meddra_data
+        object@data$reac$pt, meddra@hierarchy
     )
     object@data$reac <- cbind(
         object@data$reac,
-        meddra_standardize_pt(object@data$reac$cleaned_pt, meddra_data)
+        meddra_standardize_pt(object@data$reac$cleaned_pt, meddra@hierarchy)
     )
     object@data$reac[, cleaned_pt := NULL]
-    object@meddra <- meddra_data
+    object@meddra <- meddra
     object@standardization <- TRUE
     object
 })
 
-clean_indi_pt <- function(x, meddra_data) {
+clean_indi_pt <- function(x, hierarchy) {
     x <- str_replace_all(str_trim(toupper(x)), "\\s+", " ")
     code <- data.table::fcase(
         x == "ACID REFLUX", "10017885",
@@ -161,12 +163,12 @@ clean_indi_pt <- function(x, meddra_data) {
     )
     operated_idx <- !is.na(code)
     x[operated_idx] <- meddra_map_code_into_names(
-        terms = code[operated_idx], meddra_data
+        codes = code[operated_idx], hierarchy
     )
     x
 }
 
-clean_reac_pt <- function(x, meddra_data) {
+clean_reac_pt <- function(x, hierarchy) {
     x <- str_replace_all(str_trim(toupper(x)), "\\s+", " ")
     code <- data.table::fcase(
         x == "ANO-RECTAL STENOSIS", "10002581",
@@ -216,7 +218,7 @@ clean_reac_pt <- function(x, meddra_data) {
     )
     operated_idx <- !is.na(code)
     x[operated_idx] <- meddra_map_code_into_names(
-        terms = code[operated_idx], meddra_data
+        codes = code[operated_idx], hierarchy
     )
     x
 }

@@ -57,7 +57,10 @@ methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     field <- match.arg(field, faers_ascii_file_fields)
     out <- object@data[[field]]
     if (object@standardization && any(field == c("indi", "reac"))) {
-        cbind(out[, !"meddra_idx"], object@meddra[out$meddra_idx])
+        cbind(
+            out[, !"meddra_hierarchy_idx"],
+            object@meddra@hierarchy[out$meddra_hierarchy_idx]
+        )
     } else {
         out
     }
@@ -81,10 +84,10 @@ methods::setMethod("faers_mget", "FAERSascii", function(object, fields) {
     if (object@standardization) {
         ii <- intersect(names(out), c("indi", "reac"))
         for (i in ii) {
-            meddra_idx <- out[[i]]$meddra_idx
+            meddra_hierarchy_idx <- out[[i]]$meddra_hierarchy_idx
             out[[i]] <- cbind(
-                out[[i]][, !"meddra_idx"],
-                object@meddra[meddra_idx]
+                out[[i]][, !"meddra_hierarchy_idx"],
+                object@meddra@hierarchy[meddra_hierarchy_idx]
             )
         }
     }

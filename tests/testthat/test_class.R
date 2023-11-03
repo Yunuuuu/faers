@@ -16,7 +16,7 @@ testthat::test_that("FAERS object and extractor works well", {
         paste0(faers_year(data), faers_quarter(data)) ==
             faers_period(data)
     ))
-    testthat::expect_null(faers_meddra(data))
+    testthat::expect_s4_class(faers_meddra(data), "MedDRA")
     testthat::expect_true(is.character(faers_deleted_cases(data)))
     testthat::expect_equal(length(faers_deleted_cases(data)), 0L)
 })

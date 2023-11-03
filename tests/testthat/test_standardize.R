@@ -5,21 +5,33 @@ data <- faers(c(2004, 2017),
     dir = internal_file("extdata"),
     compress_dir = tempdir()
 )
-data_std <- faers_standardize(data, "~/Data/MedDRA/MedDRA_26_1_English")
+data_std <- faers_standardize(data, "~/Data/MedDRA/MedDRA_26_1_English",
+    add_smq = TRUE
+)
 
 testthat::test_that("standardize FAERS ascii data works well", {
     testthat::expect_true(data_std@standardization)
-    testthat::expect_s3_class(data_std@meddra, "data.table")
+    testthat::expect_s4_class(data_std@meddra, "MedDRA")
+    testthat::expect_s4_class(faers_meddra(data_std), "MedDRA")
+    testthat::expect_s3_class(faers_meddra(data_std, "hierarchy"), "data.table")
+    testthat::expect_s3_class(faers_meddra(data_std, "smq"), "data.table")
     testthat::expect_true(all(
-        names(data_std@meddra) == c(meddra_hierarchy_infos(meddra_hierarchy_fields), "primary_soc_fg")
+        names(data_std@meddra@hierarchy) ==
+            c(meddra_columns(meddra_hierarchy_fields), "smq_code")
     ))
     testthat::expect_true(all(
         setdiff(names(data_std@data$indi), names(data@data$indi)) ==
-            c("meddra_idx", "meddra_hierarchy", "meddra_code", "meddra_pt")
+            c(
+                "meddra_hierarchy_idx", "meddra_hierarchy_from",
+                "meddra_code", "meddra_pt"
+            )
     ))
     testthat::expect_true(all(
         setdiff(names(data_std@data$reac), names(data@data$reac)) ==
-            c("meddra_idx", "meddra_hierarchy", "meddra_code", "meddra_pt")
+            c(
+                "meddra_hierarchy_idx", "meddra_hierarchy_from",
+                "meddra_code", "meddra_pt"
+            )
     ))
 })
 
@@ -39,21 +51,21 @@ testthat::test_that("de-duplicating FAERS ascii data works well", {
 })
 
 testthat::test_that("`faers_get` for standardizated data works well", {
-    meddra_cols <- names(data_std@meddra)
+    hierarchy_cols <- names(data_std@meddra@hierarchy)
     testthat::expect_s3_class(faers_get(data_std, "indi"), "data.table")
     testthat::expect_s3_class(faers_get(data_std, "reac"), "data.table")
     testthat::expect_identical(
-        faers_get(data_std, "indi")[, .SD, .SDcols = meddra_cols],
-        data_std@meddra[data_std@data$indi$meddra_idx]
+        faers_get(data_std, "indi")[, .SD, .SDcols = hierarchy_cols],
+        data_std@meddra@hierarchy[data_std@data$indi$meddra_hierarchy_idx]
     )
     testthat::expect_identical(
-        faers_get(data_std, "reac")[, .SD, .SDcols = meddra_cols],
-        data_std@meddra[data_std@data$reac$meddra_idx]
+        faers_get(data_std, "reac")[, .SD, .SDcols = hierarchy_cols],
+        data_std@meddra@hierarchy[data_std@data$reac$meddra_hierarchy_idx]
     )
 })
 
 testthat::test_that("`faers_mget` for standardizated data works well", {
-    meddra_cols <- names(data_std@meddra)
+    hierarchy_cols <- names(data_std@meddra@hierarchy)
     data_list <- faers_mget(data_std, c("indi", "reac", "demo", "drug"))
     testthat::expect_true(is.list(data_list))
     testthat::expect_true(all(
@@ -63,20 +75,20 @@ testthat::test_that("`faers_mget` for standardizated data works well", {
         testthat::expect_s3_class(x, "data.table")
     })
     testthat::expect_identical(
-        data_list$indi[, .SD, .SDcols = meddra_cols],
-        data_std@meddra[data_std@data$indi$meddra_idx]
+        data_list$indi[, .SD, .SDcols = hierarchy_cols],
+        data_std@meddra@hierarchy[data_std@data$indi$meddra_hierarchy_idx]
     )
     testthat::expect_identical(
-        data_list$reac[, .SD, .SDcols = meddra_cols],
-        data_std@meddra[data_std@data$reac$meddra_idx]
+        data_list$reac[, .SD, .SDcols = hierarchy_cols],
+        data_std@meddra@hierarchy[data_std@data$reac$meddra_hierarchy_idx]
     )
 })
 
 testthat::test_that("`$` for standardizated data works well", {
     testthat::expect_s3_class(data_std$indi, "data.table")
     testthat::expect_s3_class(data_std$reac, "data.table")
-    testthat::expect_in("meddra_idx", names(data_std$indi))
-    testthat::expect_in("meddra_idx", names(data_std$reac))
+    testthat::expect_in("meddra_hierarchy_idx", names(data_std$indi))
+    testthat::expect_in("meddra_hierarchy_idx", names(data_std$reac))
     data_std$indi[, .temp := 1L]
     testthat::expect_in(".temp", names(data_std$indi))
     data_std$indi[, .temp := NULL]
@@ -88,8 +100,8 @@ testthat::test_that("`$` for standardizated data works well", {
 testthat::test_that("`[[` for standardizated data works well", {
     testthat::expect_s3_class(data_std[["indi"]], "data.table")
     testthat::expect_s3_class(data_std[["reac"]], "data.table")
-    testthat::expect_in("meddra_idx", names(data_std[["indi"]]))
-    testthat::expect_in("meddra_idx", names(data_std[["reac"]]))
+    testthat::expect_in("meddra_hierarchy_idx", names(data_std[["indi"]]))
+    testthat::expect_in("meddra_hierarchy_idx", names(data_std[["reac"]]))
     data_std[["indi"]][, .temp := 1L]
     testthat::expect_in(".temp", names(data_std[["indi"]]))
     data_std[["indi"]][, .temp := NULL]
@@ -99,7 +111,7 @@ testthat::test_that("`[[` for standardizated data works well", {
 })
 
 testthat::test_that("`[` for standardizated data works well", {
-    meddra_cols <- names(data_std@meddra)
+    hierarchy_cols <- names(data_std@meddra@hierarchy)
     data_list <- data_std[c("indi", "reac", "demo", "drug")]
     testthat::expect_true(is.list(data_list))
     testthat::expect_true(all(
@@ -111,16 +123,15 @@ testthat::test_that("`[` for standardizated data works well", {
 })
 
 testthat::test_that("`faers_merge` for standardizated data works well", {
-    meddra_cols <- c(
-        meddra_hierarchy_infos(meddra_hierarchy_fields),
-        "primary_soc_fg", "meddra_hierarchy",
-        "meddra_code", "meddra_pt"
+    hierarchy_cols <- c(
+        meddra_columns(meddra_hierarchy_fields),
+        "meddra_hierarchy_from", "meddra_code", "meddra_pt"
     )
     # indi and reac included meddra columns
     indi_data <- faers_merge(data_std, "indi")
-    testthat::expect_in(meddra_cols, names(indi_data))
+    testthat::expect_in(hierarchy_cols, names(indi_data))
     reac_data <- faers_merge(data_std, "reac")
-    testthat::expect_in(meddra_cols, names(reac_data))
+    testthat::expect_in(hierarchy_cols, names(reac_data))
 
     # internal don't modify data by reference and drug_seq match well
     raw_indi <- data.table::copy(data_std$indi)
@@ -166,8 +177,8 @@ testthat::test_that("`faers_merge` for standardizated data works well", {
     testthat::expect_identical(data_std$indi, raw_indi)
     testthat::expect_identical(data_std$reac, raw_reac)
     testthat::expect_in("indi_drug_seq", names(indi_reac))
-    testthat::expect_in(paste("indi", meddra_cols, sep = "_"), names(indi_reac))
-    testthat::expect_in(paste("reac", meddra_cols, sep = "_"), names(indi_reac))
+    testthat::expect_in(paste("indi", hierarchy_cols, sep = "_"), names(indi_reac))
+    testthat::expect_in(paste("reac", hierarchy_cols, sep = "_"), names(indi_reac))
 
     # only one caseid column was included in the final output
     testthat::expect_true(

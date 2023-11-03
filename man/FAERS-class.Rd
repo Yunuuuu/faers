@@ -49,7 +49,7 @@ faers_period(object)
 
 faers_meddra(object, ...)
 
-\S4method{faers_meddra}{FAERS}(object)
+\S4method{faers_meddra}{FAERS}(object, use = NULL)
 
 faers_deleted_cases(object, ...)
 
@@ -63,6 +63,9 @@ faers_header(object)
 \item{object}{A \link{FAERS} object.}
 
 \item{...}{Other arguments passed to specific methods.}
+
+\item{use}{A string, what meddra data to use, "hierarchy" or "smq". If
+\code{NULL}, a \code{list} will be returned.}
 }
 \value{
 A \link{FAERSascii} or \link{FAERSxml} object.
