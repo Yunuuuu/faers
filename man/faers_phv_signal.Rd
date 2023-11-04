@@ -34,16 +34,7 @@ faers_phv_table(object, ..., interested, object2)
 
 faers_phv_signal(object, ...)
 
-\S4method{faers_phv_signal}{FAERSascii}(
-  object,
-  ...,
-  methods = NULL,
-  alpha = 0.05,
-  correct = TRUE,
-  n_mcmc = 100000L,
-  alpha1 = 0.5,
-  alpha2 = 0.5
-)
+\S4method{faers_phv_signal}{FAERSascii}(object, ..., phv_signal_params = list())
 }
 \arguments{
 \item{object}{A \link{FAERSascii} object.}
@@ -75,23 +66,7 @@ when \code{interested} and \code{object2} are both \code{missing}}
 columns were selected, the combination for all columns will define the
 interested events.}
 
-\item{methods}{An atomic character, specifies the method used to signal
-mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
-"obsexp_shrink", "fisher", and "ebgm" are supported. If \code{NULL}, all supported
-methods will be used.}
-
-\item{alpha}{Level of significance, for construction of the confidence
-intervals.}
-
-\item{correct}{A bool indicating whether to apply Yates's continuity
-correction when computing the chi-squared statistic.}
-
-\item{n_mcmc}{Number of MCMC simulations per \verb{(a,b,c,d)}-tuple to calculate
-confidence intervals.}
-
-\item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.}
-
-\item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.}
+\item{phv_signal_params}{Other arguments passed to \link{phv_signal}.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.
@@ -104,7 +79,7 @@ Create contingency table and run disproportionality analysis
 \item \code{faers_phv_table}: build a contingency table for all events in
 \code{interested_event}.
 \item \code{faers_phv_signal}: Pharmacovigilance Analysis used contingency table
-constructed with \code{faers_phv_table}. Details see \link{phv_signal}.
+constructed with \code{faers_phv_table}.
 }
 }
 \examples{

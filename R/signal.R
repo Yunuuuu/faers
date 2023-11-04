@@ -3,7 +3,7 @@
 #'  - `faers_phv_table`: build a contingency table for all events in
 #'    `interested_event`.
 #'  - `faers_phv_signal`: Pharmacovigilance Analysis used contingency table
-#'    constructed with `faers_phv_table`. Details see [phv_signal].
+#'    constructed with `faers_phv_table`.
 #' @param object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods.
 #'  - `faers_phv_table`: other arguments passed to [faers_counts].
@@ -167,20 +167,15 @@ methods::setGeneric("faers_phv_signal", function(object, ...) {
     methods::makeStandardGeneric("faers_phv_signal")
 })
 
-#' @inheritParams phv_signal
+#' @param phv_signal_params Other arguments passed to [phv_signal].
 #' @seealso [phv_signal]
 #' @method faers_phv_signal FAERSascii
 #' @rdname faers_phv_signal
-methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
+methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., phv_signal_params = list()) {
+    assert_(phv_signal_params, is.list, "a list")
     out <- faers_phv_table(object, ...)
-    cbind(
-        out,
-        do.call(
-            phv_signal,
-            c(out[, .SD, .SDcols = c("a", "b", "c", "d")], list(
-                methods = methods, alpha = alpha, correct = correct,
-                n_mcmc = n_mcmc, alpha1 = alpha1, alpha2 = alpha2
-            ))
-        )
-    )
+    cbind(out, do.call(
+        phv_signal,
+        c(out[, .SD, .SDcols = c("a", "b", "c", "d")], phv_signal_params)
+    ))
 })
