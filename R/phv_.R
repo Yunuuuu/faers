@@ -168,6 +168,7 @@ phv_prr <- function(a, b, c, d, alpha = 0.05) {
 #' @export
 #' @rdname phv_signal
 phv_chisq <- function(a, b, c, d, correct = TRUE) {
+    assert_phv_table(a, b, c, d)
     out <- .mapply(
         function(n11, n10, n01, n00) {
             out <- stats::chisq.test(
@@ -185,6 +186,7 @@ phv_chisq <- function(a, b, c, d, correct = TRUE) {
 #' @export
 #' @rdname phv_signal
 phv_fisher <- function(a, b, c, d, alpha = 0.05) {
+    assert_phv_table(a, b, c, d)
     out <- .mapply(
         function(n11, n10, n01, n00) {
             out <- stats::fisher.test(
@@ -384,6 +386,9 @@ phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0
 #' @export
 #' @rdname phv_signal
 phv_ebgm <- function(a, b, c, d, alpha = 0.05, theta_init = NULL, squashing = TRUE) {
+    assert_phv_table(a, b, c, d)
+    assert_bool(squashing)
+    assert_data_frame(theta_init, null_ok = TRUE)
     proc <- data.table(N = a, E = (a + b) / (a + b + c + d) * (a + c))
     # For the purpose of reducing computational burden, zero counts should not
     # typically be included for hyperparameter estimation; however, they may
