@@ -11,10 +11,12 @@
 #' and expert discussion. SMQs represent a variety of safety topics of
 #' regulatory interest (e.g., SMQ Severe cutaneous adverse reactions, SMQ
 #' Anaphylactic reaction).
-#' @return 
+#' @slot version A string, the version of MedDRA.
+#' @return
 #' - `meddra_data`: A `MedDRA` object.
 #' - `meddra_hierarchy`: Extract the `hierarchy` slot.
 #' - `meddra_smq`: Extract the `smq` slot.
+#' - `meddra_version`: Extract the `version` slot.
 #' @seealso
 #' - <https://www.meddra.org/>
 #' - <https://www.meddra.org/how-to-use/basics/hierarchy>
@@ -30,6 +32,7 @@ NULL
 #' @rdname MedDRA-class
 meddra_data <- function(path, add_smq = FALSE) {
     hierarchy <- meddra_load_hierarchy(path, primary_soc = TRUE)
+    version <- meddra_load_version(path)
     if (add_smq) {
         smq_data <- meddra_load_smq(path)
         smq_code <- unique(smq_data$smq_code)
@@ -43,7 +46,11 @@ meddra_data <- function(path, add_smq = FALSE) {
     } else {
         smq_data <- NULL
     }
-    methods::new("MedDRA", hierarchy = hierarchy, smq = smq_data)
+    methods::new("MedDRA",
+        hierarchy = hierarchy,
+        smq = smq_data,
+        version = version
+    )
 }
 
 #' @importClassesFrom data.table data.table
@@ -53,10 +60,47 @@ methods::setClassUnion("DTOrNull", c("NULL", "data.table"))
 #' @rdname MedDRA-class
 methods::setClass(
     "MedDRA",
-    slots = list(hierarchy = "DTOrNull", smq = "DTOrNull"),
-    prototype = list(hierarchy = NULL, smq = NULL)
+    slots = list(
+        hierarchy = "DTOrNull", smq = "DTOrNull",
+        version = "character"
+    ),
+    prototype = list(hierarchy = NULL, smq = NULL, version = NA_character_),
+    validity = function(object) {
+        if (length(object@version) != 1L) {
+            return("the length of `@version` must be a string")
+        }
+        TRUE
+    }
 )
 
+
+#' @param object A [MedDRA] object.
+#' @importFrom methods show
+#' @export
+#' @method show MedDRA
+#' @rdname MedDRA-class
+methods::setMethod("show", "MedDRA", function(object) {
+    hierarchy <- object@hierarchy
+    smq <- object@smq
+    version <- object@version
+    msg <- sprintf(
+        "%s data for MedDRA",
+        if (is.null(hierarchy) && is.null(smq)) {
+            "no"
+        } else if (is.null(hierarchy)) {
+            "SMQs"
+        } else if (is.null(smq)) {
+            "Hierarchy"
+        } else {
+            "Hierarchy and SMQs"
+        }
+    )
+    if (!is.na(version)) {
+        msg <- paste(msg, sprintf("(version %s)", version))
+    }
+    cat(msg, sep = "\n")
+    invisible(object)
+})
 
 #######################################################
 #' @param object A `MedDRA` object.
@@ -90,7 +134,84 @@ methods::setMethod("meddra_smq", "MedDRA", function(object) {
     object@smq
 })
 
+#######################################################
+#' @export
+#' @aliases meddra_version
+#' @rdname MedDRA-class
+methods::setGeneric("meddra_version", function(object, ...) {
+    methods::makeStandardGeneric("meddra_version")
+})
+
+#' @export
+#' @method meddra_version MedDRA
+#' @rdname MedDRA-class
+methods::setMethod("meddra_version", "MedDRA", function(object) {
+    object@version
+})
+
+##############################################################
+meddra_standardize_pt <- function(terms, data, use = c("llt", "pt")) {
+    # ignore letter case
+    terms <- toupper(terms)
+    # prepare data
+    pt_from <- rep_len(NA_character_, length(terms))
+    out_code <- rep_len(NA_integer_, length(terms))
+    idx <- rep_len(NA_integer_, length(terms))
+    # order `use` based on the order in `meddra_hierarchy_fields`
+    # from lowest to highest
+    use <- intersect(meddra_hierarchy_fields, use)
+    for (i in use) {
+        operated_idx <- which(is.na(out_code))
+        mapped_idx <- data.table::chmatch(
+            terms[operated_idx],
+            toupper(data[[paste(i, "name", sep = "_")]])
+        )
+        pt_from[operated_idx[!is.na(mapped_idx)]] <- i
+        out_code[operated_idx] <- data[[
+            paste(i, "code", sep = "_")
+        ]][mapped_idx]
+        idx[operated_idx] <- mapped_idx
+        if (!anyNA(idx)) break
+    }
+    data.table(
+        meddra_hierarchy_idx = idx,
+        meddra_hierarchy_from = pt_from,
+        meddra_code = as.character(out_code),
+        meddra_pt = meddra_map_code_into_names(
+            out_code, data,
+            code_col = paste(use, "_code", sep = "_"),
+            name_cols = paste(use, "name", sep = "_")
+        )
+    )
+}
+
 ##########################################################
+meddra_load_version <- function(path) {
+    version <- meddra_extract_version(path)
+    if (is.na(version)) {
+        patterns <- c("readme.*\\.txt$", "^version_report")
+        for (pattern in patterns) {
+            path <- tryCatch(
+                locate_files(path, pattern),
+                no_file = function(cnd) {
+                    NA_character_
+                }
+            )
+            version <- meddra_extract_version(path)
+            if (!is.na(version)) break
+        }
+    }
+    str_replace(version, "_", ".")
+}
+
+meddra_extract_version <- function(path) {
+    path <- path[!is.na(path)]
+    if (length(path) == 0L) {
+        return(NA_character_)
+    }
+    str_extract(basename(path), "\\d+[_.]\\d+")
+}
+
 meddra_load_smq <- function(path) {
     data <- meddra_load(path, use = c("smq_content", "smq_list"))
     out <- data$smq_content[, c("smq_code", "term_code")]
@@ -98,19 +219,16 @@ meddra_load_smq <- function(path) {
 }
 
 meddra_load_hierarchy <- function(path, primary_soc = TRUE) {
-    use <- c("llt", "mdhier")
-    data <- meddra_load(path, use = use)
+    data <- meddra_load(path, use = c("llt", "mdhier"))
     if (primary_soc) {
         # one PT can linked more than one hlt, we can choose the primary SOC
         is_primary <- data$mdhier[
             , list(is_primary = sum(primary_soc_fg == "Y", na.rm = TRUE)),
             by = "pt_code"
         ]
-        if (all(is_primary$is_primary == 1L)) {
-
-        } else {
+        if (!all(is_primary$is_primary == 1L)) {
             cli::cli_warn(
-                "{sum(!is_primary$is_primary)} PT item{?s} do{?es}n't ha{?s/ve} a primary SOC, will choose the first one" # nolint
+                "{sum(is_primary$is_primary != 1L)} PT item{?s} have more than one primary SOC or none, will choose the first one" # nolint
             )
         }
         out <- data$mdhier[, .SD[{
@@ -124,10 +242,9 @@ meddra_load_hierarchy <- function(path, primary_soc = TRUE) {
     } else {
         out <- data$mdhier
     }
-    cols <- meddra_columns(meddra_hierarchy_fields)
     out[data$llt, on = "pt_code", allow.cartesian = TRUE][
         , .SD,
-        .SDcols = cols
+        .SDcols = meddra_columns(meddra_hierarchy_fields)
     ]
 }
 
@@ -176,41 +293,6 @@ meddra_map_code_into_names <- function(
         if (!anyNA(out)) break
     }
     out
-}
-
-meddra_standardize_pt <- function(terms, data, use = c("llt", "pt")) {
-    # ignore letter case
-    terms <- toupper(terms)
-    # prepare data
-    pt_from <- rep_len(NA_character_, length(terms))
-    out_code <- rep_len(NA_integer_, length(terms))
-    idx <- rep_len(NA_integer_, length(terms))
-    # order `use` based on the order in `meddra_hierarchy_fields`
-    # from lowest to highest
-    use <- intersect(meddra_hierarchy_fields, use)
-    for (i in use) {
-        operated_idx <- which(is.na(out_code))
-        mapped_idx <- data.table::chmatch(
-            terms[operated_idx],
-            toupper(data[[paste(i, "name", sep = "_")]])
-        )
-        pt_from[operated_idx[!is.na(mapped_idx)]] <- i
-        out_code[operated_idx] <- data[[
-            paste(i, "code", sep = "_")
-        ]][mapped_idx]
-        idx[operated_idx] <- mapped_idx
-        if (!anyNA(idx)) break
-    }
-    data.table(
-        meddra_hierarchy_idx = idx,
-        meddra_hierarchy_from = pt_from,
-        meddra_code = as.character(out_code),
-        meddra_pt = meddra_map_code_into_names(
-            out_code, data,
-            code_col = paste(use, "_code", sep = "_"),
-            name_cols = paste(use, "name", sep = "_")
-        )
-    )
 }
 
 meddra_columns <- function(use, add_soc_abbrev = TRUE, add_primary_soc = TRUE) {

@@ -40,7 +40,10 @@ locate_dir <- function(path, pattern, ignore.case = TRUE) {
     path <- list.dirs(path, recursive = FALSE)
     path <- path[str_detect(basename(path), pattern, ignore.case = ignore.case)]
     if (!length(path) || !dir.exists(path)) {
-        cli::cli_abort("Cannot locate {.field {pattern}} directory in {.path {path}}")
+        cli::cli_abort(
+            "Cannot locate {.field {pattern}} directory in {.path {path}}",
+            class = "no_dir"
+        )
     }
     path
 }
@@ -51,7 +54,10 @@ locate_files <- function(path, pattern, ignore.case = TRUE) {
         ignore.case = ignore.case
     )
     if (!length(files)) {
-        cli::cli_abort("Cannot locate {.field {pattern}} file in {.path {path}}")
+        cli::cli_abort(
+            "Cannot locate {.field {pattern}} file in {.path {path}}",
+            class = "no_file"
+        )
     }
     files
 }

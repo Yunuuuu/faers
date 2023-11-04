@@ -5,13 +5,18 @@
 \alias{MedDRA-class}
 \alias{MedDRA}
 \alias{meddra_data}
+\alias{show,MedDRA-method}
 \alias{meddra_hierarchy}
 \alias{meddra_hierarchy,MedDRA-method}
 \alias{meddra_smq}
 \alias{meddra_smq,MedDRA-method}
+\alias{meddra_version}
+\alias{meddra_version,MedDRA-method}
 \title{MedDRA class}
 \usage{
 meddra_data(path, add_smq = FALSE)
+
+\S4method{show}{MedDRA}(object)
 
 meddra_hierarchy(object, ...)
 
@@ -20,6 +25,10 @@ meddra_hierarchy(object, ...)
 meddra_smq(object, ...)
 
 \S4method{meddra_smq}{MedDRA}(object)
+
+meddra_version(object, ...)
+
+\S4method{meddra_version}{MedDRA}(object)
 }
 \arguments{
 \item{path}{A string, define the path of MedDRA directory.}
@@ -36,6 +45,7 @@ should be added. If \code{TRUE}, "smq_content.asc", and "smq_list.asc" must exis
 \item \code{meddra_data}: A \code{MedDRA} object.
 \item \code{meddra_hierarchy}: Extract the \code{hierarchy} slot.
 \item \code{meddra_smq}: Extract the \code{smq} slot.
+\item \code{meddra_version}: Extract the \code{version} slot.
 }
 }
 \description{
@@ -55,6 +65,8 @@ terms. These sets of terms have undergone extensive review, testing, analysis
 and expert discussion. SMQs represent a variety of safety topics of
 regulatory interest (e.g., SMQ Severe cutaneous adverse reactions, SMQ
 Anaphylactic reaction).}
+
+\item{\code{version}}{A string, the version of MedDRA.}
 }}
 
 \seealso{
