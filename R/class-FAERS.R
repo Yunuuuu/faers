@@ -40,6 +40,8 @@ NULL
 
 #' @include meddra.R
 methods::setClassUnion("MedDRAOrNull", c("NULL", "MedDRA"))
+
+#' @export
 methods::setClass(
     "FAERS",
     slots = list(
@@ -112,6 +114,7 @@ validate_faers <- function(object) {
 
 methods::setValidity("FAERS", validate_faers)
 
+#' @export
 #' @aliases FAERSascii
 #' @rdname FAERS-class
 methods::setClass(
@@ -138,6 +141,7 @@ methods::setValidity("FAERSascii", function(object) {
     validate_faers(object)
 })
 
+#' @export
 #' @aliases FAERSxml
 #' @rdname FAERS-class
 methods::setClass(
@@ -157,7 +161,7 @@ methods::setClass(
 #' @rdname FAERS-class
 methods::setMethod("show", "FAERS", function(object) {
     l <- length(faers_period(object))
-    general_msg <- sprintf(
+    msg <- sprintf(
         "FAERS data from %s Quarterly %s file%s",
         l, object@format, if (l > 1L) "s" else ""
     )
@@ -170,8 +174,8 @@ methods::setMethod("show", "FAERS", function(object) {
     } else {
         prefix <- NULL
     }
-    if (!is.null(prefix)) general_msg <- paste(prefix, general_msg, sep = " ")
-    cat(general_msg, sep = "\n")
+    if (!is.null(prefix)) msg <- paste(prefix, msg, sep = " ")
+    cat(msg, sep = "\n")
     invisible(object)
 })
 
