@@ -54,6 +54,8 @@ testthat::test_that("`faers_get` for standardizated data works well", {
     hierarchy_cols <- names(data_std@meddra@hierarchy)
     testthat::expect_s3_class(faers_get(data_std, "indi"), "data.table")
     testthat::expect_s3_class(faers_get(data_std, "reac"), "data.table")
+    testthat::expect_false(anyNA(faers_get(data_std, "indi")$meddra_pt))
+    testthat::expect_false(anyNA(faers_get(data_std, "reac")$meddra_pt))
     testthat::expect_identical(
         faers_get(data_std, "indi")[, .SD, .SDcols = hierarchy_cols],
         data_std@meddra@hierarchy[data_std@data$indi$meddra_hierarchy_idx]

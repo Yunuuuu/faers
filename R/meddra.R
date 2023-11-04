@@ -180,7 +180,7 @@ meddra_standardize_pt <- function(terms, data, use = c("llt", "pt")) {
         meddra_code = as.character(out_code),
         meddra_pt = meddra_map_code_into_names(
             out_code, data,
-            code_col = paste(use, "_code", sep = "_"),
+            code_col = paste(use, "code", sep = "_"),
             name_cols = paste(use, "name", sep = "_")
         )
     )
