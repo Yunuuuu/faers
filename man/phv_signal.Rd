@@ -9,6 +9,7 @@
 \alias{phv_bcpnn_norm}
 \alias{phv_bcpnn_mcmc}
 \alias{phv_obsexp_shrink}
+\alias{phv_ebgm}
 \title{Pharmacovigilance Analysis}
 \usage{
 phv_signal(
@@ -21,7 +22,9 @@ phv_signal(
   correct = TRUE,
   n_mcmc = 100000L,
   alpha1 = 0.5,
-  alpha2 = 0.5
+  alpha2 = 0.5,
+  theta_init = NULL,
+  squashing = TRUE
 )
 
 phv_ror(a, b, c, d, alpha = 0.05)
@@ -46,6 +49,8 @@ phv_obsexp_shrink(
   alpha2 = 0.5,
   n_mcmc = 100000L
 )
+
+phv_ebgm(a, b, c, d, alpha = 0.05, theta_init = NULL, squashing = TRUE)
 }
 \arguments{
 \item{a}{also referred to as \code{n11} as this is the count of event of interest
@@ -62,8 +67,8 @@ of interest under \emph{not} exposure of interest.}
 
 \item{methods}{An atomic character, specifies the method used to signal
 mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
-"obsexp_shrink", and "fisher" are supported. If \code{NULL}, all supported methods
-will be used.}
+"obsexp_shrink", "fisher", and "ebgm" are supported. If \code{NULL}, all supported
+methods will be used.}
 
 \item{alpha}{Level of significance, for construction of the confidence
 intervals.}
@@ -77,6 +82,12 @@ confidence intervals.}
 \item{alpha1}{Numerator shrinkage parameter \verb{>=0}, default \code{0.5}.}
 
 \item{alpha2}{Denominator shrinkage parameter \verb{>=0}, default \code{0.5}.}
+
+\item{theta_init}{A data frame of initial hyperparameter guesses with columns
+ordered as:\verb{ alpha1, beta1, alpha2, beta2, P}. See \link[openEBGM:autoHyper]{openEBGM::autoHyper}}
+
+\item{squashing}{A bool, whether do automated data squashing. If any zeros
+found in \code{a}, will always be \code{TRUE}.}
 }
 \value{
 A \link[data.table:data.table]{data.table} with columns of estimated
@@ -90,6 +101,7 @@ interval around the \code{prr}.
 \item \code{phv_bcpnn_norm}: information component (\code{ic}).
 \item \code{phv_bcpnn_mcmc}: information component (\code{ic}).
 \item \code{phv_obsexp_shrink}: observed to expected ratio (\code{oe_ratio}).
+\item \code{phv_ebgm}: Empirical Bayes Geometric Mean (\code{ebgm}).
 }
 }
 \description{
@@ -147,6 +159,27 @@ is the confidence intervals as implemented in \code{phv_bcpnn_mcmc} (Norén et a
 network information component (IC) with reasonable accuracy when \code{alpha1 = alpha2 = 0.5} (Norén et al., 2013).
 }
 
+\section{phv_ebgm}{
+
+An implementation of the Gamma-Poisson Shrinker (GPS) model for identifying
+unexpected counts in large contingency tables using an empirical Bayes
+approach. The Empirical Bayes Geometric Mean (EBGM) and quantile scores are
+obtained from the GPS model estimates.
+The GPS was proposed by DuMouchel as a signal detection tool for large
+frequency tables with both observed (O) and expected (E) counts for each
+drug-outcome pair. It assumes the observed count of any drug-outcome pair
+follows the Poisson distribution.
+
+For each drug-outcome pair, the primary parameter of interest was the risk
+ratio. Rather than using the observed over expected (O/E), GPS uses the
+empirical Bayesian geometric mean (EBGM) posterior distribution of the risk
+ratio and the surrounding confidence interval for each drug-outcome pair to
+identify statistical signals of excess risk. To prevent spurious false
+positives due to implausibly high risk ratios, GPS implements a Bayesian
+framework that “shrinks” O/E estimates towards a value which is close to the
+average O/E values for all drug-event pairs at each level of granularity.
+}
+
 \examples{
 phv_signal(122, 1320, 381, 31341)
 phv_signal(122, 1320, 381, 31341, "ror")
@@ -163,15 +196,30 @@ phv_signal(122, 1320, 381, 31341, "obsexp_shrink")
 phv_obsexp_shrink(122, 1320, 381, 31341)
 phv_signal(122, 1320, 381, 31341, "fisher")
 phv_fisher(122, 1320, 381, 31341)
+phv_signal(122, 1320, 381, 31341, "ebgm")
+phv_ebgm(122, 1320, 381, 31341)
 }
 \references{
+\itemize{
+\item David Olaleye, SAS Institute Inc. (2019), Real-World Evidence and
+Population Health Analytics: Intersection and Application,
+\url{https://support.sas.com/resources/papers/proceedings19/3361-2019.pdf}
+}
+
 \itemize{
 \item Evans, S.J.W., Waller, P.C. and Davis, S. (2001), Use of proportional
 reporting ratios (PRRs) for signal generation from spontaneous adverse drug
 reaction reports. Pharmacoepidem. Drug Safe., 10: 483-486.
 \url{https://doi.org/10.1002/pds.677}
-\item David Olaleye, SAS Institute Inc. (2019), Real-World Evidence and
-Population Health Analytics: Intersection and Application,
-\url{https://support.sas.com/resources/papers/proceedings19/3361-2019.pdf}
+}
+
+\itemize{
+\item Norén GN, Hopstadius J, Bate A. Shrinkage observed-to-expected ratios for
+robust and transparent large-scale pattern discovery.  Statistical methods
+in medical research. 2013 Feb;22(1):57-69.
+}
+
+\itemize{
+\item \url{https://journal.r-project.org/archive/2017/RJ-2017-063/RJ-2017-063.pdf}
 }
 }

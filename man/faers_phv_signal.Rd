@@ -77,8 +77,8 @@ interested events.}
 
 \item{methods}{An atomic character, specifies the method used to signal
 mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
-"obsexp_shrink", and "fisher" are supported. If \code{NULL}, all supported methods
-will be used.}
+"obsexp_shrink", "fisher", and "ebgm" are supported. If \code{NULL}, all supported
+methods will be used.}
 
 \item{alpha}{Level of significance, for construction of the confidence
 intervals.}

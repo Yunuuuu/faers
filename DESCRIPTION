@@ -15,6 +15,7 @@ Imports:
     httr2,
     MCMCpack,
     methods,
+    openEBGM,
     rappdirs,
     rlang (>= 1.1.0),
     rvest,
@@ -52,6 +53,7 @@ Collate:
     'parse.R'
     'period.R'
     'phv_.R'
+    'phv_ebgm.R'
     'rxnorm.R'
     'sample.R'
     'signal.R'

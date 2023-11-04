@@ -16,8 +16,8 @@
 #' of interest under \emph{not} exposure of interest.
 #' @param methods An atomic character, specifies the method used to signal
 #' mining. Currently, only "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
-#' "obsexp_shrink", and "fisher" are supported. If `NULL`, all supported methods
-#' will be used.
+#' "obsexp_shrink", "fisher", and "ebgm" are supported. If `NULL`, all supported
+#' methods will be used.
 #' @param alpha Level of significance, for construction of the confidence
 #'  intervals.
 #' @details
@@ -28,7 +28,7 @@
 #' It is assumed that the contingency table under consideration has
 #' drugs/exposures in the rows and outcomes/events in the columns. See
 #' contingency table section.
-#' 
+#'
 #' We use the `distinct` patient count method to obtain the frequency counts of
 #' patients exposed to each interested drug, those reporting interested event.
 #' As illustrated in the Contingency table, `n` equals the total number of
@@ -39,8 +39,8 @@
 #' with the drug, `n01` is the number of patients that did not use the
 #' interested drug but experienced interested event, and `n00` is the number of
 #' patients that were not exposed to the interested drug and did not report
-#' interested condition. 
-#' 
+#' interested condition.
+#'
 #' @section Contingency table:
 #' |                   | ADR of interest | Other ADRs |  Total  |
 #' |-------------------|-----------------|------------|---------|
@@ -58,7 +58,8 @@
 #' - `phv_bcpnn_norm`: information component (`ic`).
 #' - `phv_bcpnn_mcmc`: information component (`ic`).
 #' - `phv_obsexp_shrink`: observed to expected ratio (`oe_ratio`).
-#' @examples 
+#' - `phv_ebgm`: Empirical Bayes Geometric Mean (`ebgm`).
+#' @examples
 #' phv_signal(122, 1320, 381, 31341)
 #' phv_signal(122, 1320, 381, 31341, "ror")
 #' phv_ror(122, 1320, 381, 31341)
@@ -74,20 +75,18 @@
 #' phv_obsexp_shrink(122, 1320, 381, 31341)
 #' phv_signal(122, 1320, 381, 31341, "fisher")
 #' phv_fisher(122, 1320, 381, 31341)
+#' phv_signal(122, 1320, 381, 31341, "ebgm")
+#' phv_ebgm(122, 1320, 381, 31341)
 #' @references
-#' - Evans, S.J.W., Waller, P.C. and Davis, S. (2001), Use of proportional
-#'   reporting ratios (PRRs) for signal generation from spontaneous adverse drug
-#'   reaction reports. Pharmacoepidem. Drug Safe., 10: 483-486.
-#'   <https://doi.org/10.1002/pds.677>
 #' - David Olaleye, SAS Institute Inc. (2019), Real-World Evidence and
 #'   Population Health Analytics: Intersection and Application,
-#'   <https://support.sas.com/resources/papers/proceedings19/3361-2019.pdf>   
+#'   <https://support.sas.com/resources/papers/proceedings19/3361-2019.pdf>
 #' @export
 #' @name phv_signal
-phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5) {
+phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5, theta_init = NULL, squashing = TRUE) {
     allowed_methods <- c(
         "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
-        "obsexp_shrink", "fisher"
+        "obsexp_shrink", "fisher", "ebgm"
     )
     assert_inclusive(methods, allowed_methods, null_ok = TRUE)
     methods <- unique(methods %||% allowed_methods)
@@ -103,6 +102,10 @@ phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE,
             ),
             chisq = do.call(phv_fn, c(
                 args[c("a", "b", "c", "d")], list(correct = correct)
+            )),
+            ebgm = do.call(phv_fn, c(
+                args[c("a", "b", "c", "d")],
+                list(theta_init = theta_init, squashing = squashing)
             )),
             do.call(phv_fn, args)
         )
@@ -122,10 +125,10 @@ phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE,
     out[]
 }
 
-# modified from https://github.com/tystan/pharmsignal
 #' @export
 #' @rdname phv_signal
 phv_ror <- function(a, b, c, d, alpha = 0.05) {
+    # https://github.com/tystan/pharmsignal/blob/master/R/ror_signal.R
     assert_phv_table(a, b, c, d)
 
     # ugly way to do ad/bc but this way avoids integer overflow
@@ -141,7 +144,13 @@ phv_ror <- function(a, b, c, d, alpha = 0.05) {
 
 #' @export
 #' @rdname phv_signal
+#' @references
+#' - Evans, S.J.W., Waller, P.C. and Davis, S. (2001), Use of proportional
+#'   reporting ratios (PRRs) for signal generation from spontaneous adverse drug
+#'   reaction reports. Pharmacoepidem. Drug Safe., 10: 483-486.
+#'   <https://doi.org/10.1002/pds.677>
 phv_prr <- function(a, b, c, d, alpha = 0.05) {
+    # https://github.com/tystan/pharmsignal/blob/master/R/prr_signal.R
     assert_phv_table(a, b, c, d)
 
     # run prr analysis
@@ -194,7 +203,7 @@ phv_fisher <- function(a, b, c, d, alpha = 0.05) {
 #' @rdname phv_signal
 phv_bcpnn_norm <- function(a, b, c, d, alpha = 0.05) {
     assert_phv_table(a, b, c, d)
-
+    # https://github.com/tystan/pharmsignal/blob/master/R/bcpnn_norm_signal.R
     # run bcpnn analysis
     n1. <- a + b
     n.1 <- a + c
@@ -229,7 +238,7 @@ phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
     # run bcpnn analysis
     # NOTE: we could speed up the code by combining some of the expressions
     # here. We decided to keep it like this for readability's sake.
-
+    # https://github.com/bips-hb/pvm/blob/master/R/BCPNN.R
     # determine the marginals and the total
     n1. <- a + b
     n.1 <- a + c
@@ -302,9 +311,14 @@ phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
 #' `log2(OE)` approximates the Bayesian confidence propagation neural
 #' network information component (IC) with reasonable accuracy when `alpha1
 #' = alpha2 = 0.5` (Norén et al., 2013).
+#' @references
+#' - Norén GN, Hopstadius J, Bate A. Shrinkage observed-to-expected ratios for
+#'   robust and transparent large-scale pattern discovery.  Statistical methods
+#'   in medical research. 2013 Feb;22(1):57-69.
 #' @export
 #' @rdname phv_signal
 phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5, n_mcmc = 1e5L) {
+    # https://github.com/tystan/pharmsignal/blob/master/R/obsexp_shrink_signal.R
     assert_phv_table(a, b, c, d)
     # run bcpnn analysis
     n <- a + b + c + d
@@ -322,7 +336,7 @@ phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0
     if (any(need_exact_lims)) {
         cli::cli_warn(c(
             `!` = "{sum(need_exact_lims)} case{?s} of (O + alpha1) < 1",
-            i = "will use the CIs from the BCPNN IC (using MCMC estimation)"
+            i = "will use the information components from the BCPNN (using MCMC estimation) to estimate the confidence interval" # nolint
         ))
 
         # use default mcmc draws
@@ -343,10 +357,128 @@ phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0
     )
 }
 
+#' @param theta_init A data frame of initial hyperparameter guesses with columns
+#' ordered as:` alpha1, beta1, alpha2, beta2, P`. See [openEBGM::autoHyper]
+#' @param squashing A bool, whether do automated data squashing. If any zeros
+#' found in `a`, will always be `TRUE`.
+#' @section phv_ebgm:
+#' An implementation of the Gamma-Poisson Shrinker (GPS) model for identifying
+#' unexpected counts in large contingency tables using an empirical Bayes
+#' approach. The Empirical Bayes Geometric Mean (EBGM) and quantile scores are
+#' obtained from the GPS model estimates.
+#' The GPS was proposed by DuMouchel as a signal detection tool for large
+#' frequency tables with both observed (O) and expected (E) counts for each
+#' drug-outcome pair. It assumes the observed count of any drug-outcome pair
+#' follows the Poisson distribution.
+#'
+#' For each drug-outcome pair, the primary parameter of interest was the risk
+#' ratio. Rather than using the observed over expected (O/E), GPS uses the
+#' empirical Bayesian geometric mean (EBGM) posterior distribution of the risk
+#' ratio and the surrounding confidence interval for each drug-outcome pair to
+#' identify statistical signals of excess risk. To prevent spurious false
+#' positives due to implausibly high risk ratios, GPS implements a Bayesian
+#' framework that “shrinks” O/E estimates towards a value which is close to the
+#' average O/E values for all drug-event pairs at each level of granularity.
+#' @references
+#' - <https://journal.r-project.org/archive/2017/RJ-2017-063/RJ-2017-063.pdf>
+#' @export
+#' @rdname phv_signal
+phv_ebgm <- function(a, b, c, d, alpha = 0.05, theta_init = NULL, squashing = TRUE) {
+    proc <- data.table(N = a, E = (a + b) / (a + b + c + d) * (a + c))
+    # For the purpose of reducing computational burden, zero counts should not
+    # typically be included for hyperparameter estimation; however, they may
+    # help when convergence issues are encountered. If included, the points
+    # should be squashed (discussed in later sections) in order to reduce the
+    # computation time. These zero counts should not typically be used for EB
+    # scores since they are meaningless for studying larger-than-expected counts
+    # (which is usually the goal).
+    # In some situations, 0 will always cause error, so we just remove zeros
+    zeros <- any(a == 0L)
+    if (zeros && !squashing) {
+        cli::cli_warn("Using {.code squashing = TRUE} since zeros exist")
+        squashing <- TRUE
+    }
+    if (squashing) {
+        squashed <- openEBGM::autoSquash(proc)
+    } else {
+        squashed <- proc
+    }
+    theta_init <- theta_init %||% data.frame(
+        alpha1 = c(0.2, 0.1, 0.3),
+        beta1 = c(0.1, 0.2, 0.5),
+        alpha2 = c(2, 10, 6),
+        beta2 = c(4, 10, 6),
+        p = c(1 / 3, 0.2, 0.5)
+    )
+    # The N_star argument allows the user to choose the smallest value of N used
+    # for hyperparameter estimation. The user must be careful to match N_star
+    # with the actual minimum count in a. If the user wishes to use a larger
+    # value for N_star, the vectors supplied to arguments `ni`, `ei`, and `wi`
+    # must be filtered. Here, we are using all counts except zeroes, so no
+    # filtering is needed. In general, N_star = 1 should be used whenever
+    # practical.
+    theta_hats <- tryCatch(
+        openEBGM::autoHyper(
+            data = squashed,
+            theta_init = theta_init,
+            squashed = squashing,
+            zeroes = zeros,
+            N_star = if (zeros) NULL else min(squashed$N)
+        )$estimates,
+        error = function(cnd) {
+            cli::cli_warn(c(
+                x = "Cannot estimate hyperparameter using {.pkg openEBGM}",
+                i = "Using {.fn nlminb} directly to estimate hyperparameter"
+            ))
+            # stats::nlminb(
+            #     start = c(0.2, 0.1, 2, 4, 1 / 3),
+            #     objective = objective,
+            #     ni = squashed$N, ei = squashed$E,
+            #     wi = squashed$weight, lower = 0,
+            #     upper = Inf,
+            #     N_star = if (zeros) NULL else min(squashed$N)
+            # )$par
+            # https://github.com/bips-hb/pvm/blob/master/R/fitPriorParametersGPS.R
+            init <- c(0.2, 0.1, 2, 4, 1 / 3)
+            if (zeros) {
+                out <- stats::nlminb(
+                    start = init, objective = openEBGM::negLLzero,
+                    N = proc$N, E = proc$E,
+                    lower = 0, upper = c(Inf, Inf, Inf, Inf, 1.0),
+                    control = list(iter.max = 500L)
+                )
+            } else {
+                out <- stats::nlminb(
+                    start = init, objective = openEBGM::negLL,
+                    N = proc$N, E = proc$E,
+                    lower = 0, upper = c(Inf, Inf, Inf, Inf, 1.0),
+                    N_star = if (zeros) NULL else min(proc$N),
+                    control = list(iter.max = 500L)
+                )
+            }
+            out$par
+        }
+    )
+    qn <- phv_ebgm_qn(theta_hats, N = proc$N, E = proc$E)
+    ebgm <- phv_ebgm_score(theta_hats, N = proc$N, E = proc$E, qn = qn)
+    half <- alpha / 2L
+    ci_low <- phv_ebgm_quant_bisect(half,
+        theta_hat = theta_hats,
+        N = proc$N, E = proc$E, qn = qn
+    )
+    ci_high <- phv_ebgm_quant_bisect(
+        1 - half,
+        theta_hat = theta_hats,
+        N = proc$N, E = proc$E, qn = qn
+    )
+    data.table(ebgm = ebgm, ci_low = ci_low, ci_high = ci_high)
+}
+
+#############################################################
 assert_phv_table <- function(a, b, c, d, call = rlang::caller_env()) {
     lst <- list(a, b, c, d)
     right_cls <- vapply(lst, function(x) {
-        is.numeric(x) && all(x >= 0L)
+        !anyNA(x) && is.numeric(x) && all(x >= 0L)
     }, logical(1L))
     if (!all(right_cls)) {
         fail_cls <- c("a", "b", "c", "d")[!right_cls] # nolint
