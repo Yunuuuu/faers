@@ -35,11 +35,12 @@ meddra_data <- function(path, add_smq = FALSE) {
     version <- meddra_load_version(path)
     if (add_smq) {
         smq_data <- meddra_load_smq(path)
-        smq_code <- unique(smq_data$smq_code)
-        smq_code <- smq_code[
+        term_and_smq <- unique(smq_data[, c("smq_code", "term_code")])
+        smq_code <- term_and_smq$smq_code[
             meddra_hierarchy_match(
-                hierarchy, smq_code,
-                c("llt_code", "pt_code")
+                hierarchy,
+                terms = term_and_smq$term_code,
+                use = c("llt_code", "pt_code")
             )
         ]
         hierarchy[, smq_code := smq_code]
@@ -47,7 +48,7 @@ meddra_data <- function(path, add_smq = FALSE) {
         smq_data <- NULL
     }
     methods::new("MedDRA",
-        hierarchy = hierarchy,
+        hierarchy = hierarchy[], # in case of meddra_hierarchy() don't print
         smq = smq_data,
         version = version
     )
