@@ -26,9 +26,9 @@ use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
 can be used.}
 
 \item{interested_event}{A character specify the events column(s?) in the
-\code{interested_field} of object to count the unique \code{primaryid}. If multiple
-columns were selected, the combination for all columns will define the
-interested events.}
+\code{interested_field} data to count the unique \code{primaryid}. If multiple columns
+were selected, the combination for all columns will define the interested
+events.}
 
 \item{interested_fn}{A function or formula defined the preprocessing function
 before creating contingency table, with the \code{interested_field} data as the

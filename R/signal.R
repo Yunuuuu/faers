@@ -72,7 +72,7 @@ methods::setMethod(
 methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "FAERSascii", object2 = "missing"),
-    function(object, interested_event = "soc_name", ..., interested, object2) {
+    function(object, interested_field = "reac", interested_event = "soc_name", ..., interested, object2) {
         if (!object@standardization) {
             cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
         }
@@ -86,9 +86,12 @@ methods::setMethod(
         }
         full_counts <- faers_counts(
             object,
+            interested_field = interested_field,
             interested_event = interested_event, ...
         )
-        interested_counts <- faers_counts(interested,
+        interested_counts <- faers_counts(
+            interested,
+            interested_field = interested_field,
             interested_event = interested_event, ...
         )
         n <- sum(full_counts$N) # scalar
@@ -114,7 +117,7 @@ methods::setMethod(
 methods::setMethod(
     "faers_phv_table",
     c(object = "FAERSascii", interested = "missing", object2 = "FAERSascii"),
-    function(object, interested_event = "soc_name", ..., interested, object2) {
+    function(object, interested_field = "reac", interested_event = "soc_name", ..., interested, object2) {
         if (!object@standardization) {
             cli::cli_abort("{.arg object} must be standardized using {.fn faers_standardize}")
         }
@@ -128,9 +131,11 @@ methods::setMethod(
             cli::cli_warn("{.val {overlapped_idx}} report{?s} are overlapped between {.arg object} and {.arg object2}")
         }
         interested_counts <- faers_counts(object,
+            interested_field = interested_field,
             interested_event = interested_event, ...
         )
         interested_counts2 <- faers_counts(object2,
+            interested_field = interested_field,
             interested_event = interested_event, ...
         )
         n1. <- sum(interested_counts$N)
@@ -150,15 +155,6 @@ methods::setMethod(
 )
 
 utils::globalVariables(c("a", "b", "d", "n.1"))
-
-#' @rdname faers_phv_signal
-methods::setMethod(
-    "faers_phv_table",
-    c(object = "FAERSascii", interested = "FAERSascii", object2 = "FAERSascii"),
-    function(object, interested, object2) {
-        cli::cli_abort("{.arg interested} and {.arg object2} are both exclusive, must be provided only one or none")
-    }
-)
 
 ##############################################################
 #' @export

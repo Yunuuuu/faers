@@ -31,9 +31,9 @@ methods::setGeneric("faers_counts", function(object, ...) {
 #' use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
 #' can be used.
 #' @param interested_event A character specify the events column(s?) in the
-#' `interested_field` of object to count the unique `primaryid`. If multiple
-#' columns were selected, the combination for all columns will define the
-#' interested events.
+#' `interested_field` data to count the unique `primaryid`. If multiple columns
+#' were selected, the combination for all columns will define the interested
+#' events.
 #' @param interested_fn A function or formula defined the preprocessing function
 #' before creating contingency table, with the `interested_field` data as the
 #' input and return a [data.table][data.table::data.table].

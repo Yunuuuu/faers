@@ -6,7 +6,6 @@
 \alias{faers_phv_table,FAERSascii,missing,missing-method}
 \alias{faers_phv_table,FAERSascii,FAERSascii,missing-method}
 \alias{faers_phv_table,FAERSascii,missing,FAERSascii-method}
-\alias{faers_phv_table,FAERSascii,FAERSascii,FAERSascii-method}
 \alias{faers_phv_signal,FAERSascii-method}
 \title{Create contingency table and run disproportionality analysis}
 \usage{
@@ -16,6 +15,7 @@ faers_phv_table(object, ..., interested, object2)
 
 \S4method{faers_phv_table}{FAERSascii,FAERSascii,missing}(
   object,
+  interested_field = "reac",
   interested_event = "soc_name",
   ...,
   interested,
@@ -24,13 +24,12 @@ faers_phv_table(object, ..., interested, object2)
 
 \S4method{faers_phv_table}{FAERSascii,missing,FAERSascii}(
   object,
+  interested_field = "reac",
   interested_event = "soc_name",
   ...,
   interested,
   object2
 )
-
-\S4method{faers_phv_table}{FAERSascii,FAERSascii,FAERSascii}(object, interested, object2)
 
 faers_phv_signal(object, ...)
 
@@ -61,10 +60,14 @@ or \code{a} will be calculated from \code{object}}
 \item{filter_params}{Other arguments passed to \link{faers_filter}, solely used
 when \code{interested} and \code{object2} are both \code{missing}}
 
+\item{interested_field}{A string indicates the interested FAERS fields to
+use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
+can be used.}
+
 \item{interested_event}{A character specify the events column(s?) in the
-\code{interested_field} of object to count the unique \code{primaryid}. If multiple
-columns were selected, the combination for all columns will define the
-interested events.}
+\code{interested_field} data to count the unique \code{primaryid}. If multiple columns
+were selected, the combination for all columns will define the interested
+events.}
 
 \item{phv_signal_params}{Other arguments passed to \link{phv_signal}.}
 }
