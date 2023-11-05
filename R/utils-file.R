@@ -16,17 +16,26 @@ faers_clearcache <- function(caches = NULL, force = FALSE) {
         paths <- faers_cache_dir(caches, create = FALSE)
     }
     for (path in paths) {
-        dir_delete(path, force = force)
+        delete_cache(path, force = force)
     }
     invisible(paths)
 }
 
-dir_delete <- function(path, ...) {
-    # Not deleting a non-existent file is not a failure
-    if (unlink(path, recursive = TRUE, ...)) {
-        cli::cli_warn("Cannot remove {.path {path}}")
+delete_cache <- function(path, ..., name = NULL) {
+    if (dir.exists(path)) {
+        # Not deleting a non-existent file is not a failure
+        if (unlink(path, recursive = TRUE, ...)) {
+            cli::cli_warn("Cannot remove {.path {path}}")
+        } else {
+            cli::cli_alert_success("Removing {.path {path}} successfully")
+        }
     } else {
-        cli::cli_alert_success("Removing {.path {path}} successfully")
+        if (is.null(name)) {
+            msg <- "No cache"
+        } else {
+            msg <- "No cache found for {.field {name}}"
+        }
+        cli::cli_alert_info(msg)
     }
 }
 
