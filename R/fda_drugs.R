@@ -31,14 +31,8 @@ fda_drugs_load <- function(file, use = "Products", list = FALSE, dir = faers_cac
     if (list) {
         list.files(path)
     } else {
-        file <- locate_files(path, use, ignore.case = TRUE)
-        if (length(file) > 1L) {
-            cli::cli_abort(
-                "Multiple files matched, files: {.file {basename(file)}}"
-            )
-        }
-        # Don't use data.table
-        # Stopped early on line
+        file <- locate_file(path, use, ignore.case = TRUE)
+        # Don't use data.table: error, Stopped early on line
         out <- vroom::vroom(file, show_col_types = FALSE)
         data.table::setDT(out)[]
     }
@@ -47,9 +41,7 @@ fda_drugs_load <- function(file, use = "Products", list = FALSE, dir = faers_cac
 fda_drugs_file <- function(dir = faers_cache_dir("fdadrugs")) {
     file <- tryCatch(
         locate_files(dir, "^fda_drugs_data.*\\.zip", ignore.case = FALSE),
-        no_file = function(cnd) {
-            FALSE
-        }
+        no_file = function(cnd) FALSE
     )
     if (isFALSE(file)) {
         file <- fda_drugs_download(dir = dir)

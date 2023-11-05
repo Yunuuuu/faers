@@ -88,11 +88,18 @@ unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
 }
 
 locate_dir <- function(path, pattern = NULL, ignore.case = TRUE) {
-    path <- list.dirs(path, recursive = FALSE)
+    path <- list.dirs(path, full.names = TRUE, recursive = FALSE)
     if (!is.null(pattern)) {
         path <- path[
             str_detect(basename(path), pattern, ignore.case = ignore.case)
         ]
+    } else {
+        pattern <- "any"
+    }
+    if (length(path) > 1L) {
+        cli::cli_abort(
+            "Multiple directories matched, dir: {.path {basename(path)}}"
+        )
     }
     if (!length(path) || !dir.exists(path)) {
         cli::cli_abort(
@@ -103,12 +110,24 @@ locate_dir <- function(path, pattern = NULL, ignore.case = TRUE) {
     path
 }
 
+locate_file <- function(path, pattern = NULL, ignore.case = TRUE) {
+    file <- locate_files(path, pattern = pattern, ignore.case = ignore.case)
+    if (length(file) > 1L) {
+        cli::cli_abort(
+            "Multiple files matched, files: {.file {basename(file)}}"
+        )
+    }
+    file
+}
+
 locate_files <- function(path, pattern = NULL, ignore.case = TRUE) {
     files <- list.files(path, full.names = TRUE)
     if (!is.null(pattern)) {
         files <- files[
             str_detect(basename(files), pattern, ignore.case = ignore.case)
         ]
+    } else {
+        pattern <- "any"
     }
     if (!length(files)) {
         cli::cli_abort(
