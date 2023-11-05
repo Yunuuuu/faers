@@ -54,7 +54,10 @@ fda_drugs_file <- function(dir = faers_cache_dir("fdadrugs")) {
     if (isFALSE(file)) {
         file <- fda_drugs_download(dir = dir)
     } else {
-        date <- as.Date(str_extract(file, "[\\d-]+"))
+        date <- as.Date(
+            str_extract(basename(file), "\\d+-\\d+-\\d+"),
+            format = "%Y-%m-%d"
+        )
         if (length(file) > 1L) {
             i <- order(date, decreasing = TRUE)[1L]
             file <- file[i]
