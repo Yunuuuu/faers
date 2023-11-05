@@ -57,16 +57,6 @@ methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_
         ]
     })
     object@deduplication <- TRUE
-    # ..__matched_ids__.. <- unique(deduplicated_data$primaryid)
-    # # we keep the latest demographic information for the patients
-    # object@data$demo <- object@data$demo[
-    #     deduplicated_data,
-    #     on = c("year", "quarter", "primaryid")
-    # ]
-    # # we keep all other information for the patients
-    # for (i in setdiff(faers_ascii_file_fields, "demo")) {
-    #     object@data[[i]] <- object@data[[i]][primaryid %in% ..__matched_ids__..]
-    # }
     object
 })
 
@@ -142,6 +132,8 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     # consumer and by the sponsor. we have found some duplicated `primaryid`
     # with different caseid in `demo`, so we remove this by keeping the latest
     # one, we remove `deleted_cases` firstly if it exist
+
+    # we don't use `setorderv` as it will change data by reference
     if (is.null(deleted_cases)) {
         out <- unique(
             data$demo[
@@ -226,7 +218,7 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     }), .SDcols = all_columns]
     for (i in seq_along(can_be_ignored_columns)) {
         data.table::setorderv(out,
-            cols = c("primaryid", "year", "quarter"),
+            cols = c("year", "quarter", "primaryid"),
             order = -1L
         )
         out <- unique(out,
