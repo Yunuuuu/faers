@@ -11,7 +11,7 @@
 #' @param compress_dir A string specifies the directory to extract files to. It
 #' will be created if necessary.
 #' @return A [FAERSxml] or [FAERSascii] object.
-#' @examples 
+#' @examples
 #' # the files included in the package are sampled
 #' data <- faers_parse(
 #'     system.file("extdata", "aers_ascii_2004q1.zip", package = "faers"),
@@ -152,7 +152,10 @@ safely_read_ascii <- function(file, year, quarter) {
     n_seps <- str_count(file_text, "$", fixed = TRUE)
     collapsed_lines <- floor(n_seps / n_seps[2L]) > 1L
     if (any(collapsed_lines)) {
-        cli::cli_warn("omiting collapsed lines: {which(collapsed_lines)}")
+        cli::cli_warn(c(
+            "omiting {sum(collapsed_lines)} collapsed line{?s}",
+            i = "line number: {which(collapsed_lines)}"
+        ))
         file_text <- file_text[!collapsed_lines]
     }
     file_text <- str_remove(file_text[!collapsed_lines], "\\$$")
