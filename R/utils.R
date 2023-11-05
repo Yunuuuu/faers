@@ -1,6 +1,6 @@
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-# name used: metadata, rxnorm, athena
+# name used: metadata, fda_drug, rxnorm, athena
 faers_cache_dir <- function(name) {
     path <- faers_cache_env[[name]]
     if (is.null(path)) {
@@ -14,7 +14,7 @@ faers_user_cache_dir <- function() {
     dir_create2(rappdirs::user_cache_dir(pkg_nm()), recursive = TRUE)
 }
 
-#' Used by `faers_cache_dir` and `faers_meta_doc`
+#' Used by `faers_cache_dir`
 #' @noRd
 faers_cache_env <- new.env()
 
@@ -32,7 +32,10 @@ has_name <- function(x, name) {
     any(name == rlang::names2(x))
 }
 
-fda_host <- "https://fis.fda.gov"
+fda_host <- function(prefix = "www") {
+    sprintf("https://%s.fda.gov", prefix)
+}
+
 faers_file_format <- c("ascii", "xml")
 faers_file_quarters <- c("q1", "q2", "q3", "q4")
 faers_ascii_file_fields <- c("demo", "drug", "indi", "reac", "ther", "rpsr", "outc")

@@ -41,7 +41,7 @@ will parse metadata in
 faers_meta()
 #> → Using FAERS metadata from cached
 #>   '~/.cache/faers/metadata/faers_meta_data.rds'
-#>   Snapshot time: 2023-11-03 15:23:33.866049
+#>   Snapshot time: 2023-11-05 17:10:13.921026
 #>      year quarter             period
 #>     <int>  <char>             <char>
 #>  1:  2023      q3   July - September

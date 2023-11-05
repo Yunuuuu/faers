@@ -20,6 +20,7 @@ Imports:
     rlang (>= 1.1.0),
     rvest,
     utils,
+    vroom,
     xml2
 Suggests: 
     knitr,
@@ -44,6 +45,7 @@ Collate:
     'download.R'
     'faers-package.R'
     'faers.R'
+    'fda_drugs.R'
     'import-standalone-assert.R'
     'import-standalone-cli.R'
     'import-standalone-obj-type.R'

@@ -49,10 +49,10 @@ locate_dir <- function(path, pattern, ignore.case = TRUE) {
 }
 
 locate_files <- function(path, pattern, ignore.case = TRUE) {
-    files <- list.files(path,
-        pattern = pattern, full.names = TRUE,
-        ignore.case = ignore.case
-    )
+    files <- list.files(path, full.names = TRUE)
+    files <- files[
+        str_detect(basename(files), pattern, ignore.case = ignore.case)
+    ]
     if (!length(files)) {
         cli::cli_abort(
             "Cannot locate {.field {pattern}} file in {.path {path}}",

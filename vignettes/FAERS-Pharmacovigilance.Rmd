@@ -55,7 +55,7 @@ This will return a data.table reporting years, period, quarter, and file urls
 and file sizes. By default, this will use the cached file in
 `rappdirs::user_cache_dir("faers")`.  If it doesn't exist, the internal will
 parse metadata in <`r sprintf("%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html",
-faers:::fda_host)`> 
+faers:::fda_host("fis"))`> 
 ```{r}
 faers_meta()
 ```
