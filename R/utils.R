@@ -2,21 +2,13 @@
 
 # name used: metadata, fda_drug, rxnorm, athena
 faers_cache_dir <- function(name) {
-    path <- faers_cache_env[[name]]
-    if (is.null(path)) {
-        path <- file.path(faers_user_cache_dir(), name)
-        faers_cache_env[[name]] <- dir_create2(path)
-    }
-    path
+    path <- file.path(faers_user_cache_dir(), name)
+    dir_create2(path)
 }
 
 faers_user_cache_dir <- function() {
     dir_create2(rappdirs::user_cache_dir(pkg_nm()), recursive = TRUE)
 }
-
-#' Used by `faers_cache_dir`
-#' @noRd
-faers_cache_env <- new.env()
 
 pkg_nm <- function() {
     utils::packageName(topenv(environment()))
