@@ -15,29 +15,22 @@
 #' @seealso
 #' <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
 #' @export
-faers_meta <- function(force = FALSE, internal = FALSE) {
+faers_meta <- function(force = FALSE, internal = !curl::has_internet()) {
     assert_bool(force)
     if (force || is.null(out <- faers_meta_cache_read(internal = internal))) {
         out <- faers_meta_parse()
         faers_meta_cache_save(out)
-        # save the data in the cached environment for the usage of next time
-        # like faers_available()
-        faers_cache_env[[".faers_meta_data"]] <- out
     }
     out
 }
 
 faers_meta_cache_read <- function(internal = FALSE) {
-    if (exists(".faers_meta_data", where = faers_cache_env, inherits = FALSE)) {
-        return(get(".faers_meta_data", pos = faers_cache_env, inherits = FALSE))
-    }
     file <- faers_meta_cache_file()
     if (file.exists(file)) {
         out <- readRDS(file)
         msg <- "Using FAERS metadata from cached {.file {file}}"
         # save the data in the cached environment for the usage of next time
         # like faers_available()
-        faers_cache_env[[".faers_meta_data"]] <- out$data
     } else {
         if (internal) {
             out <- readRDS(internal_file("extdata", "faers_meta_data.rds"))
@@ -64,7 +57,10 @@ faers_meta_cache_file <- function(dir = faers_cache_dir("metadata")) {
 
 faers_meta_parse <- function(call = rlang::caller_env()) {
     assert_internet(call = call)
-    url <- sprintf("%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html", fda_host)
+    url <- sprintf(
+        "%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html",
+        fda_host("fis")
+    )
     cli::cli_inform(c(">" = "Reading html: {.url {url}}"))
     html <- xml2::read_html(url)
     table_xml_list <- rvest::html_elements(html, ".panel.panel-default")

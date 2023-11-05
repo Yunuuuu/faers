@@ -4,7 +4,7 @@
 \alias{faers_meta}
 \title{List of FAERS data}
 \usage{
-faers_meta(force = FALSE, internal = FALSE)
+faers_meta(force = FALSE, internal = !curl::has_internet())
 }
 \arguments{
 \item{force}{A boolean value. If set to \code{TRUE}, it indicates the retrieval of
