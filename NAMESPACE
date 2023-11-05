@@ -3,6 +3,7 @@
 export(faers)
 export(faers_available)
 export(faers_before_period)
+export(faers_clearcache)
 export(faers_combine)
 export(faers_counts)
 export(faers_data)

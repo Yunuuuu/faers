@@ -19,14 +19,14 @@ fda_drugs <- function(use = "Products", list = FALSE, force = FALSE) {
     assert_bool(list)
     assert_bool(force)
     if (force) {
-        file <- fda_drugs_download(dir = faers_cache_dir("fda_drugs"))
+        file <- fda_drugs_download(dir = faers_cache_dir("fdadrugs"))
     } else {
         file <- fda_drugs_file()
     }
     fda_drugs_load(file, use = use, list = list)
 }
 
-fda_drugs_load <- function(file, use = "Products", list = FALSE, dir = faers_cache_dir("fda_drugs")) {
+fda_drugs_load <- function(file, use = "Products", list = FALSE, dir = faers_cache_dir("fdadrugs")) {
     path <- unzip2(file, dir)
     if (list) {
         list.files(path)
@@ -44,7 +44,7 @@ fda_drugs_load <- function(file, use = "Products", list = FALSE, dir = faers_cac
     }
 }
 
-fda_drugs_file <- function(dir = faers_cache_dir("fda_drugs")) {
+fda_drugs_file <- function(dir = faers_cache_dir("fdadrugs")) {
     file <- tryCatch(
         locate_files(dir, "^fda_drugs_data.*\\.zip", ignore.case = FALSE),
         no_file = function(cnd) {
@@ -68,7 +68,7 @@ fda_drugs_file <- function(dir = faers_cache_dir("fda_drugs")) {
     file
 }
 
-fda_drugs_download <- function(dir = faers_cache_dir("fda_drugs"), call = rlang::caller_env()) {
+fda_drugs_download <- function(dir = faers_cache_dir("fdadrugs"), call = rlang::caller_env()) {
     assert_internet(call = call)
     file <- file.path(dir, sprintf("fda_drugs_data_%s.zip", Sys.Date()))
     download_inform(fda_drugs_url(), file)

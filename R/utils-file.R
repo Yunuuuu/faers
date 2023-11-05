@@ -1,3 +1,54 @@
+#' Removes caches 
+#'
+#' @param caches An atomic character, indicates what caches to remove? Only
+#' `"metadata"`, `"fdadrugs"`, `"rxnorm"`, and `"athena"` can be used. If
+#' `NULL`, all caches will be removed.
+#' @inheritParams base::unlink
+#' @return Path of the deleted directory invisiblely
+#' @examples
+#' faers_clearcache()
+#' @export 
+faers_clearcache <- function(caches = NULL, force = FALSE) {
+    if (is.null(caches)) {
+        paths <- faers_user_cache_dir(create = FALSE)
+    } else {
+        assert_inclusive(caches, c("metadata", "fdadrugs", "rxnorm", "athena"))
+        paths <- faers_cache_dir(caches, create = FALSE)
+    }
+    for (path in paths) {
+        dir_delete(path, force = force)
+    }
+    invisible(paths)
+}
+
+dir_delete <- function(path, ...) {
+    # Not deleting a non-existent file is not a failure
+    if (unlink(path, recursive = TRUE, ...)) {
+        cli::cli_warn("Cannot remove {.path {path}}")
+    } else {
+        cli::cli_alert_success("Removing {.path {path}} successfully")
+    }
+}
+
+# name used: metadata, fdadrugs, rxnorm, athena
+faers_cache_dir <- function(name, create = TRUE) {
+    path <- file.path(faers_user_cache_dir(create = create), name)
+    if (create) {
+        dir_create2(path)
+    } else {
+        path
+    }
+}
+
+faers_user_cache_dir <- function(create = TRUE) {
+    path <- rappdirs::user_cache_dir(pkg_nm())
+    if (create) {
+        dir_create2(path, recursive = TRUE)
+    } else {
+        path
+    }
+}
+
 # file or path utils function --------------
 dir_or_unzip <- function(path, compress_dir, pattern, none_msg, ignore.case = TRUE) {
     if (dir.exists(path)) {

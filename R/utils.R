@@ -1,15 +1,5 @@
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-# name used: metadata, fda_drug, rxnorm, athena
-faers_cache_dir <- function(name) {
-    path <- file.path(faers_user_cache_dir(), name)
-    dir_create2(path)
-}
-
-faers_user_cache_dir <- function() {
-    dir_create2(rappdirs::user_cache_dir(pkg_nm()), recursive = TRUE)
-}
-
 pkg_nm <- function() {
     utils::packageName(topenv(environment()))
 }
