@@ -1,4 +1,4 @@
-#' Removes caches 
+#' Remove caches
 #'
 #' @param caches An atomic character, indicates what caches to remove? Only
 #' `"metadata"`, `"fdadrugs"`, `"rxnorm"`, and `"athena"` can be used. If
@@ -7,7 +7,7 @@
 #' @return Path of the deleted directory invisiblely
 #' @examples
 #' faers_clearcache()
-#' @export 
+#' @export
 faers_clearcache <- function(caches = NULL, force = FALSE) {
     if (is.null(caches)) {
         paths <- faers_user_cache_dir(create = FALSE)
@@ -87,9 +87,13 @@ unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
     compress_dir
 }
 
-locate_dir <- function(path, pattern, ignore.case = TRUE) {
+locate_dir <- function(path, pattern = NULL, ignore.case = TRUE) {
     path <- list.dirs(path, recursive = FALSE)
-    path <- path[str_detect(basename(path), pattern, ignore.case = ignore.case)]
+    if (!is.null(pattern)) {
+        path <- path[
+            str_detect(basename(path), pattern, ignore.case = ignore.case)
+        ]
+    }
     if (!length(path) || !dir.exists(path)) {
         cli::cli_abort(
             "Cannot locate {.field {pattern}} directory in {.path {path}}",
@@ -99,11 +103,13 @@ locate_dir <- function(path, pattern, ignore.case = TRUE) {
     path
 }
 
-locate_files <- function(path, pattern, ignore.case = TRUE) {
+locate_files <- function(path, pattern = NULL, ignore.case = TRUE) {
     files <- list.files(path, full.names = TRUE)
-    files <- files[
-        str_detect(basename(files), pattern, ignore.case = ignore.case)
-    ]
+    if (!is.null(pattern)) {
+        files <- files[
+            str_detect(basename(files), pattern, ignore.case = ignore.case)
+        ]
+    }
     if (!length(files)) {
         cli::cli_abort(
             "Cannot locate {.field {pattern}} file in {.path {path}}",

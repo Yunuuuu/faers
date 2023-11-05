@@ -87,7 +87,7 @@ parse_ascii <- function(path, year, quarter) {
 read_ascii_deleted_cases <- function(path, year, quarter) {
     # As of 2019 Quarter one there is a new text file that lists deleted files
     if (!is_before_period(year, quarter, 2018L, "q4")) {
-        deleted_cases_files <- locate_files(locate_dir(path, "^deleted$"), NULL)
+        deleted_cases_files <- locate_files(locate_dir(path, "^deleted$"))
         deleted_cases <- lapply(deleted_cases_files, function(file) {
             data.table::fread(
                 file = file,

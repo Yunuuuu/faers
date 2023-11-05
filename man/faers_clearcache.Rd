@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils-file.R
 \name{faers_clearcache}
 \alias{faers_clearcache}
-\title{Removes caches}
+\title{Remove caches}
 \usage{
 faers_clearcache(caches = NULL, force = FALSE)
 }
@@ -18,7 +18,7 @@ faers_clearcache(caches = NULL, force = FALSE)
 Path of the deleted directory invisiblely
 }
 \description{
-Removes caches
+Remove caches
 }
 \examples{
 faers_clearcache()
