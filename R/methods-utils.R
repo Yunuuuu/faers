@@ -63,7 +63,7 @@ methods::setMethod("faers_get", "FAERSascii", function(object, field) {
         out[, names(object@meddra@hierarchy) :=
             object@meddra@hierarchy[.__idx__.]]
     }
-    out
+    out[] # in case of not printing
 })
 
 #######################################################
@@ -91,7 +91,7 @@ methods::setMethod("faers_mget", "FAERSascii", function(object, fields) {
                 object@meddra@hierarchy[.__idx__.]]
         }
     }
-    out
+    out[] # in case of not printing
 })
 utils::globalVariables(c("meddra_hierarchy_idx"))
 
