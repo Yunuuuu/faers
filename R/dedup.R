@@ -171,7 +171,23 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
         order = c(-1L, -1L, -1L, -1L, 1L, -1L)
     )
     out <- unique(out, by = "caseid")
-
+    # test code
+    # Following codes are based on
+    # https://stackoverflow.com/questions/69366291/copy-only-one-variable-from-one-r-data-table-to-another-after-matching-on-a-vari 
+    # which should be memory efficient
+    # a <- data.table::data.table(
+    #     id = rep(letters[1:2], 5),
+    #     var1 = rnorm(10)
+    # )
+    # b <- data.table::data.table(
+    #     id = letters,
+    #     var2 = rnorm(length(letters))
+    # )
+    # b[a[, paste0(var1, collapse = "/"), by = "id"],
+    #     var1 := V1,
+    #     on = "id"
+    # ]
+    # b
     # collapse all used drugs, indi, ther states, use it as a whole to identify
     # same cases.
     # match drug, indi, and ther data.
