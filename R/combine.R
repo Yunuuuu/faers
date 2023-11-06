@@ -24,7 +24,7 @@ faers_combine <- function(x) {
     }
     type <- NULL
     for (allowed_type in c("ascii", "xml")) {
-        if (all(isMatchedFAERS(x, allowed_type))) {
+        if (all(is_matched_faers(x, allowed_type))) {
             type <- allowed_type
         }
     }
@@ -37,24 +37,7 @@ faers_combine <- function(x) {
         return(x[[1L]])
     }
     cli::cli_alert("Combining all {l} FAERS Quarterly {type} Data files")
-    switch(type,
-        ascii = combine_faers_ascii(x),
-        xml = combine_faers_xml(x)
-    )
-}
-
-isMatchedFAERS <- function(x, type) {
-    vapply(x, methods::is, logical(1L), class2 = paste0("FAERS", type))
-}
-
-combine_faers_ascii <- function(x) {
-    out <- lapply(faers_ascii_file_fields, function(field) {
-        data.table::rbindlist(
-            lapply(x, function(obj) obj@data[[field]]),
-            fill = TRUE, use.names = TRUE
-        )
-    })
-    data.table::setattr(out, "names", faers_ascii_file_fields)
+    # combine period data
     period <- data.table(
         year = unlist(lapply(x, function(obj) obj@year),
             recursive = FALSE, use.names = FALSE
@@ -67,27 +50,45 @@ combine_faers_ascii <- function(x) {
         cli::cli_warn("Duplicated periods combined")
     }
     period <- unique(period)
+    out <- switch(type,
+        ascii = combine_faers_ascii(x),
+        xml = combine_faers_xml(x)
+    )
+    out@year <- period$year
+    out@quarter <- period$quarter
+    methods::validObject(out)
+    out
+}
+
+is_matched_faers <- function(x, type) {
+    vapply(x, methods::is, logical(1L), class2 = paste0("FAERS", type))
+}
+
+combine_faers_ascii <- function(x) {
+    data_list <- lapply(faers_ascii_file_fields, function(field) {
+        data <- data.table::rbindlist(
+            lapply(x, function(obj) obj@data[[field]]),
+            fill = TRUE, use.names = TRUE
+        )
+        # In version < 1.9.8 default was key(x).
+        unique(data, by = seq_along(data))
+    })
+    data.table::setattr(data_list, "names", faers_ascii_file_fields)
     methods::new("FAERSascii",
-        data = out,
-        year = period$year,
-        quarter = period$quarter,
+        data = data_list,
         deletedCases = unique(
             unlist(lapply(x, faers_deleted_cases), use.names = FALSE)
-        )
+        ),
+        year = 0L,
+        quarter = "q1"
     )
 }
 
 combine_faers_xml <- function(x) {
-    methods::new("FAERSxml",
-        data = data.table::rbindlist(
-            lapply(x, function(obj) obj@data),
-            fill = TRUE, use.names = TRUE
-        ),
-        year = unlist(lapply(x, function(obj) obj@year),
-            recursive = FALSE, use.names = FALSE
-        ),
-        quarter = unlist(lapply(x, function(obj) obj@quarter),
-            recursive = FALSE, use.names = FALSE
-        )
+    data <- data.table::rbindlist(
+        lapply(x, function(obj) obj@data),
+        fill = TRUE, use.names = TRUE
     )
+    data <- unique(data, by = seq_along(data))
+    methods::new("FAERSxml", data = data, year = 0L, quarter = "q1")
 }
