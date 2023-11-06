@@ -37,9 +37,22 @@ testthat::test_that("standardize FAERS ascii data works well", {
 
 testthat::test_that("de-duplicating FAERS ascii data works well", {
     testthat::expect_error(faers_dedup(data))
+    # internal don't modify data by reference and drug_seq match well
+    raw_demo <- data.table::copy(data_std$demo)
+    raw_drug <- data.table::copy(data_std$drug)
+    raw_indi <- data.table::copy(data_std$indi)
+    raw_ther <- data.table::copy(data_std$ther)
+    raw_reac <- data.table::copy(data_std$reac)
     testthat::expect_no_error(data_dedup <- faers_dedup(data_std))
     testthat::expect_true(data_dedup@deduplication)
     testthat::expect_equal(anyDuplicated(faers_primaryid(data_dedup)), 0L)
+
+
+    testthat::expect_identical(data_dedup$demo, raw_demo)
+    testthat::expect_identical(data_dedup$drug, raw_drug)
+    testthat::expect_identical(data_dedup$indi, raw_indi)
+    testthat::expect_identical(data_dedup$ther, raw_ther)
+    testthat::expect_identical(data_dedup$reac, raw_reac)
     # don't introduce absent primaryid
     testthat::expect_in(data_dedup$indi$primaryid, data_std$indi$primaryid)
     testthat::expect_in(data_dedup$ther$primaryid, data_std$ther$primaryid)

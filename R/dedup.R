@@ -143,14 +143,22 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
             data$demo[
                 order(-year, -quarter, -fda_dt, i_f_code, -event_dt)
             ],
-            by = "primaryid"
+            by = "primaryid", cols = c(
+                "year", "quarter", "caseid", "caseversion",
+                "fda_dt", "i_f_code", "age_in_years", "gender",
+                "country_code", "event_dt"
+            )
         )
     } else {
         out <- unique(
             data$demo[!caseid %in% deleted_cases][
                 order(-year, -quarter, -fda_dt, i_f_code, -event_dt)
             ],
-            by = "primaryid"
+            by = "primaryid", cols = c(
+                "year", "quarter", "caseid", "caseversion",
+                "fda_dt", "i_f_code", "age_in_years", "gender",
+                "country_code", "event_dt"
+            )
         )
     }
 
@@ -169,29 +177,45 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     # match drug, indi, and ther data.
     common_keys <- c("year", "quarter", "primaryid")
     cli::cli_alert("merging `drug`, `indi`, `ther`, and `reac` data")
-    out <- data$drug[order(drug_seq),
-        list(aligned_drugs = paste0(drugname, collapse = "/")),
-        by = common_keys
-    ][out, on = common_keys]
+    out[
+        data$drug[order(drug_seq),
+            list(aligned_drugs = paste0(drugname, collapse = "/")),
+            by = common_keys
+        ],
+        aligned_drugs := i.aligned_drugs,
+        on = common_keys
+    ]
 
     # should we remove unknown indications or just translate unknown indications
     # into NA ?
     # meddra_code: indi_pt
     # pt: 10070592 Product used for unknown indication
     # llt: 10057097 Drug use for unknown indication
-    out <- data$indi[order(indi_drug_seq, meddra_code),
-        list(aligned_indi = paste0(meddra_code, collapse = "/")),
-        by = common_keys
-    ][out, on = common_keys]
-    out <- data$ther[order(dsg_drug_seq, start_dt),
-        list(aligned_start_dt = paste0(start_dt, collapse = "/")),
-        by = common_keys
-    ][out, on = common_keys]
+    out[
+        data$indi[order(indi_drug_seq, meddra_code),
+            list(aligned_indi = paste0(meddra_code, collapse = "/")),
+            by = common_keys
+        ],
+        aligned_indi := i.aligned_indi,
+        on = common_keys
+    ]
+    out[
+        data$ther[order(dsg_drug_seq, start_dt),
+            list(aligned_start_dt = paste0(start_dt, collapse = "/")),
+            by = common_keys
+        ],
+        aligned_start_dt := i.aligned_start_dt,
+        on = common_keys
+    ]
     # meddra_code: pt
-    out <- data$reac[order(meddra_code),
-        list(aligned_reac = paste0(meddra_code, collapse = "/")),
-        by = common_keys
-    ][out, on = common_keys]
+    out[
+        data$reac[order(meddra_code),
+            list(aligned_reac = paste0(meddra_code, collapse = "/")),
+            by = common_keys
+        ],
+        aligned_reac := i.aligned_reac,
+        on = common_keys
+    ]
 
     # consider two cases to be the same if they had a complete match of the
     # eight criteria which are gender, age, reporting country, event date, start
@@ -278,5 +302,12 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
 utils::globalVariables(c(
     "drug_seq", "drugname", "indi_meddra_code", "start_dt",
     "indi_drug_seq", "dsg_drug_seq", "primaryid", "caseversion", "fda_dt", "i_f_code", "event_dt", "year", "caseid", "age_in_years_round",
-    "meddra_code"
+    "meddra_code",
+    paste0(c("", "i."), rep(
+        c(
+            "aligned_drugs", "aligned_indi", "aligned_start_dt",
+            "aligned_reac"
+        ),
+        each = 2L
+    ))
 ))
