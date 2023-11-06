@@ -57,10 +57,8 @@ methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     field <- match.arg(field, faers_ascii_file_fields)
     out <- object@data[[field]]
     if (object@standardization && any(field == c("indi", "reac"))) {
-        cbind(
-            out[, !"meddra_hierarchy_idx"],
-            object@meddra@hierarchy[out$meddra_hierarchy_idx]
-        )
+        idx <- out$meddra_hierarchy_idx
+        cbind(out[, !"meddra_hierarchy_idx"], object@meddra@hierarchy[idx])
     } else {
         out
     }
@@ -154,14 +152,14 @@ methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL
     }
     # as all data has a column primaryid, we just rename the variable to use it
     # in the data.table `i`
-    .__primaryid__. <- primaryid
+    .__primaryid__. <- as.character(primaryid)
     if (isTRUE(invert)) {
         object@data <- lapply(object@data, function(x) {
-            x[!primaryid %in% .__primaryid__.]
+            x[!.__primaryid__., on = "primaryid"]
         })
     } else {
         object@data <- lapply(object@data, function(x) {
-            x[primaryid %in% .__primaryid__.]
+            x[.__primaryid__., on = "primaryid"]
         })
     }
     object
