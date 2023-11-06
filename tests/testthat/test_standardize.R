@@ -5,11 +5,19 @@ data <- faers(c(2004, 2017),
     dir = internal_file("extdata"),
     compress_dir = tempdir()
 )
-data_std <- faers_standardize(data, "~/Data/MedDRA/MedDRA_26_1_English",
-    add_smq = TRUE
-)
 
 testthat::test_that("standardize FAERS ascii data works well", {
+    # internal don't modify data by reference
+    raw_indi <- data.table::copy(data$indi)
+    raw_reac <- data.table::copy(data$reac)
+    testthat::expect_no_error(data_std <- faers_standardize(data,
+        "~/Data/MedDRA/MedDRA_26_1_English",
+        add_smq = TRUE
+    ))
+    testthat::expect_identical(data$indi, raw_indi)
+    testthat::expect_identical(data$reac, raw_reac)
+
+    # other details works as expected
     testthat::expect_true(data_std@standardization)
     testthat::expect_s4_class(data_std@meddra, "MedDRA")
     testthat::expect_s4_class(faers_meddra(data_std), "MedDRA")
@@ -35,36 +43,31 @@ testthat::test_that("standardize FAERS ascii data works well", {
     ))
 })
 
-testthat::test_that("de-duplicating FAERS ascii data works well", {
-    testthat::expect_error(faers_dedup(data))
-    # internal don't modify data by reference and drug_seq match well
+data_std <- faers_standardize(data,
+    "~/Data/MedDRA/MedDRA_26_1_English", # nolint
+    add_smq = TRUE
+)
+
+testthat::test_that("`faers_get` for standardizated data works well", {
+    hierarchy_cols <- names(data_std@meddra@hierarchy)
+    # internal don't modify data by reference
     raw_demo <- data.table::copy(data_std$demo)
     raw_drug <- data.table::copy(data_std$drug)
     raw_indi <- data.table::copy(data_std$indi)
     raw_ther <- data.table::copy(data_std$ther)
     raw_reac <- data.table::copy(data_std$reac)
-    testthat::expect_no_error(data_dedup <- faers_dedup(data_std))
-    testthat::expect_true(data_dedup@deduplication)
-    testthat::expect_equal(anyDuplicated(faers_primaryid(data_dedup)), 0L)
+    faers_get(data_std, "demo")
+    testthat::expect_identical(data_std$demo, raw_demo)
+    faers_get(data_std, "indi")
+    testthat::expect_identical(data_std$indi, raw_indi)
+    faers_get(data_std, "ther")
+    testthat::expect_identical(data_std$ther, raw_ther)
+    faers_get(data_std, "drug")
+    testthat::expect_identical(data_std$drug, raw_drug)
+    faers_get(data_std, "reac")
+    testthat::expect_identical(data_std$reac, raw_reac)
 
-
-    testthat::expect_identical(data_dedup$demo, raw_demo)
-    testthat::expect_identical(data_dedup$drug, raw_drug)
-    testthat::expect_identical(data_dedup$indi, raw_indi)
-    testthat::expect_identical(data_dedup$ther, raw_ther)
-    testthat::expect_identical(data_dedup$reac, raw_reac)
-    # don't introduce absent primaryid
-    testthat::expect_in(data_dedup$indi$primaryid, data_std$indi$primaryid)
-    testthat::expect_in(data_dedup$ther$primaryid, data_std$ther$primaryid)
-    testthat::expect_in(data_dedup$drug$primaryid, data_std$drug$primaryid)
-    testthat::expect_in(data_dedup$demo$primaryid, data_std$demo$primaryid)
-    testthat::expect_in(data_dedup$reac$primaryid, data_std$reac$primaryid)
-    testthat::expect_in(data_dedup$rpsr$primaryid, data_std$rpsr$primaryid)
-    testthat::expect_in(data_dedup$outc$primaryid, data_std$outc$primaryid)
-})
-
-testthat::test_that("`faers_get` for standardizated data works well", {
-    hierarchy_cols <- names(data_std@meddra@hierarchy)
+    # other details works as expected
     testthat::expect_s3_class(faers_get(data_std, "indi"), "data.table")
     testthat::expect_s3_class(faers_get(data_std, "reac"), "data.table")
     testthat::expect_false(anyNA(faers_get(data_std, "indi")$meddra_pt))
@@ -81,6 +84,24 @@ testthat::test_that("`faers_get` for standardizated data works well", {
 
 testthat::test_that("`faers_mget` for standardizated data works well", {
     hierarchy_cols <- names(data_std@meddra@hierarchy)
+    # internal don't modify data by reference and drug_seq match well
+    raw_demo <- data.table::copy(data_std$demo)
+    raw_drug <- data.table::copy(data_std$drug)
+    raw_indi <- data.table::copy(data_std$indi)
+    raw_ther <- data.table::copy(data_std$ther)
+    raw_reac <- data.table::copy(data_std$reac)
+    faers_mget(data_std, "demo")
+    testthat::expect_identical(data_std$demo, raw_demo)
+    faers_mget(data_std, "indi")
+    testthat::expect_identical(data_std$indi, raw_indi)
+    faers_mget(data_std, "ther")
+    testthat::expect_identical(data_std$ther, raw_ther)
+    faers_mget(data_std, "drug")
+    testthat::expect_identical(data_std$drug, raw_drug)
+    faers_mget(data_std, "reac")
+    testthat::expect_identical(data_std$reac, raw_reac)
+
+    # other details
     data_list <- faers_mget(data_std, c("indi", "reac", "demo", "drug"))
     testthat::expect_true(is.list(data_list))
     testthat::expect_true(all(
@@ -135,6 +156,34 @@ testthat::test_that("`[` for standardizated data works well", {
     lapply(data_list, function(x) {
         testthat::expect_s3_class(x, "data.table")
     })
+})
+
+testthat::test_that("de-duplicating FAERS ascii data works well", {
+    testthat::expect_error(faers_dedup(data))
+    # internal don't modify data by reference and drug_seq match well
+    raw_demo <- data.table::copy(data_std$demo)
+    raw_drug <- data.table::copy(data_std$drug)
+    raw_indi <- data.table::copy(data_std$indi)
+    raw_ther <- data.table::copy(data_std$ther)
+    raw_reac <- data.table::copy(data_std$reac)
+    testthat::expect_no_error(data_dedup <- faers_dedup(data_std))
+    testthat::expect_true(data_dedup@deduplication)
+    testthat::expect_equal(anyDuplicated(faers_primaryid(data_dedup)), 0L)
+
+
+    testthat::expect_identical(data_dedup$demo, raw_demo)
+    testthat::expect_identical(data_dedup$drug, raw_drug)
+    testthat::expect_identical(data_dedup$indi, raw_indi)
+    testthat::expect_identical(data_dedup$ther, raw_ther)
+    testthat::expect_identical(data_dedup$reac, raw_reac)
+    # don't introduce absent primaryid
+    testthat::expect_in(data_dedup$indi$primaryid, data_std$indi$primaryid)
+    testthat::expect_in(data_dedup$ther$primaryid, data_std$ther$primaryid)
+    testthat::expect_in(data_dedup$drug$primaryid, data_std$drug$primaryid)
+    testthat::expect_in(data_dedup$demo$primaryid, data_std$demo$primaryid)
+    testthat::expect_in(data_dedup$reac$primaryid, data_std$reac$primaryid)
+    testthat::expect_in(data_dedup$rpsr$primaryid, data_std$rpsr$primaryid)
+    testthat::expect_in(data_dedup$outc$primaryid, data_std$outc$primaryid)
 })
 
 testthat::test_that("`faers_merge` for standardizated data works well", {

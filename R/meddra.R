@@ -35,7 +35,10 @@ meddra_data <- function(path, add_smq = FALSE) {
     version <- meddra_load_version(path)
     if (add_smq) {
         smq_data <- meddra_load_smq(path)
-        term_and_smq <- unique(smq_data[, c("smq_code", "term_code")])
+        term_and_smq <- unique(smq_data,
+            by = c("smq_code", "term_code"),
+            cols = character()
+        )
         smq_code <- term_and_smq$smq_code[
             meddra_hierarchy_match(
                 hierarchy,

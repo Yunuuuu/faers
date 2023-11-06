@@ -31,23 +31,20 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
     # fix error: when load a saved FAERS object, don't change by reference
     cli::cli_alert("standardize {.field Preferred Term} in indi")
-    object@data$indi$cleaned_pt <- clean_indi_pt(
-        object@data$indi$indi_pt, meddra@hierarchy
-    )
-    object@data$indi <- cbind(
-        object@data$indi,
-        meddra_standardize_pt(object@data$indi$cleaned_pt, meddra@hierarchy)
-    )
-    object@data$indi[, cleaned_pt := NULL]
+    object@data$indi <- dt_shallow(object@data$indi)
+
+    meddra_cols <- c("meddra_hierarchy_idx", "meddra_hierarchy_from", "meddra_code", "meddra_pt")
+    object@data$indi[, (meddra_cols) := meddra_standardize_pt(
+        clean_indi_pt(indi_pt, meddra@hierarchy), # nolint
+        meddra@hierarchy
+    )]
+
     cli::cli_alert("standardize {.field Preferred Term} in reac")
-    object@data$reac$cleaned_pt <- clean_reac_pt(
-        object@data$reac$pt, meddra@hierarchy
-    )
-    object@data$reac <- cbind(
-        object@data$reac,
-        meddra_standardize_pt(object@data$reac$cleaned_pt, meddra@hierarchy)
-    )
-    object@data$reac[, cleaned_pt := NULL]
+    object@data$reac <- dt_shallow(object@data$reac)
+    object@data$reac[, (meddra_cols) := meddra_standardize_pt(
+        clean_reac_pt(pt, meddra@hierarchy), # nolint
+        meddra@hierarchy
+    )]
     object@meddra <- meddra
     object@standardization <- TRUE
     object
@@ -219,4 +216,4 @@ faers_standardize_drug <- function(terms, athena = NULL, force = FALSE, exact = 
     athena_standardize_drug(terms = terms, path = athena, force = force)
 }
 
-utils::globalVariables(c("cleaned_pt"))
+utils::globalVariables(c("cleaned_pt", "indi_pt", "pt"))

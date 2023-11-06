@@ -57,11 +57,13 @@ methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     field <- match.arg(field, faers_ascii_file_fields)
     out <- object@data[[field]]
     if (object@standardization && any(field == c("indi", "reac"))) {
-        idx <- out$meddra_hierarchy_idx
-        cbind(out[, !"meddra_hierarchy_idx"], object@meddra@hierarchy[idx])
-    } else {
-        out
+        .__idx__. <- out$meddra_hierarchy_idx
+        out <- dt_shallow(out)
+        out[, meddra_hierarchy_idx := NULL]
+        out[, names(object@meddra@hierarchy) :=
+            object@meddra@hierarchy[.__idx__.]]
     }
+    out
 })
 
 #######################################################
@@ -82,15 +84,16 @@ methods::setMethod("faers_mget", "FAERSascii", function(object, fields) {
     if (object@standardization) {
         ii <- intersect(names(out), c("indi", "reac"))
         for (i in ii) {
-            meddra_hierarchy_idx <- out[[i]]$meddra_hierarchy_idx
-            out[[i]] <- cbind(
-                out[[i]][, !"meddra_hierarchy_idx"],
-                object@meddra@hierarchy[meddra_hierarchy_idx]
-            )
+            .__idx__. <- out[[i]]$meddra_hierarchy_idx
+            out[[i]] <- dt_shallow(out[[i]])
+            out[[i]][, meddra_hierarchy_idx := NULL]
+            out[[i]][, names(object@meddra@hierarchy) :=
+                object@meddra@hierarchy[.__idx__.]]
         }
     }
     out
 })
+utils::globalVariables(c("meddra_hierarchy_idx"))
 
 #######################################################
 #' @export

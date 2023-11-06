@@ -69,15 +69,13 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, fields = NULL, 
     if (sum(fields %in% c("indi", "ther", "drug")) >= 2L) {
         if (any(fields == "indi")) {
             if (indi_reference) {
-                lst$indi$drug_seq <- lst$indi$indi_drug_seq
-                lst$indi$indi_drug_seq <- NULL
-            } else {
-                data.table::setnames(lst$indi, "indi_drug_seq", "drug_seq")
+                lst$indi <- dt_shallow(lst$indi)
             }
+            data.table::setnames(lst$indi, "indi_drug_seq", "drug_seq")
         }
         if (any(fields == "ther")) {
-            lst$ther$drug_seq <- lst$ther$dsg_drug_seq
-            lst$ther$dsg_drug_seq <- NULL
+            lst$ther <- dt_shallow(lst$ther)
+            data.table::setnames(lst$ther, "dsg_drug_seq", "drug_seq")
         }
     }
     Reduce(function(x, y) {

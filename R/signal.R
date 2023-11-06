@@ -170,8 +170,9 @@ methods::setGeneric("faers_phv_signal", function(object, ...) {
 methods::setMethod("faers_phv_signal", "FAERSascii", function(object, ..., phv_signal_params = list()) {
     assert_(phv_signal_params, is.list, "a list")
     out <- faers_phv_table(object, ...)
-    cbind(out, do.call(
+    .__signal__. <- do.call(
         phv_signal,
-        c(out[, .SD, .SDcols = c("a", "b", "c", "d")], phv_signal_params)
-    ))
+        c(out[, c("a", "b", "c", "d")], phv_signal_params)
+    )
+    out[, names(.__signal__.) := .__signal__.][]
 })

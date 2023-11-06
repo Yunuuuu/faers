@@ -4,6 +4,11 @@ pkg_nm <- function() {
     utils::packageName(topenv(environment()))
 }
 
+# https://github.com/Rdatatable/data.table/issues/3214#issuecomment-462490046
+dt_shallow <- function(x) {
+    x[TRUE]
+}
+
 assert_internet <- function(call = rlang::caller_env()) {
     if (!curl::has_internet()) {
         cli::cli_abort("No internet", call = call)
