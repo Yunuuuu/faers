@@ -134,29 +134,33 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     # one, we remove `deleted_cases` firstly if it exist
 
     # we don't use `setorderv` as it will change data by reference
+    # 1. fda_dt: Date FDA received Case. In subsequent versions of a case, the
+    #    latest manufacturer received date will be provided (YYYYMMDD format)
+    # 2. i_f_code: I Initial; F Follow-up. latest should be "F". "F" < "I"
+    # 3. event_dt: Date the adverse event occurred or began
     if (is.null(deleted_cases)) {
         out <- unique(
             data$demo[
-                order(-year, -quarter, -fda_dt, -i_f_code, -event_dt)
+                order(-year, -quarter, -fda_dt, i_f_code, -event_dt)
             ],
             by = "primaryid"
         )
     } else {
         out <- unique(
             data$demo[!caseid %in% deleted_cases][
-                order(-year, -quarter, -fda_dt, -i_f_code, -event_dt)
+                order(-year, -quarter, -fda_dt, i_f_code, -event_dt)
             ],
             by = "primaryid"
         )
     }
 
-    # then we keep the latest informations for the patients
+    # then we keep the `latest` informations for the patients
     # Such as caseid "11232882" in 2017q2 2019q2, 2019q3
     data.table::setorderv(out,
         cols = c(
             "year", "quarter", "caseversion", "fda_dt", "i_f_code", "event_dt"
         ),
-        order = -1L
+        order = c(-1L, -1L, -1L, -1L, 1L, -1L)
     )
     out <- unique(out, by = "caseid")
 
@@ -216,12 +220,46 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
         }
         x
     }), .SDcols = all_columns]
+    # bench results:
+    # dt <- data.table::as.data.table(mtcars)
+    # dt2 <- data.table::as.data.table(mtcars)
+    # dt3 <- data.table::as.data.table(mtcars)
+    # keyed_dt <- data.table::as.data.table(mtcars)
+    # data.table::setkeyv(keyed_dt, c("vs", "am"))
+    # keyed_dt2 <- data.table::as.data.table(mtcars)
+    # data.table::setkeyv(keyed_dt2, c("vs", "am"))
+    # bench::mark(
+    #   unique = unique(dt[order(-mpg, -gear)], by = "cyl"),
+    #   unique2 = {
+    #     data.table::setorderv(dt2, c("mpg", "gear"), order = -1L)
+    #     unique(dt2, by = "cyl")
+    #   },
+    #   unique3 = {
+    #     data.table::setkeyv(dt3, c("mpg", "gear"))
+    #     unique(dt3, fromLast = TRUE, by = "cyl")
+    #   },
+    #   unique4 = unique(keyed_dt[order(-mpg, -gear)], by = "cyl"),
+    #   unique5 = {
+    #     data.table::setorderv(keyed_dt2, c("mpg", "gear"), order = -1L)
+    #     unique(keyed_dt2, by = "cyl")
+    #   },
+    #   unique5 = dt[order(-mpg, -gear), unique(.SD, by = "cyl")],
+    #   iterations = 100L, check = data.table::fsetequal
+    # )
+    # A tibble: 6 × 13
+    #   expression      min  median `itr/sec` mem_alloc `gc/sec` n_itr
+    #   <bch:expr> <bch:tm> <bch:t>     <dbl> <bch:byt>    <dbl> <int>
+    # 1 unique       74.1µs    81µs    11974.    36.1KB      0     100
+    # 2 unique2      31.1µs  33.7µs    28466.    16.3KB      0     100
+    # 3 unique3      21.1µs  23.9µs    39440.    16.3KB      0     100
+    # 4 unique4      71.7µs  76.9µs    11943.    36.1KB    121.     99
+    # 5 unique5      29.3µs  30.8µs    30956.    16.6KB      0     100
+    # 6 unique5     191.8µs 203.7µs     4704.    52.6KB     47.5    99
+
     for (i in seq_along(can_be_ignored_columns)) {
-        data.table::setorderv(out,
-            cols = c("year", "quarter", "primaryid"),
-            order = -1L
-        )
+        data.table::setkeyv(out, cols = common_keys)
         out <- unique(out,
+            fromLast = TRUE,
             by = c(must_matched_columns, can_be_ignored_columns[-i])
         )
     }
@@ -239,6 +277,6 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
 
 utils::globalVariables(c(
     "drug_seq", "drugname", "indi_meddra_code", "start_dt",
-    "indi_drug_seq", "dsg_drug_seq", "primaryid", "caseversion", "fda_dt", "i_f_code", "event_dt", "year", "caseid", "age_in_years_round", 
+    "indi_drug_seq", "dsg_drug_seq", "primaryid", "caseversion", "fda_dt", "i_f_code", "event_dt", "year", "caseid", "age_in_years_round",
     "meddra_code"
 ))
