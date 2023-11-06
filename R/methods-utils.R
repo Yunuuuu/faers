@@ -162,7 +162,7 @@ methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL
         })
     } else {
         object@data <- lapply(object@data, function(x) {
-            x[.__primaryid__., on = "primaryid"]
+            x[.__primaryid__., on = "primaryid", nomatch = NULL]
         })
     }
     object
