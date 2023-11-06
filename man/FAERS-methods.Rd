@@ -41,7 +41,7 @@ faers_keep(object, ...)
 
 faers_filter(object, ...)
 
-\S4method{faers_filter}{FAERSascii}(object, .fn, ..., field = NULL)
+\S4method{faers_filter}{FAERSascii}(object, .fn, ..., field = NULL, invert = FALSE)
 }
 \arguments{
 \item{object}{A \link{FAERSascii} object.}
@@ -65,9 +65,11 @@ okay to use integer indices.}
 \item{primaryid}{An atomic character or integer specifies the reports to
 keep. If \code{NULL}, will do nothing.}
 
-\item{invert}{A bool. If \code{TRUE}, will keep reports no in \code{primaryid}.}
+\item{invert}{A bool. If \code{TRUE}, will keep reports not in \code{primaryid}.}
 
-\item{.fn}{A function or formula.
+\item{.fn}{A function or formula, accept the field data as the input and
+return an atomic integer or character of \code{primaryid} you want to keep or
+remove based on argument \code{invert}.
 
 If a \strong{function}, it is used as is.
 

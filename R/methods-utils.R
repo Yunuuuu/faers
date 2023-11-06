@@ -143,7 +143,7 @@ methods::setGeneric("faers_keep", function(object, ...) {
 #' @export
 #' @param primaryid An atomic character or integer specifies the reports to
 #' keep. If `NULL`, will do nothing.
-#' @param invert A bool. If `TRUE`, will keep reports no in `primaryid`.
+#' @param invert A bool. If `TRUE`, will keep reports not in `primaryid`.
 #' @method faers_keep FAERSascii
 #' @rdname FAERS-methods
 methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL, invert = FALSE) {
@@ -172,7 +172,9 @@ methods::setGeneric("faers_filter", function(object, ...) {
     methods::makeStandardGeneric("faers_filter")
 })
 
-#' @param .fn A function or formula.
+#' @param .fn A function or formula, accept the field data as the input and
+#' return an atomic integer or character of `primaryid` you want to keep or
+#' remove based on argument `invert`.
 #'
 #'   If a **function**, it is used as is.
 #'
@@ -185,7 +187,7 @@ methods::setGeneric("faers_filter", function(object, ...) {
 #' @export
 #' @method faers_filter FAERSascii
 #' @rdname FAERS-methods
-methods::setMethod("faers_filter", "FAERSascii", function(object, .fn, ..., field = NULL) {
+methods::setMethod("faers_filter", "FAERSascii", function(object, .fn, ..., field = NULL, invert = FALSE) {
     if (is.null(field)) {
         data <- object
     } else {
@@ -195,7 +197,7 @@ methods::setMethod("faers_filter", "FAERSascii", function(object, .fn, ..., fiel
     if (!(is.numeric(ids) || is.character(ids))) {
         cli::cli_abort("{.arg .fn} must return an atomic integer or character")
     }
-    faers_keep(object, primaryid = ids)
+    faers_keep(object, primaryid = ids, invert = invert)
 })
 
 #########################################################
