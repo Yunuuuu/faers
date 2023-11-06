@@ -151,7 +151,7 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
         )
     } else {
         out <- unique(
-            data$demo[!caseid %in% deleted_cases][
+            data$demo[!deleted_cases, on = "caseid"][
                 order(-year, -quarter, -fda_dt, i_f_code, -event_dt)
             ],
             by = "primaryid", cols = c(
