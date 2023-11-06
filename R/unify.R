@@ -1,4 +1,5 @@
 #' Used in internal function, unify data
+#' @return Always change their input by reference
 #' @noRd
 unify_ascii <- function(data, field, year, quarter) {
     data.table::setnames(data, tolower)
@@ -17,7 +18,6 @@ unify_ascii <- function(data, field, year, quarter) {
     )
     data[, c("year", "quarter") := list(year, quarter)]
     data.table::setcolorder(data, c("year", "quarter"))
-    data[!is.na(primaryid)]
 }
 
 unify_ascii_demo <- function(data, year, quarter) {
