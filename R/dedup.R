@@ -34,7 +34,7 @@ methods::setMethod("faers_dedup", "FAERSascii", function(object, remove_deleted_
     }
     if (isTRUE(remove_deleted_cases)) {
         deleted_cases <- faers_deleted_cases(object)
-        if (length(deleted_cases)) {
+        if (!length(deleted_cases)) {
             deleted_cases <- NULL
         }
     } else {
@@ -173,7 +173,7 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     out <- unique(out, by = "caseid")
     # test code
     # Following codes are based on
-    # https://stackoverflow.com/questions/69366291/copy-only-one-variable-from-one-r-data-table-to-another-after-matching-on-a-vari 
+    # https://stackoverflow.com/questions/69366291/copy-only-one-variable-from-one-r-data-table-to-another-after-matching-on-a-vari
     # which should be memory efficient
     # a <- data.table::data.table(
     #     id = rep(letters[1:2], 5),
