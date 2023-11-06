@@ -45,47 +45,45 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, fields = NULL, 
     lst <- faers_mget(object, fields = fields)
     # indi_reference: check if we need copy indi
     # to prevent modify in place (change the input object)
-    if (object@standardization && all(c("indi", "reac") %in% fields)) {
-        hierarchy_columns <- c(
-            meddra_columns(meddra_hierarchy_fields),
-            "meddra_hierarchy_from", "meddra_code", "meddra_pt"
-        )
-        lst$indi <- data.table::copy(lst$indi)
+    if (object@standardization) {
         indi_reference <- FALSE
-        data.table::setnames(
-            lst$indi, hierarchy_columns,
-            function(x) paste("indi", x, sep = "_"),
-            skip_absent = TRUE
-        )
-        lst$reac <- data.table::copy(lst$reac)
-        data.table::setnames(
-            lst$reac, hierarchy_columns,
-            function(x) paste("reac", x, sep = "_"),
-            skip_absent = TRUE
-        )
+        if (all(c("indi", "reac") %in% fields)) {
+            hierarchy_columns <- c(
+                meddra_columns(meddra_hierarchy_fields),
+                "meddra_hierarchy_from", "meddra_code", "meddra_pt"
+            )
+            data.table::setnames(
+                lst$indi, hierarchy_columns,
+                function(x) paste("indi", x, sep = "_")
+            )
+            data.table::setnames(
+                lst$reac, hierarchy_columns,
+                function(x) paste("reac", x, sep = "_")
+            )
+        }
     } else {
         indi_reference <- TRUE
     }
 
-    # check if drug_seq should be matched
+    # check if `drug_seq` should be matched
     if (sum(fields %in% c("indi", "ther", "drug")) >= 2L) {
         if (any(fields == "indi")) {
-            if (indi_reference) lst$indi <- data.table::copy(lst$indi)
-            data.table::setnames(lst$indi, "indi_drug_seq", "drug_seq")
+            if (indi_reference) {
+                lst$indi$drug_seq <- lst$indi$indi_drug_seq
+                lst$indi$indi_drug_seq <- NULL
+            } else {
+                data.table::setnames(lst$indi, "indi_drug_seq", "drug_seq")
+            }
         }
         if (any(fields == "ther")) {
-            lst$ther <- data.table::copy(lst$ther)
-            data.table::setnames(lst$ther, "dsg_drug_seq", "drug_seq")
+            lst$ther$drug_seq <- lst$ther$dsg_drug_seq
+            lst$ther$dsg_drug_seq <- NULL
         }
     }
-
     Reduce(function(x, y) {
         if (has_name(y, "caseid") && has_name(x, "caseid")) {
-            y <- y[, .SD, .SDcols = !"caseid"]
+            y <- y[, !"caseid"]
         }
-        # y[x, on = intersect(names(x), names(y)),
-        #     allow.cartesian = TRUE
-        # ]
         merge(x, y,
             by = intersect(names(x), names(y)),
             allow.cartesian = TRUE, sort = FALSE,

@@ -4,6 +4,10 @@ testthat::test_that("`faers_merge` for FAERS ascii data works well", {
         dir = internal_file("extdata"),
         compress_dir = tempdir()
     )
+    # demo and drug
+    demo_drug <- faers_merge(data, c("demo", "drug"))
+    testthat::expect_s3_class(demo_drug, "data.table")
+
     # internal don't modify data by reference and drug_seq match well
     raw_indi <- data.table::copy(data$indi)
     raw_ther <- data.table::copy(data$ther)
