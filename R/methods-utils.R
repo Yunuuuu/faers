@@ -155,7 +155,7 @@ methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL
     }
     # as all data has a column primaryid, we just rename the variable to use it
     # in the data.table `i`
-    .__primaryid__. <- as.character(primaryid)
+    .__primaryid__. <- unique(as.character(primaryid))
     if (isTRUE(invert)) {
         object@data <- lapply(object@data, function(x) {
             x[!.__primaryid__., on = "primaryid"]

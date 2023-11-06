@@ -120,6 +120,7 @@ testthat::test_that("faers_keep works well", {
     testthat::expect_in(data2_invert$rpsr$primaryid, ids2_invert)
     testthat::expect_in(data2_invert$outc$primaryid, ids2_invert)
 
+    # for non-exist primarids
     ids3 <- "none_exist_ids"
     data3 <- faers_keep(data, ids3)
     testthat::expect_equal(nrow(data3$drug), 0L)
@@ -130,6 +131,28 @@ testthat::test_that("faers_keep works well", {
     testthat::expect_equal(nrow(data3$outc), 0L)
     data4 <- faers_keep(data, ids3, invert = TRUE)
     testthat::expect_identical(data4, data)
+
+    # for duplicated primarids
+    ids4 <- rep(ids2, 2L)
+    ids4_invert <- setdiff(faers_primaryid(data), ids4)
+    data4 <- faers_keep(data, ids4)
+    data4_invert <- faers_keep(data, ids4, invert = TRUE)
+    testthat::expect_true(anyDuplicated(data4$demo) == 0L)
+    testthat::expect_setequal(data4$demo$primaryid, ids4)
+    testthat::expect_in(data4$drug$primaryid, ids4)
+    testthat::expect_in(data4$indi$primaryid, ids4)
+    testthat::expect_in(data4$reac$primaryid, ids4)
+    testthat::expect_in(data4$ther$primaryid, ids4)
+    testthat::expect_in(data4$rpsr$primaryid, ids4)
+    testthat::expect_in(data4$outc$primaryid, ids4)
+
+    testthat::expect_setequal(data4_invert$demo$primaryid, ids4_invert)
+    testthat::expect_in(data4_invert$drug$primaryid, ids4_invert)
+    testthat::expect_in(data4_invert$indi$primaryid, ids4_invert)
+    testthat::expect_in(data4_invert$reac$primaryid, ids4_invert)
+    testthat::expect_in(data4_invert$ther$primaryid, ids4_invert)
+    testthat::expect_in(data4_invert$rpsr$primaryid, ids4_invert)
+    testthat::expect_in(data4_invert$outc$primaryid, ids4_invert)
 })
 
 testthat::test_that("faers_filter works well", {
