@@ -2,7 +2,7 @@
 #'
 #' Packed all [FAERSascii] or [FAERSxml] objects into a single [FAERSascii] or
 #' [FAERSxml] object. Note: Unique reports will not be removed.
-#' 
+#'
 #' @param ... Multiple [FAERSxml] or [FAERSascii] objects or a list containing
 #' [FAERSxml] or [FAERSascii] objects. Objects can be standardized by
 #' [faers_standardize] but cannot be de-duplicated by [faers_dedup]. If we
@@ -31,22 +31,16 @@ faers_combine <- function(...) {
         return(x[[1L]])
     }
     cli::cli_alert("Combining all {l} {.cls FAERS} Data{?s}")
-    combine_faers(x,
-        allow_duplicate_period = FALSE,
-        allow_dedup = FALSE, unique = FALSE
-    )
+    combine_faers(x)
 }
 
-combine_faers <- function(x, allow_duplicate_period, allow_dedup = FALSE, unique = allow_duplicate_period, call = rlang::caller_env()) {
+combine_faers <- function(x, call = rlang::caller_env()) {
     type <- check_faers_list_type(x, call = call)
-    is_dedup <- check_faers_deduplication(x, call = call)
-    period <- check_faers_period(x,
-        allow_duplicate = allow_duplicate_period,
-        unique = unique, call = call
-    )
+    period <- check_faers_period(x, call = call)
+    is_dedup <- check_faers_deduplication(x, allow_dedup = FALSE, call = call)
     is_stand <- check_faers_standardization(x, call = call)
     meddra <- check_faers_meddra(x, standardization = is_stand, call = call)
-    data <- combine_faers_data(x, type, unique = unique)
+    data <- combine_faers_data(x, type)
     switch(type,
         ascii = methods::new("FAERSascii",
             data = data,
@@ -66,54 +60,6 @@ combine_faers <- function(x, allow_duplicate_period, allow_dedup = FALSE, unique
     )
 }
 
-combine_faers_data <- function(x, type, unique = FALSE) {
-    switch(type,
-        ascii = combine_faers_ascii_data(x, unique = unique),
-        xml = combine_faers_xml_data(x, unique = unique)
-    )
-}
-
-combine_faers_ascii_data <- function(x, unique = FALSE) {
-    data_list <- lapply(faers_ascii_file_fields, function(field) {
-        out <- data.table::rbindlist(
-            lapply(x, function(obj) obj@data[[field]]),
-            fill = TRUE, use.names = TRUE
-        )
-        if (unique) out <- unique(out, by = seq_along(out))
-        out
-    })
-    data.table::setattr(data_list, "names", faers_ascii_file_fields)
-    data_list
-}
-
-combine_faers_xml_data <- function(x, unique = FALSE) {
-    out <- data.table::rbindlist(
-        lapply(x, function(obj) obj@data),
-        fill = TRUE, use.names = TRUE
-    )
-    if (unique) out <- unique(out, by = seq_along(out))
-    out
-}
-
-check_faers_period <- function(lst, allow_duplicate = FALSE, unique = allow_duplicate, call = rlang::caller_env()) {
-    out <- data.table(
-        year = unlist(lapply(lst, function(obj) obj@year),
-            recursive = FALSE, use.names = FALSE
-        ),
-        quarter = unlist(lapply(lst, function(obj) obj@quarter),
-            recursive = FALSE, use.names = FALSE
-        )
-    )
-    if (!allow_duplicate && anyDuplicated(out)) {
-        cli::cli_abort(c(
-            "Duplicated FAERS quarterly datas are not allowed",
-            i = "You can check {.fn faers_primaryid}"
-        ), call = call)
-    }
-    if (unique) out <- unique(out, by = seq_along(out))
-    out
-}
-
 check_faers_list_type <- function(lst, call = rlang::caller_env()) {
     type <- NULL
     for (allowed_type in c("ascii", "xml")) {
@@ -130,37 +76,22 @@ check_faers_list_type <- function(lst, call = rlang::caller_env()) {
     type
 }
 
-check_faers_meddra <- function(lst, standardization, call = rlang::caller_env()) {
-    if (!standardization) {
-        return(NULL)
-    }
-    ref <- lst[[1L]]@meddra
-    is_right <- vapply(
-        lst, function(object) identical(object@meddra, ref), logical(1L)
-    )
-    if (all(is_right)) {
-        return(ref)
-    }
-    cli::cli_abort(
-        "All elements in {.arg ...} must use the same {.cls MedDRA} data",
-        call = call
-    )
-}
-
-check_faers_standardization <- function(lst, call = rlang::caller_env()) {
-    standardization_vec <- vapply(
-        lst, function(object) object@standardization, logical(1L)
-    )
-    if (all(standardization_vec)) {
-        TRUE
-    } else if (!any(standardization_vec)) {
-        FALSE
-    } else {
-        cli::cli_abort(
-            "All elements in {.arg ...} must be either fully standardized or not at all.",
-            call = call
+check_faers_period <- function(lst, call = rlang::caller_env()) {
+    out <- data.table(
+        year = unlist(lapply(lst, function(obj) obj@year),
+            recursive = FALSE, use.names = FALSE
+        ),
+        quarter = unlist(lapply(lst, function(obj) obj@quarter),
+            recursive = FALSE, use.names = FALSE
         )
+    )
+    if (anyDuplicated(out)) {
+        cli::cli_abort(c(
+            "Duplicated FAERS quarterly datas are not allowed",
+            i = "You can check {.fn faers_primaryid}"
+        ), call = call)
     }
+    out
 }
 
 check_faers_deduplication <- function(lst, allow_dedup = FALSE, call = rlang::caller_env()) {
@@ -186,6 +117,64 @@ check_faers_deduplication <- function(lst, allow_dedup = FALSE, call = rlang::ca
         }
         cli::cli_abort(msg, call = call)
     }
+}
+
+check_faers_standardization <- function(lst, call = rlang::caller_env()) {
+    standardization_vec <- vapply(
+        lst, function(object) object@standardization, logical(1L)
+    )
+    if (all(standardization_vec)) {
+        TRUE
+    } else if (!any(standardization_vec)) {
+        FALSE
+    } else {
+        cli::cli_abort(
+            "All elements in {.arg ...} must be either fully standardized or not at all.",
+            call = call
+        )
+    }
+}
+
+combine_faers_data <- function(x, type) {
+    switch(type,
+        ascii = combine_faers_ascii_data(x),
+        xml = combine_faers_xml_data(x)
+    )
+}
+
+combine_faers_ascii_data <- function(x) {
+    data_list <- lapply(faers_ascii_file_fields, function(field) {
+        data.table::rbindlist(
+            lapply(x, function(obj) obj@data[[field]]),
+            fill = TRUE, use.names = TRUE
+        )
+    })
+    data.table::setattr(data_list, "names", faers_ascii_file_fields)
+    data_list
+}
+
+combine_faers_xml_data <- function(x) {
+    data.table::rbindlist(
+        lapply(x, function(obj) obj@data),
+        fill = TRUE, use.names = TRUE
+    )
+}
+
+check_faers_meddra <- function(lst, standardization, call = rlang::caller_env()) {
+    if (!standardization) {
+        return(NULL)
+    }
+    ref <- lst[[1L]]@meddra
+    is_right <- vapply(
+        lst, function(object) identical(object@meddra, ref), logical(1L)
+    )
+    if (all(is_right)) {
+        return(ref)
+    }
+    cli::cli_abort(
+        "All elements in {.arg ...} must use the same {.cls MedDRA} data",
+        call = call
+    )
 }
 
 is_matched_faers <- function(x, type) {
