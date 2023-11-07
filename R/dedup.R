@@ -168,7 +168,7 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
         cols = c(
             "year", "quarter", "caseversion", "fda_dt", "i_f_code", "event_dt"
         ),
-        order = c(-1L, -1L, -1L, -1L, 1L, -1L)
+        order = c(-1L, -1L, -1L, -1L, 1L, -1L), na.last = TRUE
     )
     out <- unique(out, by = "caseid")
     # test code
@@ -297,6 +297,7 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     # 6 unique5     191.8µs 203.7µs     4704.    52.6KB     47.5    99
 
     for (i in seq_along(can_be_ignored_columns)) {
+        # NAs are always first for `setkeyv`
         data.table::setkeyv(out, cols = common_keys)
         out <- unique(out,
             fromLast = TRUE,
