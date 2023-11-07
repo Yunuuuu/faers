@@ -2,13 +2,16 @@
 % Please edit documentation in R/combine.R
 \name{faers_combine}
 \alias{faers_combine}
-\title{Combine a list FAERS objects into one}
+\title{Combine FAERS objects from different Quarterly files.}
 \usage{
 faers_combine(...)
 }
 \arguments{
 \item{...}{Multiple \link{FAERSxml} or \link{FAERSascii} objects or a list containing
-\link{FAERSxml} or \link{FAERSascii} objects.}
+\link{FAERSxml} or \link{FAERSascii} objects. Objects can be standardized by
+\link{faers_standardize} but cannot be de-duplicated by \link{faers_dedup}. If we
+combine deduplicated objects from different quarterly data files, duplicate
+reports will be introduced again.}
 }
 \value{
 A \link{FAERSxml} or \link{FAERSascii} object.

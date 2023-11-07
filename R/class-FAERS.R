@@ -90,11 +90,11 @@ validate_faers <- function(object) {
         return("the period combined from `@year` and `@quarter` must be unique, you cannot import duplicated FAERS Quarterly Data file")
     }
 
-    if (length(object@standardization) != 1L) {
-        return("@standardization must be a scalar logical")
+    if (length(object@standardization) != 1L || is.na(object@standardization)) {
+        return("@standardization must be a bool, `TRUE` or `FALSE`")
     }
-    if (length(object@deduplication) != 1L) {
-        return("@deduplication must be a scalar logical")
+    if (length(object@deduplication) != 1L || is.na(object@deduplication)) {
+        return("@deduplication must be a bool, `TRUE` or `FALSE`")
     }
 
     if (!rlang::is_string(object@format, faers_file_format)) {

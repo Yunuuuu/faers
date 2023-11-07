@@ -1,9 +1,13 @@
-#' Combine a list FAERS objects into one
+#' Combine FAERS objects from different Quarterly files.
 #'
 #' Packed all [FAERSascii] or [FAERSxml] objects into a single [FAERSascii] or
 #' [FAERSxml] object. Note: Unique reports will not be removed.
+#' 
 #' @param ... Multiple [FAERSxml] or [FAERSascii] objects or a list containing
-#' [FAERSxml] or [FAERSascii] objects.
+#' [FAERSxml] or [FAERSascii] objects. Objects can be standardized by
+#' [faers_standardize] but cannot be de-duplicated by [faers_dedup]. If we
+#' combine deduplicated objects from different quarterly data files, duplicate
+#' reports will be introduced again.
 #' @return A [FAERSxml] or [FAERSascii] object.
 #' @examples
 #' # the files included in the package are sampled
@@ -20,61 +24,94 @@
 faers_combine <- function(...) {
     x <- wrap_faers(...)
     l <- length(x)
-    if (l == 0L) {
-        cli::cli_abort("empty list")
-    }
     if (l == 1L) {
+        cli::cli_alert(
+            "Nothing to do since only one {.cls FAERS} data provided"
+        )
         return(x[[1L]])
     }
-    type <- check_faers_list_type(x)
-    cli::cli_alert("Combining all {l} {.cls FAERS{type}} Data")
-    # combine period data
-    period <- data.table(
-        year = unlist(lapply(x, function(obj) obj@year),
-            recursive = FALSE, use.names = FALSE
-        ),
-        quarter = unlist(lapply(x, function(obj) obj@quarter),
-            recursive = FALSE, use.names = FALSE
-        )
+    cli::cli_alert("Combining all {l} {.cls FAERS} Data{?s}")
+    combine_faers(x,
+        allow_duplicate_period = FALSE,
+        allow_dedup = FALSE, unique = FALSE
     )
-    if (anyDuplicated(period)) {
-        cli::cli_abort("Duplicated periods combined")
-    }
-    data <- switch(type,
-        ascii = combine_faers_ascii_data(x),
-        xml = combine_faers_xml_data(x)
+}
+
+combine_faers <- function(x, allow_duplicate_period, allow_dedup = FALSE, unique = allow_duplicate_period, call = rlang::caller_env()) {
+    type <- check_faers_list_type(x, call = call)
+    is_dedup <- check_faers_deduplication(x, call = call)
+    period <- check_faers_period(x,
+        allow_duplicate = allow_duplicate_period,
+        unique = unique, call = call
     )
+    is_stand <- check_faers_standardization(x, call = call)
+    meddra <- check_faers_meddra(x, standardization = is_stand, call = call)
+    data <- combine_faers_data(x, type, unique = unique)
     switch(type,
         ascii = methods::new("FAERSascii",
             data = data,
             deletedCases = unique(
                 unlist(lapply(x, faers_deleted_cases), use.names = FALSE)
             ),
-            year = period$year, quarter = period$quarter
+            year = period$year, quarter = period$quarter,
+            standardization = is_stand, deduplication = is_dedup,
+            meddra = meddra
         ),
         xml = methods::new("FAERSxml",
             data = data,
-            year = period$year, quarter = period$quarter
+            year = period$year, quarter = period$quarter,
+            standardization = is_stand, deduplication = is_dedup,
+            meddra = meddra
         )
     )
 }
 
-combine_faers_ascii_data <- function(x) {
+combine_faers_data <- function(x, type, unique = FALSE) {
+    switch(type,
+        ascii = combine_faers_ascii_data(x, unique = unique),
+        xml = combine_faers_xml_data(x, unique = unique)
+    )
+}
+
+combine_faers_ascii_data <- function(x, unique = FALSE) {
     data_list <- lapply(faers_ascii_file_fields, function(field) {
-        data.table::rbindlist(
+        out <- data.table::rbindlist(
             lapply(x, function(obj) obj@data[[field]]),
             fill = TRUE, use.names = TRUE
         )
+        if (unique) out <- unique(out, by = seq_along(out))
+        out
     })
     data.table::setattr(data_list, "names", faers_ascii_file_fields)
     data_list
 }
 
-combine_faers_xml_data <- function(x) {
-    data.table::rbindlist(
+combine_faers_xml_data <- function(x, unique = FALSE) {
+    out <- data.table::rbindlist(
         lapply(x, function(obj) obj@data),
         fill = TRUE, use.names = TRUE
     )
+    if (unique) out <- unique(out, by = seq_along(out))
+    out
+}
+
+check_faers_period <- function(lst, allow_duplicate = FALSE, unique = allow_duplicate, call = rlang::caller_env()) {
+    out <- data.table(
+        year = unlist(lapply(lst, function(obj) obj@year),
+            recursive = FALSE, use.names = FALSE
+        ),
+        quarter = unlist(lapply(lst, function(obj) obj@quarter),
+            recursive = FALSE, use.names = FALSE
+        )
+    )
+    if (!allow_duplicate && anyDuplicated(out)) {
+        cli::cli_abort(c(
+            "Duplicated FAERS quarterly datas are not allowed",
+            i = "You can check {.fn faers_primaryid}"
+        ), call = call)
+    }
+    if (unique) out <- unique(out, by = seq_along(out))
+    out
 }
 
 check_faers_list_type <- function(lst, call = rlang::caller_env()) {
@@ -93,11 +130,72 @@ check_faers_list_type <- function(lst, call = rlang::caller_env()) {
     type
 }
 
+check_faers_meddra <- function(lst, standardization, call = rlang::caller_env()) {
+    if (!standardization) {
+        return(NULL)
+    }
+    ref <- lst[[1L]]@meddra
+    is_right <- vapply(
+        lst, function(object) identical(object@meddra, ref), logical(1L)
+    )
+    if (all(is_right)) {
+        return(ref)
+    }
+    cli::cli_abort(
+        "All elements in {.arg ...} must use the same {.cls MedDRA} data",
+        call = call
+    )
+}
+
+check_faers_standardization <- function(lst, call = rlang::caller_env()) {
+    standardization_vec <- vapply(
+        lst, function(object) object@standardization, logical(1L)
+    )
+    if (all(standardization_vec)) {
+        TRUE
+    } else if (!any(standardization_vec)) {
+        FALSE
+    } else {
+        cli::cli_abort(
+            "All elements in {.arg ...} must be either fully standardized or not at all.",
+            call = call
+        )
+    }
+}
+
+check_faers_deduplication <- function(lst, allow_dedup = FALSE, call = rlang::caller_env()) {
+    dedup_vec <- vapply(lst, function(object) object@deduplication, logical(1L))
+    if (all(dedup_vec)) {
+        # If we combine deduplicated objects from different quarterly data
+        # files, duplicate reports will be introduced. Therefore, we should only
+        # combine objects without performing deduplication.
+        if (!allow_dedup) {
+            cli::cli_abort(
+                "De-duplicated data must not be combined, you should always do de-duplication as a whole",
+                call = call
+            )
+        }
+        TRUE
+    } else if (!any(dedup_vec)) {
+        FALSE
+    } else {
+        if (allow_dedup) {
+            msg <- "All elements in {.arg ...} must be either fully deduplicated or not at all."
+        } else {
+            msg <- "All elements in {.arg ...} must be fully undeduplicated."
+        }
+        cli::cli_abort(msg, call = call)
+    }
+}
+
 is_matched_faers <- function(x, type) {
     vapply(x, methods::is, logical(1L), class2 = paste0("FAERS", type))
 }
 
 wrap_faers <- function(..., call = rlang::caller_env()) {
+    if (!...length()) {
+        cli::cli_abort("empty {.arg ...}", call = call)
+    }
     if (is.list(..1)) {
         if (...length() == 1L) {
             ..1
