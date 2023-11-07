@@ -12,6 +12,12 @@ testthat::test_that("faers() function works as expected", {
         dir = internal_file("extdata"),
         compress_dir = tempdir()
     ))
+    testthat::expect_no_error(data3 <- faers(
+        rep(c(2004, 2017), each = 2L),
+        rep(c("q1", "q2"), each = 2L), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    ))
     testthat::expect_s4_class(data3, "FAERSascii")
     testthat::expect_false(data3@deduplication)
     testthat::expect_false(data3@standardization)

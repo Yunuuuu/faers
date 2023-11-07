@@ -11,6 +11,8 @@
 faers <- function(years, quarters, format = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
     format <- match.arg(format, faers_file_format)
     yq <- recycle_scalar(years = years, quarters = quarters)
+    data.table::setDT(yq)
+    yq <- unique(yq)
     faers_files <- do.call(faers_download, c(
         yq, list(format = format, dir = dir), handle_opts
     ))
