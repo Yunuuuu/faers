@@ -4,17 +4,18 @@
 \alias{faers_combine}
 \title{Combine a list FAERS objects into one}
 \usage{
-faers_combine(x)
+faers_combine(...)
 }
 \arguments{
-\item{x}{A list of \link{FAERSxml} or \link{FAERSascii} objects.}
+\item{...}{Multiple \link{FAERSxml} or \link{FAERSascii} objects or a list containing
+\link{FAERSxml} or \link{FAERSascii} objects.}
 }
 \value{
 A \link{FAERSxml} or \link{FAERSascii} object.
 }
 \description{
 Packed all \link{FAERSascii} or \link{FAERSxml} objects into a single \link{FAERSascii} or
-\link{FAERSxml} object
+\link{FAERSxml} object. Note: Unique reports will not be removed.
 }
 \examples{
 # the files included in the package are sampled
@@ -26,5 +27,5 @@ data2 <- faers_parse(
     system.file("extdata", "faers_ascii_2017q2.zip", package = "faers"),
     compress_dir = tempdir()
 )
-faers_combine(list(data1, data2))
+faers_combine(data1, data2)
 }

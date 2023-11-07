@@ -7,8 +7,10 @@ testthat::test_that("combine FAERS ojbect works as expected", {
         internal_file("extdata", "faers_ascii_2017q2.zip"),
         compress_dir = tempdir()
     )
+    testthat::expect_no_error(faers_combine(data1, data2))
     testthat::expect_no_error(data3 <- faers_combine(list(data1, data2)))
-    testthat::expect_warning(faers_combine(list(data1, data1)))
+    testthat::expect_error(faers_combine(data1, data1))
+    testthat::expect_error(faers_combine(list(data1), list(data2)))
     testthat::expect_s4_class(data3, "FAERSascii")
     testthat::expect_false(data3@deduplication)
     testthat::expect_false(data3@standardization)
