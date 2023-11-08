@@ -12,9 +12,9 @@ testthat::test_that("FAERS object and extractor works well", {
     testthat::expect_true(all(grepl("^20\\d{2}$", faers_year(data))))
     testthat::expect_true(is.character(faers_quarter(data)))
     testthat::expect_true(all(faers_quarter(data) %in% paste0("q", 1:4)))
-    testthat::expect_true(all(
-        paste0(faers_year(data), faers_quarter(data)) ==
-            faers_period(data)
+    testthat::expect_true(identical(
+        data.table(year = faers_year(data), quarter = faers_quarter(data)),
+        faers_period(data)
     ))
     testthat::expect_null(data@meddra)
     testthat::expect_null(faers_meddra(data))

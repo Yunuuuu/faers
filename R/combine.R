@@ -77,14 +77,7 @@ check_faers_list_type <- function(lst, call = rlang::caller_env()) {
 }
 
 check_faers_period <- function(lst, call = rlang::caller_env()) {
-    out <- data.table(
-        year = unlist(lapply(lst, function(obj) obj@year),
-            recursive = FALSE, use.names = FALSE
-        ),
-        quarter = unlist(lapply(lst, function(obj) obj@quarter),
-            recursive = FALSE, use.names = FALSE
-        )
-    )
+    out <- data.table::rbindlist(lapply(lst, faers_period))
     if (anyDuplicated(out)) {
         cli::cli_abort(c(
             "Duplicated FAERS quarterly datas are not allowed",

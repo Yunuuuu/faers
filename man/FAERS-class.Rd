@@ -79,8 +79,8 @@ Provide a container for FAERS Quarterly Data file
 \item \code{faers_data}: Extract the \code{data} slot.
 \item \code{faers_year}: Extract the \code{year} slot.
 \item \code{faers_quarter}: Extract the \code{quarter} slot.
-\item \code{faers_period}: Extract the \code{period} slot (just Concatenate the year and
-quarter slot).
+\item \code{faers_period}: A \link[data.table:data.table]{data.table} combine the \code{year}
+and \code{quarter} slot.
 \item \code{faers_meddra}: Extract the \code{meddra} slot. If \code{object} have never been
 standardized, always return \code{NULL}.
 \item \code{faers_deleted_cases}: Extract the \code{deletedCases} slot.

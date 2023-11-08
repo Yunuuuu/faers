@@ -18,8 +18,8 @@
 #'  - `faers_data`: Extract the `data` slot.
 #'  - `faers_year`: Extract the `year` slot.
 #'  - `faers_quarter`: Extract the `quarter` slot.
-#'  - `faers_period`: Extract the `period` slot (just Concatenate the year and
-#'    quarter slot).
+#'  - `faers_period`: A [data.table][data.table::data.table] combine the `year`
+#'    and `quarter` slot.
 #'  - `faers_meddra`: Extract the `meddra` slot. If `object` have never been
 #'    standardized, always return `NULL`.
 #'  - `faers_deleted_cases`: Extract the `deletedCases` slot.
@@ -64,18 +64,6 @@ methods::setClass(
 ## Validator for FAERS
 
 ################ utils methods ########################
-# methods::setGeneric("faers_data_period", function(object) {
-#     methods::makeStandardGeneric("faers_data_period")
-# })
-
-# methods::setMethod("faers_data_period", "FAERSxml", function(object) {
-#     faers_period(object)
-# })
-
-# methods::setMethod("faers_data_period", "FAERSascii", function(object) {
-#     object@data$demo
-# })
-
 validate_faers <- function(object) {
     if (length(object@year) != length(object@quarter)) {
         return("the length of `@year` and `@quarter` must be the same")
@@ -96,19 +84,12 @@ validate_faers <- function(object) {
     if (length(object@deduplication) != 1L || is.na(object@deduplication)) {
         return("@deduplication must be a bool, `TRUE` or `FALSE`")
     }
-
     if (!rlang::is_string(object@format, faers_file_format)) {
         return(sprintf(
             "`@format` must be a string of %s",
             oxford_comma(faers_file_format, final = "or")
         ))
     }
-    ### Also, we check if year-quarter in @data slot contain all data from
-    # @year-@quarter
-    # period <- faers_period(object)
-    # if (!setequal(period, faers_data_period(object))) {
-    #     return("`@data` must be compatible with `@year` and `@quarter`")
-    # }
     TRUE
 }
 
@@ -160,7 +141,7 @@ methods::setClass(
 #' @method show FAERS
 #' @rdname FAERS-class
 methods::setMethod("show", "FAERS", function(object) {
-    l <- length(faers_period(object))
+    l <- nrow(faers_period(object))
     msg <- sprintf(
         "FAERS data from %s Quarterly %s file%s",
         l, object@format, if (l > 1L) "s" else ""
@@ -260,7 +241,7 @@ methods::setGeneric("faers_period", function(object) {
 #' @aliases faers_period
 #' @rdname FAERS-class
 methods::setMethod("faers_period", "FAERS", function(object) {
-    paste0(object@year, object@quarter)
+    data.table(year = object@year, quarter = object@quarter)
 })
 
 #' @export
