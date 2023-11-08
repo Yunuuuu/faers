@@ -39,7 +39,12 @@ faers <- function(years, quarters, format = NULL, dir = getwd(), compress_dir = 
         list(path = faers_files, year = yq$years, quarter = yq$quarters),
         MoreArgs = list(format = format, compress_dir = compress_dir)
     )
-    faers_combine(out)
+    l <- length(out)
+    if (l == 1L) {
+        return(out[[1L]])
+    }
+    cli::cli_alert("Combining all {l} {.cls FAERS} Data{?s}")
+    combine_faers(out)
 }
 
 recycle_scalar <- function(..., length = NULL, args = NULL) {
