@@ -54,6 +54,8 @@ methods::setClass(
         format = "character"
     ),
     prototype = list(
+        year = integer(),
+        quarter = character(),
         data = NULL,
         meddra = NULL,
         deduplication = FALSE,
@@ -61,9 +63,7 @@ methods::setClass(
     )
 )
 
-## Validator for FAERS
-
-################ utils methods ########################
+################ validate method ########################
 validate_faers <- function(object) {
     if (length(object@year) != length(object@quarter)) {
         return("the length of `@year` and `@quarter` must be the same")
@@ -135,6 +135,7 @@ methods::setClass(
     contains = "FAERS"
 )
 
+################ show method ########################
 #' @param object A [FAERS] object.
 #' @importFrom methods show
 #' @export
