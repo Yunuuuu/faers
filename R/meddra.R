@@ -13,7 +13,7 @@
 #' Anaphylactic reaction).
 #' @slot version A string, the version of MedDRA.
 #' @return
-#' - `meddra_data`: A `MedDRA` object.
+#' - `meddra`: A `MedDRA` object.
 #' - `meddra_hierarchy`: Extract the `hierarchy` slot.
 #' - `meddra_smq`: Extract the `smq` slot.
 #' - `meddra_version`: Extract the `version` slot.
@@ -30,7 +30,7 @@ NULL
 #' should be added. If `TRUE`, "smq_content.asc", and "smq_list.asc" must exist.
 #' @export
 #' @rdname MedDRA-class
-meddra_data <- function(path, add_smq = FALSE) {
+meddra <- function(path, add_smq = FALSE) {
     hierarchy <- meddra_load_hierarchy(path, primary_soc = TRUE)
     version <- meddra_load_version(path)
     if (add_smq) {

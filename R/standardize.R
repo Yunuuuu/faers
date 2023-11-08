@@ -20,7 +20,7 @@ methods::setGeneric("faers_standardize", function(object, ...) {
 })
 
 #' @param meddra_path A string, define the path of MedDRA directory.
-#' @inheritParams meddra_data
+#' @inheritParams meddra
 #' @export
 #' @method faers_standardize FAERSascii
 #' @rdname faers_standardize
@@ -28,7 +28,7 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
     # standardize PT terms
     # for indi
     assert_string(meddra_path)
-    meddra <- meddra_data(meddra_path, add_smq = add_smq)
+    meddra_data <- meddra(meddra_path, add_smq = add_smq)
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
     # fix error: when load a saved FAERS object, don't change by reference
     cli::cli_alert("standardize {.field Preferred Term} in indi")
@@ -36,17 +36,17 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
 
     meddra_cols <- c("meddra_hierarchy_idx", "meddra_hierarchy_from", "meddra_code", "meddra_pt")
     object@data$indi[, (meddra_cols) := meddra_standardize_pt(
-        clean_indi_pt(indi_pt, meddra@hierarchy), # nolint
-        meddra@hierarchy
+        clean_indi_pt(indi_pt, meddra_data@hierarchy), # nolint
+        meddra_data@hierarchy
     )]
 
     cli::cli_alert("standardize {.field Preferred Term} in reac")
     object@data$reac <- dt_shallow(object@data$reac)
     object@data$reac[, (meddra_cols) := meddra_standardize_pt(
-        clean_reac_pt(pt, meddra@hierarchy), # nolint
-        meddra@hierarchy
+        clean_reac_pt(pt, meddra_data@hierarchy), # nolint
+        meddra_data@hierarchy
     )]
-    object@meddra <- meddra
+    object@meddra <- meddra_data
     object@standardization <- TRUE
     object
 })

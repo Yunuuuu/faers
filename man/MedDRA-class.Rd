@@ -4,7 +4,7 @@
 \name{MedDRA-class}
 \alias{MedDRA-class}
 \alias{MedDRA}
-\alias{meddra_data}
+\alias{meddra}
 \alias{show,MedDRA-method}
 \alias{meddra_hierarchy}
 \alias{meddra_hierarchy,MedDRA-method}
@@ -14,7 +14,7 @@
 \alias{meddra_version,MedDRA-method}
 \title{MedDRA class}
 \usage{
-meddra_data(path, add_smq = FALSE)
+meddra(path, add_smq = FALSE)
 
 \S4method{show}{MedDRA}(object)
 
@@ -42,7 +42,7 @@ should be added. If \code{TRUE}, "smq_content.asc", and "smq_list.asc" must exis
 }
 \value{
 \itemize{
-\item \code{meddra_data}: A \code{MedDRA} object.
+\item \code{meddra}: A \code{MedDRA} object.
 \item \code{meddra_hierarchy}: Extract the \code{hierarchy} slot.
 \item \code{meddra_smq}: Extract the \code{smq} slot.
 \item \code{meddra_version}: Extract the \code{version} slot.
