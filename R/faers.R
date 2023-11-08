@@ -6,7 +6,10 @@
 #' @return A [FAERSxml] or [FAERSascii] object.
 #' @examples
 #' # you must change `dir`, as the file included in the package is sampled
-#' data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
+#' data <- faers(2004, "q1",
+#'     dir = system.file("extdata", package = "faers"),
+#'     compress_dir = tempdir()
+#' )
 #' @export
 faers <- function(years, quarters, format = NULL, dir = getwd(), compress_dir = dir, handle_opts = list()) {
     format <- match.arg(format, faers_file_format)

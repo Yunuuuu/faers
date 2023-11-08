@@ -13,7 +13,10 @@
 #' @return A [data.table][data.table::data.table] object.
 #' @examples
 #' # you must change `dir`, as the file included in the package is sampled
-#' data <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
+#' data <- faers(2004, "q1",
+#'     dir = system.file("extdata", package = "faers"),
+#'     compress_dir = tempdir()
+#' )
 #' faers_merge(data, "indi") # only one field is just like faers_get()
 #' faers_merge(data, c("demo", "indi"))
 #' @export

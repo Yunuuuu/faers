@@ -39,9 +39,10 @@ will parse metadata in
 
 ``` r
 faers_meta()
-#> → Using FAERS metadata from cached
-#>   '~/.cache/faers/metadata/faers_meta_data.rds'
-#>   Snapshot time: 2023-11-05 17:10:13.921026
+#> → Reading html:
+#>   <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
+#> → Writing FAERS metadata into cached
+#>   '~/.cache/R/faers/metadata/faers_meta_data.rds'
 #>      year quarter             period
 #>     <int>  <char>             <char>
 #>  1:  2023      q3   July - September
@@ -266,6 +267,9 @@ TRUE`.
 
 ``` r
 faers_meta(internal = TRUE)
+#> → Using FAERS metadata from cached
+#>   '~/.cache/R/faers/metadata/faers_meta_data.rds'
+#>   Snapshot time: 2023-11-08 14:33:01.032028
 #>      year quarter             period
 #>     <int>  <char>             <char>
 #>  1:  2023      q3   July - September
@@ -510,8 +514,12 @@ in the following process.)
 
 ``` r
 # # you must change `dir`, as the file included in the package is sampled
-data1 <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
+data1 <- faers(2004, "q1",
+  dir = system.file("extdata", package = "faers"),
+  compress_dir = tempdir()
+)
 #> Finding 1 file already downloaded: 'aers_ascii_2004q1.zip'
+#> → Nothing to do since only one <FAERS> data provided
 data1
 #> FAERS data from 1 Quarterly ascii file
 #>   Total reports: 100 (with duplicates)
@@ -522,11 +530,12 @@ the `faers_combine()` function is judiciously employed.
 
 ``` r
 data2 <- faers(c(2004, 2017), c("q1", "q2"),
-  dir = system.file("extdata", package = "faers")
+  dir = system.file("extdata", package = "faers"),
+  compress_dir = tempdir()
 )
 #> Finding 2 files already downloaded: 'aers_ascii_2004q1.zip' and
 #> 'faers_ascii_2017q2.zip'
-#> → Combining all 2 FAERS Quarterly ascii Data files
+#> → Combining all 2 <FAERS> Datas
 data2
 #> FAERS data from 2 Quarterly ascii files
 #>   Total reports: 200 (with duplicates)
@@ -597,8 +606,11 @@ sessionInfo()
 #> [1] faers_0.99.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] compiler_4.3.1    fastmap_1.1.1     cli_3.6.1         tools_4.3.1      
-#>  [5] htmltools_0.5.5   rstudioapi_0.15.0 rappdirs_0.3.3    yaml_2.3.7       
-#>  [9] rmarkdown_2.23    data.table_1.14.9 knitr_1.43        xfun_0.39        
-#> [13] digest_0.6.33     rlang_1.1.1       evaluate_0.21
+#>  [1] digest_0.6.33     R6_2.5.1          fastmap_1.1.1     rvest_1.0.3      
+#>  [5] xfun_0.39         magrittr_2.0.3    rappdirs_0.3.3    glue_1.6.2       
+#>  [9] stringr_1.5.0     knitr_1.43        htmltools_0.5.5   rmarkdown_2.23   
+#> [13] lifecycle_1.0.3   xml2_1.3.5        cli_3.6.1         vctrs_0.6.3      
+#> [17] data.table_1.14.9 compiler_4.3.1    httr_1.4.6        rstudioapi_0.15.0
+#> [21] tools_4.3.1       curl_5.0.1        evaluate_0.21     yaml_2.3.7       
+#> [25] rlang_1.1.1       stringi_1.7.12    selectr_0.4-2
 ```

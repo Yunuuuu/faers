@@ -87,7 +87,10 @@ in the following process.)
 
 ```{r}
 # # you must change `dir`, as the file included in the package is sampled
-data1 <- faers(2004, "q1", dir = system.file("extdata", package = "faers"))
+data1 <- faers(2004, "q1",
+  dir = system.file("extdata", package = "faers"),
+  compress_dir = tempdir()
+)
 data1
 ```
 
@@ -95,7 +98,8 @@ Furthermore, in cases where multiple quarterly data files are requisite, the
 `faers_combine()` function is judiciously employed. 
 ```{r}
 data2 <- faers(c(2004, 2017), c("q1", "q2"),
-  dir = system.file("extdata", package = "faers")
+  dir = system.file("extdata", package = "faers"),
+  compress_dir = tempdir()
 )
 data2
 ```
