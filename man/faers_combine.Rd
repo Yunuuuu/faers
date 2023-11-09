@@ -18,7 +18,10 @@ A \link{FAERSxml} or \link{FAERSascii} object.
 }
 \description{
 Packed all \link{FAERSascii} or \link{FAERSxml} objects into a single \link{FAERSascii} or
-\link{FAERSxml} object. Note: Unique reports will not be removed.
+\link{FAERSxml} object. It is important to note that all data passed to these
+functions via the \code{...} argument must belong to the different \link{FAERS}
+objects, indicating that they have the different period data (as defined by
+\link{faers_period}).
 }
 \examples{
 # the files included in the package are sampled

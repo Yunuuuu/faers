@@ -1,7 +1,10 @@
 #' Combine FAERS objects from different Quarterly files.
 #'
 #' Packed all [FAERSascii] or [FAERSxml] objects into a single [FAERSascii] or
-#' [FAERSxml] object. Note: Unique reports will not be removed.
+#' [FAERSxml] object. It is important to note that all data passed to these
+#' functions via the `...` argument must belong to the different [FAERS]
+#' objects, indicating that they have the different period data (as defined by
+#' [faers_period]).
 #'
 #' @param ... Multiple [FAERSxml] or [FAERSascii] objects or a list containing
 #' [FAERSxml] or [FAERSascii] objects. Objects can be standardized by
@@ -35,11 +38,11 @@ faers_combine <- function(...) {
 }
 
 combine_faers <- function(x, call = rlang::caller_env()) {
-    type <- check_faers_list_type(x, call = call)
-    period <- check_faers_period(x, call = call)
-    is_dedup <- check_faers_deduplication(x, allow_dedup = FALSE, call = call)
-    is_stand <- check_faers_standardization(x, call = call)
-    meddra <- check_faers_meddra(x, standardization = is_stand, call = call)
+    type <- combine_faers_list_type(x, call = call)
+    period <- combine_faers_period(x, call = call)
+    is_dedup <- combine_faers_deduplication(x, call = call)
+    is_stand <- combine_faers_standardization(x, call = call)
+    meddra <- combine_faers_meddra(x, standardization = is_stand, call = call)
     data <- combine_faers_data(x, type)
     switch(type,
         ascii = methods::new("FAERSascii",
@@ -60,7 +63,7 @@ combine_faers <- function(x, call = rlang::caller_env()) {
     )
 }
 
-check_faers_list_type <- function(lst, call = rlang::caller_env()) {
+combine_faers_list_type <- function(lst, call = rlang::caller_env()) {
     type <- NULL
     for (allowed_type in c("ascii", "xml")) {
         if (all(is_matched_faers(lst, allowed_type))) {
@@ -76,7 +79,7 @@ check_faers_list_type <- function(lst, call = rlang::caller_env()) {
     type
 }
 
-check_faers_period <- function(lst, call = rlang::caller_env()) {
+combine_faers_period <- function(lst, call = rlang::caller_env()) {
     out <- data.table::rbindlist(lapply(lst, faers_period))
     if (anyDuplicated(out)) {
         cli::cli_abort(c(
@@ -87,32 +90,28 @@ check_faers_period <- function(lst, call = rlang::caller_env()) {
     out
 }
 
-check_faers_deduplication <- function(lst, allow_dedup = FALSE, call = rlang::caller_env()) {
+combine_faers_deduplication <- function(lst, call = rlang::caller_env()) {
     dedup_vec <- vapply(lst, function(object) object@deduplication, logical(1L))
     if (all(dedup_vec)) {
         # If we combine deduplicated objects from different quarterly data
         # files, duplicate reports will be introduced. Therefore, we should only
         # combine objects without performing deduplication.
-        if (!allow_dedup) {
-            cli::cli_abort(
-                "De-duplicated data must not be combined, you should always do de-duplication as a whole",
-                call = call
-            )
-        }
+        cli::cli_abort(
+            "De-duplicated data must not be combined, you should always do de-duplication as a whole",
+            call = call
+        )
         TRUE
     } else if (!any(dedup_vec)) {
         FALSE
     } else {
-        if (allow_dedup) {
-            msg <- "All elements in {.arg ...} must be either fully deduplicated or not at all."
-        } else {
-            msg <- "All elements in {.arg ...} must be fully undeduplicated."
-        }
-        cli::cli_abort(msg, call = call)
+        cli::cli_abort(
+            "All elements in {.arg ...} must be fully undeduplicated.",
+            call = call
+        )
     }
 }
 
-check_faers_standardization <- function(lst, call = rlang::caller_env()) {
+combine_faers_standardization <- function(lst, call = rlang::caller_env()) {
     standardization_vec <- vapply(
         lst, function(object) object@standardization, logical(1L)
     )
@@ -153,7 +152,7 @@ combine_faers_xml_data <- function(x) {
     )
 }
 
-check_faers_meddra <- function(lst, standardization, call = rlang::caller_env()) {
+combine_faers_meddra <- function(lst, standardization, call = rlang::caller_env()) {
     if (!standardization) {
         return(NULL)
     }
