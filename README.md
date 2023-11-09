@@ -39,10 +39,9 @@ will parse metadata in
 
 ``` r
 faers_meta()
-#> → Reading html:
-#>   <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
-#> → Writing FAERS metadata into cached
+#> → Using FAERS metadata from cached
 #>   '~/.cache/R/faers/metadata/faers_meta_data.rds'
+#>   Snapshot time: 2023-11-09 10:41:04.974943
 #>      year quarter             period
 #>     <int>  <char>             <char>
 #>  1:  2023      q3   July - September
@@ -269,7 +268,7 @@ TRUE`.
 faers_meta(internal = TRUE)
 #> → Using FAERS metadata from cached
 #>   '~/.cache/R/faers/metadata/faers_meta_data.rds'
-#>   Snapshot time: 2023-11-08 14:33:01.032028
+#>   Snapshot time: 2023-11-09 10:41:04.974943
 #>      year quarter             period
 #>     <int>  <char>             <char>
 #>  1:  2023      q3   July - September
@@ -572,10 +571,11 @@ detection, assessment, understanding and prevention of adverse effects
 or any other medicine/vaccine related problem.
 
 ``` r
-faers_phv_signal(data,
-  filter_params = list(field = "demo", .fn = function(x) {
-    sample(x$primaryid, 100L)
-  })
+# we use faers_filter() to extract data we are interested
+# here, we just sample 100 reports. You should do it based on your purpose.
+faers_phv_signal(
+  faers_filter(data, .fn = ~ sample(faers_primaryid(.x), 100L)),
+  .full = data
 )
 ```
 
@@ -606,11 +606,8 @@ sessionInfo()
 #> [1] faers_0.99.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] digest_0.6.33     R6_2.5.1          fastmap_1.1.1     rvest_1.0.3      
-#>  [5] xfun_0.39         magrittr_2.0.3    rappdirs_0.3.3    glue_1.6.2       
-#>  [9] stringr_1.5.0     knitr_1.43        htmltools_0.5.5   rmarkdown_2.23   
-#> [13] lifecycle_1.0.3   xml2_1.3.5        cli_3.6.1         vctrs_0.6.3      
-#> [17] data.table_1.14.9 compiler_4.3.1    httr_1.4.6        rstudioapi_0.15.0
-#> [21] tools_4.3.1       curl_5.0.1        evaluate_0.21     yaml_2.3.7       
-#> [25] rlang_1.1.1       stringi_1.7.12    selectr_0.4-2
+#>  [1] compiler_4.3.1    fastmap_1.1.1     cli_3.6.1         tools_4.3.1      
+#>  [5] htmltools_0.5.5   rstudioapi_0.15.0 rappdirs_0.3.3    yaml_2.3.7       
+#>  [9] rmarkdown_2.23    data.table_1.14.9 knitr_1.43        xfun_0.39        
+#> [13] digest_0.6.33     rlang_1.1.1       evaluate_0.21
 ```

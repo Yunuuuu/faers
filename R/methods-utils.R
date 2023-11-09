@@ -1,7 +1,7 @@
 #' Methods for FAERS class
 #'
 #' Utils function for [FAERSascii] class.
-#' @param object A [FAERSascii] object.
+#' @param object,.object A [FAERSascii] object.
 #' @param ... Other arguments passed to specific methods. For `faers_filter`:
 #' other arguments passed to `.fn`.
 #' @details
@@ -21,8 +21,8 @@
 #'    `quarter`, `deletedCases` will be kept as the original. So make sure you
 #'    didn't filter a whole period FAERS quarterly data, in this way, it's much
 #'    better to run [faers].
-#'  - `faers_filter`: apply a function to extract wanted `primaryid`, then use
-#'    `faers_keep` to filter.
+#'  - `faers_filter`: apply a function to extract the wanted `primaryid`, then
+#'    use `faers_keep` to keep data from these primaryids.
 #' @return See details.
 #' @examples
 #' # you must change `dir`, as the file included in the package is sampled
@@ -42,7 +42,7 @@
 #' faers_keep(data, primaryid = sample(faers_primaryid(data), 20L))
 #' faers_filter(data, .fn = function(x) {
 #'     sample(x$primaryid, 100L)
-#' }, field = "demo")
+#' }, .field = "demo")
 #' @export
 #' @rdname FAERS-methods
 methods::setGeneric("faers_get", function(object, ...) {
@@ -50,9 +50,7 @@ methods::setGeneric("faers_get", function(object, ...) {
 })
 
 #' @param field A string indicates the FAERS fields to use. Only values "demo",
-#' "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used. For
-#' `faers_filter`, this field data will be passed to `.fn` to extract primaryid;
-#' if `NULL`, the `object` will be passed to `.fn` directly.
+#' "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.
 #' @export
 #' @method faers_get FAERSascii
 #' @rdname FAERS-methods
@@ -149,7 +147,7 @@ methods::setGeneric("faers_keep", function(object, ...) {
 #' @export
 #' @param primaryid An atomic character or integer specifies the reports to
 #' keep. If `NULL`, will do nothing.
-#' @param invert A bool. If `TRUE`, will keep reports not in `primaryid`.
+#' @param invert, A bool. If `TRUE`, will keep reports not in `primaryid`.
 #' @method faers_keep FAERSascii
 #' @rdname FAERS-methods
 methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL, invert = FALSE) {
@@ -174,13 +172,13 @@ methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL
 ##############################################################
 #' @export
 #' @rdname FAERS-methods
-methods::setGeneric("faers_filter", function(object, ...) {
+methods::setGeneric("faers_filter", function(.object, ...) {
     methods::makeStandardGeneric("faers_filter")
 })
 
 #' @param .fn A function or formula, accept the field data as the input and
 #' return an atomic integer or character of `primaryid` you want to keep or
-#' remove based on argument `invert`.
+#' remove based on argument `.invert`.
 #'
 #'   If a **function**, it is used as is.
 #'
@@ -190,21 +188,29 @@ methods::setGeneric("faers_filter", function(object, ...) {
 #'   very compact anonymous functions (lambdas) with up to two inputs.
 #'
 #'   If a **string**, the function is looked up in `globalenv()`.
+#' @param .field A string indicating the FAERS data to be used as input for the
+#' `.fn` function in order to extract the primaryid. Only values "demo", "drug",
+#' "indi", "ther", "reac", "rpsr", and "outc" can be used. if `NULL`, the
+#' `.object` will be passed to `.fn` directly.
+#' @param .invert A bool. If `TRUE`, will keep reports not returned by `.fn`.
 #' @export
 #' @method faers_filter FAERSascii
 #' @rdname FAERS-methods
-methods::setMethod("faers_filter", "FAERSascii", function(object, .fn, ..., field = NULL, invert = FALSE) {
-    if (is.null(field)) {
-        data <- object
-    } else {
-        data <- faers_get(object, field = field)
+methods::setMethod(
+    "faers_filter", "FAERSascii",
+    function(.object, .fn, ..., .field = NULL, .invert = FALSE) {
+        if (is.null(.field)) {
+            data <- .object
+        } else {
+            data <- faers_get(.object, field = .field)
+        }
+        ids <- rlang::as_function(.fn)(data, ...)
+        if (!(is.numeric(ids) || is.character(ids))) {
+            cli::cli_abort("{.arg .fn} must return an atomic integer or character")
+        }
+        faers_keep(.object, primaryid = ids, invert = .invert)
     }
-    ids <- rlang::as_function(.fn)(data, ...)
-    if (!(is.numeric(ids) || is.character(ids))) {
-        cli::cli_abort("{.arg .fn} must return an atomic integer or character")
-    }
-    faers_keep(object, primaryid = ids, invert = invert)
-})
+)
 
 #########################################################
 use_indices <- function(i, names, arg = rlang::caller_arg(i), call = rlang::caller_env()) {

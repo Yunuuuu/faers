@@ -3,40 +3,24 @@
 \name{faers_phv_signal}
 \alias{faers_phv_signal}
 \alias{faers_phv_table}
-\alias{faers_phv_table,FAERSascii,missing,missing-method}
 \alias{faers_phv_table,FAERSascii,FAERSascii,missing-method}
 \alias{faers_phv_table,FAERSascii,missing,FAERSascii-method}
 \alias{faers_phv_signal,FAERSascii-method}
 \title{Create contingency table and run disproportionality analysis}
 \usage{
-faers_phv_table(object, ..., interested, object2)
+faers_phv_table(.object, ..., .full, .object2)
 
-\S4method{faers_phv_table}{FAERSascii,missing,missing}(object, ..., filter_params = list(), interested, object2)
+\S4method{faers_phv_table}{FAERSascii,FAERSascii,missing}(.object, .events = "soc_name", ..., .full, .object2)
 
-\S4method{faers_phv_table}{FAERSascii,FAERSascii,missing}(
-  object,
-  interested_field = "reac",
-  interested_event = "soc_name",
-  ...,
-  interested,
-  object2
-)
+\S4method{faers_phv_table}{FAERSascii,missing,FAERSascii}(.object, .events = "soc_name", ..., .full, .object2)
 
-\S4method{faers_phv_table}{FAERSascii,missing,FAERSascii}(
-  object,
-  interested_field = "reac",
-  interested_event = "soc_name",
-  ...,
-  interested,
-  object2
-)
+faers_phv_signal(.object, ...)
 
-faers_phv_signal(object, ...)
-
-\S4method{faers_phv_signal}{FAERSascii}(object, ..., phv_signal_params = list())
+\S4method{faers_phv_signal}{FAERSascii}(.object, .methods = NULL, ..., .phv_signal_params = list())
 }
 \arguments{
-\item{object}{A \link{FAERSascii} object.}
+\item{.object}{A \link{FAERSascii} object. The value \code{n11} or \code{a} will be
+calculated from \code{object}}
 
 \item{...}{Other arguments passed to specific methods.
 \itemize{
@@ -44,32 +28,19 @@ faers_phv_signal(object, ...)
 \item \code{faers_phv_signal}: other arguments passed to \code{faers_phv_table}.
 }}
 
-\item{interested}{A \link{FAERSascii} object, containing information pertaining to
-the relevant exposure, typically involving pharmaceutical substances, should
-constitute a subset of the overarching "object". In the event that both
-"interested" and "object2" are absent, the \link{faers_filter} function will be
-invoked to selectively procure data concerning the interested exposure from
-the "object". Subsequently, the acquired "interested" subset will be once
-again channeled into \code{faers_phv_table}. The parameters "n11" or "a" will then
-be computed based on the contents of "interested".}
+\item{.full}{A \link{FAERSascii} object with data from full data. In this way,
+\code{.object} must be a subset of \code{.full}.}
 
-\item{object2}{A \link{FAERSascii} object with data from another interested drug,
-In this way, \code{object} and \code{object2} should be not overlapped. The value \code{n11}
-or \code{a} will be calculated from \code{object}}
+\item{.object2}{A \link{FAERSascii} object with data from another interested drug,
+In this way, \code{.object} and \code{.object2} should be not overlapped.}
 
-\item{filter_params}{Other arguments passed to \link{faers_filter}, solely used
-when \code{interested} and \code{object2} are both \code{missing}}
+\item{.events}{A character specify the events column(s?) in the \code{.field} data
+to count the unique \code{primaryid}. If multiple columns were selected, the
+combination for all columns will define the interested events.}
 
-\item{interested_field}{A string indicates the interested FAERS fields to
-use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
-can be used.}
+\item{.methods}{Just an alias of \code{method} in \link{phv_signal}.}
 
-\item{interested_event}{A character specify the events column(s?) in the
-\code{interested_field} data to count the unique \code{primaryid}. If multiple columns
-were selected, the combination for all columns will define the interested
-events.}
-
-\item{phv_signal_params}{Other arguments passed to \link{phv_signal}.}
+\item{.phv_signal_params}{Other arguments passed to \link{phv_signal}.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.
@@ -80,9 +51,10 @@ Create contingency table and run disproportionality analysis
 \details{
 \itemize{
 \item \code{faers_phv_table}: build a contingency table for all events in
-\code{interested_event}.
+\code{.events}.
 \item \code{faers_phv_signal}: Pharmacovigilance Analysis used contingency table
-constructed with \code{faers_phv_table}.
+constructed with \code{faers_phv_table}. You must pass \code{.full} or \code{.object2}
+into \code{faers_phv_table}.
 }
 }
 \examples{
@@ -96,15 +68,11 @@ data <- faers(c(2004, 2017), c("q1", "q2"),
 # you should replace `meddra_path` with yours
 data <- faers_standardize(data, meddra_path)
 data <- faers_dedup(data)
-faers_phv_table(data,
-    filter_params = list(field = "demo", .fn = function(x) {
-        sample(x$primaryid, 100L)
-    })
-)
-faers_phv_signal(data,
-    filter_params = list(field = "demo", .fn = function(x) {
-        sample(x$primaryid, 100L)
-    })
+# we use faers_filter() to extract data we are interested
+# here, we just sample 100 reports. You should do it based on your purpose.
+faers_phv_signal(
+  faers_filter(data, .fn = ~ sample(faers_primaryid(.x), 100L)),
+  .full = data
 )
 }
 }

@@ -39,20 +39,18 @@ faers_keep(object, ...)
 
 \S4method{faers_keep}{FAERSascii}(object, primaryid = NULL, invert = FALSE)
 
-faers_filter(object, ...)
+faers_filter(.object, ...)
 
-\S4method{faers_filter}{FAERSascii}(object, .fn, ..., field = NULL, invert = FALSE)
+\S4method{faers_filter}{FAERSascii}(.object, .fn, ..., .field = NULL, .invert = FALSE)
 }
 \arguments{
-\item{object}{A \link{FAERSascii} object.}
+\item{object, .object}{A \link{FAERSascii} object.}
 
 \item{...}{Other arguments passed to specific methods. For \code{faers_filter}:
 other arguments passed to \code{.fn}.}
 
 \item{field}{A string indicates the FAERS fields to use. Only values "demo",
-"drug", "indi", "ther", "reac", "rpsr", and "outc" can be used. For
-\code{faers_filter}, this field data will be passed to \code{.fn} to extract primaryid;
-if \code{NULL}, the \code{object} will be passed to \code{.fn} directly.}
+"drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.}
 
 \item{fields}{A character vector specifying the fields to use. Only values
 "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.}
@@ -65,11 +63,11 @@ okay to use integer indices.}
 \item{primaryid}{An atomic character or integer specifies the reports to
 keep. If \code{NULL}, will do nothing.}
 
-\item{invert}{A bool. If \code{TRUE}, will keep reports not in \code{primaryid}.}
+\item{invert, }{A bool. If \code{TRUE}, will keep reports not in \code{primaryid}.}
 
 \item{.fn}{A function or formula, accept the field data as the input and
 return an atomic integer or character of \code{primaryid} you want to keep or
-remove based on argument \code{invert}.
+remove based on argument \code{.invert}.
 
 If a \strong{function}, it is used as is.
 
@@ -79,6 +77,13 @@ two arguments: \code{.x} (single argument) or \code{.x} and \code{.y} (two argum
 very compact anonymous functions (lambdas) with up to two inputs.
 
 If a \strong{string}, the function is looked up in \code{globalenv()}.}
+
+\item{.field}{A string indicating the FAERS data to be used as input for the
+\code{.fn} function in order to extract the primaryid. Only values "demo", "drug",
+"indi", "ther", "reac", "rpsr", and "outc" can be used. if \code{NULL}, the
+\code{.object} will be passed to \code{.fn} directly.}
+
+\item{.invert}{A bool. If \code{TRUE}, will keep reports not returned by \code{.fn}.}
 }
 \value{
 See details.
@@ -104,8 +109,8 @@ extract field data from \verb{@data} slot directly. For usual usage, just use
 \code{quarter}, \code{deletedCases} will be kept as the original. So make sure you
 didn't filter a whole period FAERS quarterly data, in this way, it's much
 better to run \link[=FAERS]{faers}.
-\item \code{faers_filter}: apply a function to extract wanted \code{primaryid}, then use
-\code{faers_keep} to filter.
+\item \code{faers_filter}: apply a function to extract the wanted \code{primaryid}, then
+use \code{faers_keep} to keep data from these primaryids.
 }
 }
 \examples{
@@ -126,5 +131,5 @@ faers_primaryid(data)
 faers_keep(data, primaryid = sample(faers_primaryid(data), 20L))
 faers_filter(data, .fn = function(x) {
     sample(x$primaryid, 100L)
-}, field = "demo")
+}, .field = "demo")
 }

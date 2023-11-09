@@ -5,34 +5,23 @@
 \alias{faers_counts,FAERSascii-method}
 \title{Counting the number of unique case for each event}
 \usage{
-faers_counts(object, ...)
+faers_counts(.object, ...)
 
-\S4method{faers_counts}{FAERSascii}(
-  object,
-  interested_field = "reac",
-  interested_event = "soc_name",
-  interested_fn = NULL,
-  ...
-)
+\S4method{faers_counts}{FAERSascii}(.object, .events = "soc_name", .fn = NULL, ..., .field = "reac")
 }
 \arguments{
-\item{object}{A \link{FAERSascii} object.}
+\item{.object}{A \link{FAERSascii} object.}
 
 \item{...}{Other arguments passed to specific methods, for \code{FAERSascii}
-method, other arguments passed to \code{interested_fn()}.}
+method, other arguments passed to \code{.fn()}.}
 
-\item{interested_field}{A string indicates the interested FAERS fields to
-use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
-can be used.}
+\item{.events}{A character specify the events column(s?) in the \code{.field} data
+to count the unique \code{primaryid}. If multiple columns were selected, the
+combination for all columns will define the interested events.}
 
-\item{interested_event}{A character specify the events column(s?) in the
-\code{interested_field} data to count the unique \code{primaryid}. If multiple columns
-were selected, the combination for all columns will define the interested
-events.}
-
-\item{interested_fn}{A function or formula defined the preprocessing function
-before creating contingency table, with the \code{interested_field} data as the
-input and return a \link[data.table:data.table]{data.table}.
+\item{.fn}{A function or formula defined the preprocessing function before
+creating contingency table, with the \code{.field} data as the input and return a
+\link[data.table:data.table]{data.table}.
 
 If a \strong{function}, it is used as is.
 
@@ -42,6 +31,10 @@ two arguments: \code{.x} (single argument) or \code{.x} and \code{.y} (two argum
 very compact anonymous functions (lambdas) with up to two inputs.
 
 If a \strong{string}, the function is looked up in \code{globalenv()}.}
+
+\item{.field}{A string indicates the interested FAERS fields to
+use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
+can be used.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.
@@ -60,11 +53,6 @@ data <- faers(c(2004, 2017), c("q1", "q2"),
 # you should replace `meddra_path` with yours
 data <- faers_standardize(data, meddra_path)
 data <- faers_dedup(data)
-faers_phv_table(data,
-    filter_params = list(field = "demo", .fn = function(x) {
-        sample(x$primaryid, 100L)
-    })
-)
 faers_counts(data)
 }
 }
