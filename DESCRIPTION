@@ -58,6 +58,7 @@ Collate:
     'phv_ebgm.R'
     'rxnorm.R'
     'sample.R'
+    'sets.R'
     'signal.R'
     'standardize.R'
     'unify.R'
