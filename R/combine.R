@@ -1,13 +1,13 @@
 #' Combine FAERS objects from different Quarterly files.
 #'
-#' Packed all [FAERSascii] or [FAERSxml] objects into a single [FAERSascii] or
-#' [FAERSxml] object. It is important to note that all data passed to these
+#' Packed all `FAERSascii` or `FAERSxml` objects into a single `FAERSascii` or
+#' `FAERSxml` object. It is important to note that all data passed to these
 #' functions via the `...` argument must belong to the different [FAERS]
 #' objects, indicating that they have the different period data (as defined by
 #' [faers_period]).
 #'
-#' @param ... Multiple [FAERSxml] or [FAERSascii] objects or a list containing
-#' [FAERSxml] or [FAERSascii] objects. Objects can be standardized by
+#' @param ... Multiple `FAERSxml` or `FAERSascii` objects or a list containing
+#' `FAERSxml` or `FAERSascii` objects. Objects can be standardized by
 #' [faers_standardize] but cannot be de-duplicated by [faers_dedup]. If we
 #' combine deduplicated objects from different quarterly data files, duplicate
 #' reports will be introduced again.
