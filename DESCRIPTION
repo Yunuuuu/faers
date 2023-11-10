@@ -49,6 +49,7 @@ Collate:
     'import-standalone-assert.R'
     'import-standalone-cli.R'
     'import-standalone-obj-type.R'
+    'load.R'
     'merge.R'
     'meta.R'
     'methods-utils.R'

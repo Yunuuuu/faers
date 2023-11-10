@@ -14,6 +14,7 @@ testthat::test_that("Parsing internal FAERS metadata works well", {
     if (file.exists(faers_meta_cache_file())) {
         file.remove(faers_meta_cache_file())
     }
+    faers_clearcache("metadata")
     testthat::expect_message(
         gds <- faers_meta(force = FALSE, internal = TRUE), "internal"
     )

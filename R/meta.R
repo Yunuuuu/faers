@@ -33,7 +33,7 @@ faers_meta_cache_read <- function(internal = FALSE) {
         # like faers_available()
     } else {
         if (internal) {
-            out <- readRDS(internal_file("extdata", "faers_meta_data.rds"))
+            out <- load_data("faers_meta_data")
             msg <- "Using internal FAERS metadata"
         } else {
             return(NULL)
