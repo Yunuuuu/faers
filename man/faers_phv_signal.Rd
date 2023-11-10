@@ -34,7 +34,7 @@ calculated from \code{object}}
 \item{.object2}{A \link{FAERSascii} object with data from another interested drug,
 In this way, \code{.object} and \code{.object2} should be not overlapped.}
 
-\item{.events}{A character specify the events column(s?) in the \code{.field} data
+\item{.events}{A character specify the events column(s) in the \code{.field} data
 to count the unique \code{primaryid}. If multiple columns were selected, the
 combination for all columns will define the interested events.}
 

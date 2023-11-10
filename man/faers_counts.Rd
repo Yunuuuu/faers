@@ -7,7 +7,14 @@
 \usage{
 faers_counts(.object, ...)
 
-\S4method{faers_counts}{FAERSascii}(.object, .events = "soc_name", .fn = NULL, ..., .field = "reac")
+\S4method{faers_counts}{FAERSascii}(
+  .object,
+  .events = "soc_name",
+  .fn = NULL,
+  ...,
+  .field = "reac",
+  .na_rm = FALSE
+)
 }
 \arguments{
 \item{.object}{A \link{FAERSascii} object.}
@@ -15,7 +22,7 @@ faers_counts(.object, ...)
 \item{...}{Other arguments passed to specific methods, for \code{FAERSascii}
 method, other arguments passed to \code{.fn()}.}
 
-\item{.events}{A character specify the events column(s?) in the \code{.field} data
+\item{.events}{A character specify the events column(s) in the \code{.field} data
 to count the unique \code{primaryid}. If multiple columns were selected, the
 combination for all columns will define the interested events.}
 
@@ -35,6 +42,9 @@ If a \strong{string}, the function is looked up in \code{globalenv()}.}
 \item{.field}{A string indicates the interested FAERS fields to
 use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
 can be used.}
+
+\item{.na_rm}{A bool, whether \code{NA} value in \code{.events} column(s) should be
+removed.}
 }
 \value{
 A \link[data.table:data.table]{data.table} object.

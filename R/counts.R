@@ -26,7 +26,7 @@ methods::setGeneric("faers_counts", function(.object, ...) {
 #' @param .field A string indicates the interested FAERS fields to
 #' use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
 #' can be used.
-#' @param .events A character specify the events column(s?) in the `.field` data
+#' @param .events A character specify the events column(s) in the `.field` data
 #' to count the unique `primaryid`. If multiple columns were selected, the
 #' combination for all columns will define the interested events.
 #' @param .fn A function or formula defined the preprocessing function before
@@ -41,12 +41,15 @@ methods::setGeneric("faers_counts", function(.object, ...) {
 #'   very compact anonymous functions (lambdas) with up to two inputs.
 #'
 #'   If a **string**, the function is looked up in `globalenv()`.
-#' 
+#'
+#' @param .na_rm A bool, whether `NA` value in `.events` column(s) should be
+#' removed.
 #' @rdname faers_counts
 #' @export
 methods::setMethod(
     "faers_counts", c(.object = "FAERSascii"),
-    function(.object, .events = "soc_name", .fn = NULL, ..., .field = "reac") {
+    function(.object, .events = "soc_name", .fn = NULL, ..., .field = "reac", .na_rm = FALSE) {
+        assert_bool(.na_rm)
         if (!.object@standardization) {
             cli::cli_abort("{.arg .object} must be standardized using {.fn faers_standardize}")
         }
@@ -59,6 +62,10 @@ methods::setMethod(
         }
         groups <- c("primaryid", .events)
         data <- unique(data, by = groups, cols = character())
+        if (.na_rm) {
+            keep <- !Reduce(`|`, lapply(data[, .SD, .SDcols = .events], is.na))
+            data <- data[keep]
+        }
         eval(substitute(
             data[, list(N = .N), by = .events],
             list(.events = .events)
