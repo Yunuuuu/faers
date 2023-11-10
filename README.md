@@ -41,7 +41,7 @@ will parse metadata in
 faers_meta()
 #> → Using FAERS metadata from cached
 #>   '~/.cache/R/faers/metadata/faers_meta_data.rds'
-#>   Snapshot time: 2023-11-09 10:41:04.974943
+#>   Snapshot time: 2023-11-09 20:23:56.474033
 #>      year quarter             period
 #>     <int>  <char>             <char>
 #>  1:  2023      q3   July - September
@@ -262,13 +262,16 @@ faers_meta()
 ```
 
 An metadata copy was associated with the package, just set `internal =
-TRUE`.
+TRUE`. However, this copy will only be used if the cached file on your
+computer cannot be found as the cached file on your computer should be
+more up-to-date than this metadata copy.
 
 ``` r
+faers_clearcache("metadata")
+#> ✔ Removing '~/.cache/R/faers/metadata' successfully
 faers_meta(internal = TRUE)
-#> → Using FAERS metadata from cached
-#>   '~/.cache/R/faers/metadata/faers_meta_data.rds'
-#>   Snapshot time: 2023-11-09 10:41:04.974943
+#> → Using internal FAERS metadata
+#>   Snapshot time: 2023-11-08 13:06:35.726011
 #>      year quarter             period
 #>     <int>  <char>             <char>
 #>  1:  2023      q3   July - September
@@ -518,7 +521,6 @@ data1 <- faers(2004, "q1",
   compress_dir = tempdir()
 )
 #> Finding 1 file already downloaded: 'aers_ascii_2004q1.zip'
-#> → Nothing to do since only one <FAERS> data provided
 data1
 #> FAERS data from 1 Quarterly ascii file
 #>   Total reports: 100 (with duplicates)

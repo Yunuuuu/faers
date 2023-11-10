@@ -61,7 +61,11 @@ faers_meta()
 ```
 
 An metadata copy was associated with the package, just set `internal = TRUE`.
+However, this copy will only be used if the cached file on your computer cannot
+be found as the cached file on your computer should be more up-to-date than this
+metadata copy.
 ```{r}
+faers_clearcache("metadata")
 faers_meta(internal = TRUE)
 ```
 
