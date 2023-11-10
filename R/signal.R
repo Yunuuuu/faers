@@ -25,8 +25,8 @@
 #' # we use faers_filter() to extract data we are interested
 #' # here, we just sample 100 reports. You should do it based on your purpose.
 #' faers_phv_signal(
-#'   faers_filter(data, .fn = ~ sample(faers_primaryid(.x), 100L)),
-#'   .full = data
+#'     faers_filter(data, .fn = ~ sample(faers_primaryid(.x), 100L)),
+#'     .full = data
 #' )
 #' }
 #' @export
@@ -35,6 +35,7 @@
 methods::setGeneric(
     "faers_phv_table",
     function(.object, ..., .full, .object2) {
+        rlang::check_exclusive(.full, .object2)
         methods::makeStandardGeneric("faers_phv_table")
     }
 )
@@ -42,6 +43,7 @@ methods::setGeneric(
 #' @param .full A [FAERSascii] object with data from full data. In this way,
 #' `.object` must be a subset of `.full`.
 #' @inheritParams faers_counts
+#' @export 
 #' @rdname faers_phv_signal
 methods::setMethod(
     "faers_phv_table",
@@ -79,6 +81,7 @@ methods::setMethod(
 #' @param .object2 A [FAERSascii] object with data from another interested drug,
 #' In this way, `.object` and `.object2` should be not overlapped.
 #' @rdname faers_phv_signal
+#' @export 
 methods::setMethod(
     "faers_phv_table",
     c(.object = "FAERSascii", .full = "missing", .object2 = "FAERSascii"),
@@ -125,6 +128,7 @@ methods::setGeneric("faers_phv_signal", function(.object, ...) {
 #' @param .methods Just an alias of `method` in [phv_signal].
 #' @param .phv_signal_params Other arguments passed to [phv_signal].
 #' @seealso [phv_signal]
+#' @export
 #' @method faers_phv_signal FAERSascii
 #' @rdname faers_phv_signal
 methods::setMethod("faers_phv_signal", "FAERSascii", function(.object, .methods = NULL, ..., .phv_signal_params = list()) {

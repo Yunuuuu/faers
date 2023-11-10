@@ -71,8 +71,8 @@ data <- faers_dedup(data)
 # we use faers_filter() to extract data we are interested
 # here, we just sample 100 reports. You should do it based on your purpose.
 faers_phv_signal(
-  faers_filter(data, .fn = ~ sample(faers_primaryid(.x), 100L)),
-  .full = data
+    faers_filter(data, .fn = ~ sample(faers_primaryid(.x), 100L)),
+    .full = data
 )
 }
 }
