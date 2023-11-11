@@ -46,7 +46,7 @@ faers_meta_cache_read <- function(internal = FALSE) {
 faers_meta_cache_save <- function(data) {
     file <- faers_meta_cache_file()
     cli::cli_inform(
-        c(">" = "Writing FAERS metadata into cached {.file {file}}")
+        c(">" = "Writing FAERS metadata into cache file {.file {file}}")
     )
     saveRDS(list(data = data, date = Sys.time()), file = file)
 }
