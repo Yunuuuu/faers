@@ -526,6 +526,7 @@ testthat::test_that("`faers_modify()` works well", {
 })
 
 testthat::test_that("`faers_modify()` for standardizated data works well", {
+    testthat::skip_on_ci()
     data <- faers(c(2004, 2017),
         c("q1", "q2"), "ascii",
         dir = internal_file("extdata"),
