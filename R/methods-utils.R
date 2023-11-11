@@ -178,7 +178,13 @@ methods::setGeneric("faers_filter", function(.object, ...) {
 
 #' @param .fn A function or formula, accept the field data as the input and
 #' return an atomic integer or character of `primaryid` you want to keep or
-#' remove based on argument `.invert`.
+#' remove based on argument `.invert`. 
+#' 
+#' Note: When using the `set*` or `:=` function from `data.table` to modify the
+#' internal data, exercise caution with un-standardized data and the "demo",
+#' "drug", "ther", "rpsr", and "outc" .field data in standardized data as these
+#' functions will modify the data directly. In such cases, it is advisable to
+#' use the [copy][data.table::copy] function first.
 #'
 #'   If a **function**, it is used as is.
 #'

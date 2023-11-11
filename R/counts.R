@@ -31,10 +31,12 @@ methods::setGeneric("faers_counts", function(.object, ...) {
 #' combination for all columns will define the interested events.
 #' @param .fn A function or formula defined the preprocessing function before
 #' creating contingency table, with the `.field` data as the input and return a
-#' [data.table][data.table::data.table]. Note: for "demo", "drug", "ther",
-#' "rpsr", and "outc", you should be careful when using `set*` or `:=` function
-#' from data.table, as these functions will modify the internal data. In this
-#' case, you'd better use [copy][data.table::copy] firstly. 
+#' [data.table][data.table::data.table]. 
+#' 
+#' Note: When using the `set*` or `:=` function from `data.table` with the
+#' "demo", "drug", "ther", "rpsr", and "outc" data, exercise caution as these
+#' functions directly modify the internal data. In such cases, it is advisable
+#' to use the [copy][data.table::copy] function first.
 #'
 #'   If a **function**, it is used as is.
 #'

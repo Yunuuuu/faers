@@ -28,10 +28,12 @@ combination for all columns will define the interested events.}
 
 \item{.fn}{A function or formula defined the preprocessing function before
 creating contingency table, with the \code{.field} data as the input and return a
-\link[data.table:data.table]{data.table}. Note: for "demo", "drug", "ther",
-"rpsr", and "outc", you should be careful when using \verb{set*} or \verb{:=} function
-from data.table, as these functions will modify the internal data. In this
-case, you'd better use \link[data.table:copy]{copy} firstly.
+\link[data.table:data.table]{data.table}.
+
+Note: When using the \verb{set*} or \verb{:=} function from \code{data.table} with the
+"demo", "drug", "ther", "rpsr", and "outc" data, exercise caution as these
+functions directly modify the internal data. In such cases, it is advisable
+to use the \link[data.table:copy]{copy} function first.
 
 If a \strong{function}, it is used as is.
 

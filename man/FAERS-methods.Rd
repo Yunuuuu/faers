@@ -69,6 +69,12 @@ keep. If \code{NULL}, will do nothing.}
 return an atomic integer or character of \code{primaryid} you want to keep or
 remove based on argument \code{.invert}.
 
+Note: When using the \verb{set*} or \verb{:=} function from \code{data.table} to modify the
+internal data, exercise caution with un-standardized data and the "demo",
+"drug", "ther", "rpsr", and "outc" .field data in standardized data as these
+functions will modify the data directly. In such cases, it is advisable to
+use the \link[data.table:copy]{copy} function first.
+
 If a \strong{function}, it is used as is.
 
 If a \strong{formula}, e.g. \code{~ .x + 2}, it is converted to a function with up to
