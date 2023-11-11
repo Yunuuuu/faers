@@ -58,14 +58,18 @@ methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     field <- match.arg(field, faers_ascii_file_fields)
     out <- object@data[[field]]
     if (object@standardization && any(field == c("indi", "reac"))) {
-        .__idx__. <- out$meddra_hierarchy_idx
-        out <- dt_shallow(out)
-        out[, meddra_hierarchy_idx := NULL]
-        out[, names(object@meddra@hierarchy) :=
-            object@meddra@hierarchy[.__idx__.]]
+        out <- faers_add_hierarchy(out, object@meddra@hierarchy)
     }
-    out[] # in case of not printing
+    out
 })
+
+faers_add_hierarchy <- function(data, hierarchy, remove_idx = TRUE) {
+    .__idx__. <- data$meddra_hierarchy_idx
+    data <- dt_shallow(data)
+    data[, names(hierarchy) := hierarchy[.__idx__.]]
+    if (remove_idx) data[, meddra_hierarchy_idx := NULL]
+    data[] # in case of not printing
+}
 
 #######################################################
 #' @export
@@ -85,14 +89,10 @@ methods::setMethod("faers_mget", "FAERSascii", function(object, fields) {
     if (object@standardization) {
         ii <- intersect(names(out), c("indi", "reac"))
         for (i in ii) {
-            .__idx__. <- out[[i]]$meddra_hierarchy_idx
-            out[[i]] <- dt_shallow(out[[i]])
-            out[[i]][, meddra_hierarchy_idx := NULL]
-            out[[i]][, names(object@meddra@hierarchy) :=
-                object@meddra@hierarchy[.__idx__.]]
+            out[[i]] <- faers_add_hierarchy(out[[i]], object@meddra@hierarchy)
         }
     }
-    out[] # in case of not printing
+    out
 })
 utils::globalVariables(c("meddra_hierarchy_idx"))
 
@@ -178,13 +178,15 @@ methods::setGeneric("faers_filter", function(.object, ...) {
 
 #' @param .fn A function or formula, accept the field data as the input and
 #' return an atomic integer or character of `primaryid` you want to keep or
-#' remove based on argument `.invert`. 
-#' 
+#' remove based on argument `.invert`.
+#'
 #' Note: When using the `set*` or `:=` function from `data.table` to modify the
 #' internal data, exercise caution with un-standardized data and the "demo",
-#' "drug", "ther", "rpsr", and "outc" .field data in standardized data as these
+#' "drug", "ther", "rpsr", and "outc" field in standardized data as these
 #' functions will modify the data directly. In such cases, it is advisable to
-#' use the [copy][data.table::copy] function first.
+#' use the [copy][data.table::copy] function first. Note that for the "indi" and
+#' "reac" field in standardized data, a shallow copy will automatically be made
+#' to add meddra data.
 #'
 #'   If a **function**, it is used as is.
 #'
@@ -195,9 +197,16 @@ methods::setGeneric("faers_filter", function(.object, ...) {
 #'
 #'   If a **string**, the function is looked up in `globalenv()`.
 #' @param .field A string indicating the FAERS data to be used as input for the
-#' `.fn` function in order to extract the primaryid. Only values "demo", "drug",
-#' "indi", "ther", "reac", "rpsr", and "outc" can be used. if `NULL`, the
-#' `.object` will be passed to `.fn` directly.
+#' `.fn` function to extract the primaryid or modify data. Only the following
+#' values can be used: "demo", "drug", "indi", "ther", "reac", "rpsr", and
+#' "outc".
+#'   - `faers_filter`: Use `.fn` to extract primaryid. If `NULL`, `.object` will
+#'     be passed directly to `.fn`. `.fn` should return an atomic integer or
+#'     character of primaryid that you want to keep or remove based on the
+#'     `.invert` argument.
+#'   - `faers_modify`: Use `.fn` to modify the specified field data. You cannot
+#'     use `NULL` here. `.fn` should always return a
+#'     [data.table][data.table::data.table].
 #' @param .invert A bool. If `TRUE`, will keep reports not returned by `.fn`.
 #' @export
 #' @method faers_filter FAERSascii
@@ -217,6 +226,49 @@ methods::setMethod(
         faers_keep(.object, primaryid = ids, invert = .invert)
     }
 )
+
+##############################################################
+#' @export
+#' @rdname FAERS-methods
+methods::setGeneric("faers_modify", function(.object, ...) {
+    methods::makeStandardGeneric("faers_modify")
+})
+
+#' @export
+#' @method faers_modify FAERSascii
+#' @rdname FAERS-methods
+methods::setMethod("faers_modify", "FAERSascii", function(.object, .field, .fn, ...) {
+    .field <- match.arg(.field, faers_ascii_file_fields)
+    out <- .object@data[[.field]]
+    cannot_be_removed_cols <- c("year", "quarter", "primaryid")
+    .fn <- rlang::as_function(.fn)
+    if (.object@standardization && any(.field == c("indi", "reac"))) {
+        meddra_data <- .object@meddra@hierarchy
+        out <- faers_add_hierarchy(out, meddra_data, remove_idx = FALSE)
+        out <- .fn(out, ...)
+        if (!data.table::is.data.table(out)) {
+            cli::cli_abort("{.fn .fn} must return a {.cls data.table}")
+        }
+        # removing meddra columns before re-assign into original object
+        meddra_cols <- intersect(names(out), names(meddra_data))
+        data.table::set(out, j = meddra_cols, value = NULL)
+        cannot_be_removed_cols <- c(
+            cannot_be_removed_cols,
+            "meddra_hierarchy_idx"
+        )
+    } else {
+        out <- .fn(out, ...)
+        if (!data.table::is.data.table(out)) {
+            cli::cli_abort("{.fn .fn} must return a {.cls data.table}")
+        }
+    }
+    missing_cols <- setdiff(cannot_be_removed_cols, names(out))
+    if (length(missing_cols)) {
+        cli::cli_abort("Cannot removing columns {.val {missing_cols}}")
+    }
+    .object@data[[.field]] <- out[] # in case of not printing
+    invisible(.object)
+})
 
 #########################################################
 use_indices <- function(i, names, arg = rlang::caller_arg(i), call = rlang::caller_env()) {

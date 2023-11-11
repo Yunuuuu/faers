@@ -15,6 +15,8 @@
 \alias{faers_keep,FAERSascii-method}
 \alias{faers_filter}
 \alias{faers_filter,FAERSascii-method}
+\alias{faers_modify}
+\alias{faers_modify,FAERSascii-method}
 \title{Methods for FAERS class}
 \usage{
 faers_get(object, ...)
@@ -42,6 +44,10 @@ faers_keep(object, ...)
 faers_filter(.object, ...)
 
 \S4method{faers_filter}{FAERSascii}(.object, .fn, ..., .field = NULL, .invert = FALSE)
+
+faers_modify(.object, ...)
+
+\S4method{faers_modify}{FAERSascii}(.object, .field, .fn, ...)
 }
 \arguments{
 \item{object, .object}{A \link{FAERSascii} object.}
@@ -71,9 +77,11 @@ remove based on argument \code{.invert}.
 
 Note: When using the \verb{set*} or \verb{:=} function from \code{data.table} to modify the
 internal data, exercise caution with un-standardized data and the "demo",
-"drug", "ther", "rpsr", and "outc" .field data in standardized data as these
+"drug", "ther", "rpsr", and "outc" field in standardized data as these
 functions will modify the data directly. In such cases, it is advisable to
-use the \link[data.table:copy]{copy} function first.
+use the \link[data.table:copy]{copy} function first. Note that for the "indi" and
+"reac" field in standardized data, a shallow copy will automatically be made
+to add meddra data.
 
 If a \strong{function}, it is used as is.
 
@@ -85,9 +93,18 @@ very compact anonymous functions (lambdas) with up to two inputs.
 If a \strong{string}, the function is looked up in \code{globalenv()}.}
 
 \item{.field}{A string indicating the FAERS data to be used as input for the
-\code{.fn} function in order to extract the primaryid. Only values "demo", "drug",
-"indi", "ther", "reac", "rpsr", and "outc" can be used. if \code{NULL}, the
-\code{.object} will be passed to \code{.fn} directly.}
+\code{.fn} function to extract the primaryid or modify data. Only the following
+values can be used: "demo", "drug", "indi", "ther", "reac", "rpsr", and
+"outc".
+\itemize{
+\item \code{faers_filter}: Use \code{.fn} to extract primaryid. If \code{NULL}, \code{.object} will
+be passed directly to \code{.fn}. \code{.fn} should return an atomic integer or
+character of primaryid that you want to keep or remove based on the
+\code{.invert} argument.
+\item \code{faers_modify}: Use \code{.fn} to modify the specified field data. You cannot
+use \code{NULL} here. \code{.fn} should always return a
+\link[data.table:data.table]{data.table}.
+}}
 
 \item{.invert}{A bool. If \code{TRUE}, will keep reports not returned by \code{.fn}.}
 }

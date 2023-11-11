@@ -1,10 +1,9 @@
-data <- faers(c(2004, 2017),
-    c("q1", "q2"), "ascii",
-    dir = internal_file("extdata"),
-    compress_dir = tempdir()
-)
-
 testthat::test_that("`faers_get()` works well", {
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
     testthat::expect_s3_class(faers_get(data, "drug"), "data.table")
     testthat::expect_s3_class(faers_get(data, "indi"), "data.table")
     testthat::expect_s3_class(faers_get(data, "reac"), "data.table")
@@ -15,6 +14,11 @@ testthat::test_that("`faers_get()` works well", {
 })
 
 testthat::test_that("`faers_primaryid()` works well", {
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
     x <- faers_primaryid(data)
     testthat::expect_identical(faers_get(data, "demo")$primaryid, x)
     testthat::expect_in(faers_get(data, "drug")$primaryid, x)
@@ -26,6 +30,11 @@ testthat::test_that("`faers_primaryid()` works well", {
 })
 
 testthat::test_that("`[` works well", {
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
     data_list <- data[c("indi", "reac", "demo", "drug")]
     testthat::expect_true(is.list(data_list))
     testthat::expect_true(all(
@@ -44,6 +53,11 @@ testthat::test_that("`[` works well", {
 })
 
 testthat::test_that("`[[` works well", {
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
     testthat::expect_s3_class(data[["drug"]], "data.table")
     testthat::expect_s3_class(data[["indi"]], "data.table")
     testthat::expect_s3_class(data[["reac"]], "data.table")
@@ -62,6 +76,11 @@ testthat::test_that("`[[` works well", {
 })
 
 testthat::test_that("`$` works well", {
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
     testthat::expect_s3_class(data$drug, "data.table")
     testthat::expect_s3_class(data$indi, "data.table")
     testthat::expect_s3_class(data$reac, "data.table")
@@ -80,7 +99,7 @@ testthat::test_that("`$` works well", {
 })
 
 
-testthat::test_that("`faers_get` for standardizated data works well", {
+testthat::test_that("`faers_get()` for standardizated data works well", {
     testthat::skip_on_ci()
     data <- faers(c(2004, 2017),
         c("q1", "q2"), "ascii",
@@ -241,6 +260,11 @@ testthat::test_that("`[` for standardizated data works well", {
 })
 
 testthat::test_that("`faers_keep()` works well", {
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
     ids1 <- sample(faers_primaryid(data), 1L)
     ids1_invert <- setdiff(faers_primaryid(data), ids1)
     data1 <- faers_keep(data, ids1)
@@ -317,6 +341,11 @@ testthat::test_that("`faers_keep()` works well", {
 })
 
 testthat::test_that("`faers_filter()` works well", {
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
     testthat::expect_error(faers_filter(data, ~FALSE))
     ids1 <- sample(faers_primaryid(data), 1L)
     ids1_invert <- setdiff(faers_primaryid(data), ids1)
@@ -357,4 +386,298 @@ testthat::test_that("`faers_filter()` works well", {
     testthat::expect_in(data2_invert$ther$primaryid, ids2_invert)
     testthat::expect_in(data2_invert$rpsr$primaryid, ids2_invert)
     testthat::expect_in(data2_invert$outc$primaryid, ids2_invert)
+})
+
+testthat::test_that("`faers_modify()` works well", {
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
+    # for reac data
+    raw_reac <- data.table::copy(data$reac)
+    faers_modify(data, "reac",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_true(all(is.na(data$reac$new_col)))
+    faers_modify(data, "reac",
+        .fn = ~ .x[, new_col := NULL]
+    )
+    testthat::expect_identical(data$reac, raw_reac)
+    testthat::expect_error(faers_modify(data, "reac",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "reac",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "reac",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
+
+    # for indi data
+    raw_indi <- data.table::copy(data$indi)
+    faers_modify(data, "indi",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_true(all(is.na(data$indi$new_col)))
+    faers_modify(data, "indi",
+        .fn = ~ .x[, new_col := NULL]
+    )
+    testthat::expect_identical(data$indi, raw_indi)
+    testthat::expect_error(faers_modify(data, "indi",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "indi",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "indi",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
+
+    # for demo data
+    raw_demo <- data.table::copy(data$demo)
+    faers_modify(data, "demo",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_true(all(is.na(data$demo$new_col)))
+    faers_modify(data, "demo",
+        .fn = ~ .x[, new_col := NULL]
+    )
+    testthat::expect_identical(data$demo, raw_demo)
+    testthat::expect_error(faers_modify(data, "demo",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "demo",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "demo",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
+
+    # for drug data
+    raw_drug <- data.table::copy(data$drug)
+    faers_modify(data, "drug",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_true(all(is.na(data$drug$new_col)))
+    faers_modify(data, "drug",
+        .fn = ~ .x[, new_col := NULL]
+    )
+    testthat::expect_identical(data$drug, raw_drug)
+    testthat::expect_error(faers_modify(data, "drug",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "drug",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "drug",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
+
+    # for ther data
+    raw_ther <- data.table::copy(data$ther)
+    faers_modify(data, "ther",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_true(all(is.na(data$ther$new_col)))
+    faers_modify(data, "ther",
+        .fn = ~ .x[, new_col := NULL]
+    )
+    testthat::expect_identical(data$ther, raw_ther)
+    testthat::expect_error(faers_modify(data, "ther",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "ther",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data, "ther",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
+})
+
+testthat::test_that("`faers_modify()` for standardizated data works well", {
+    data <- faers(c(2004, 2017),
+        c("q1", "q2"), "ascii",
+        dir = internal_file("extdata"),
+        compress_dir = tempdir()
+    )
+    data_std <- faers_standardize(data,
+        "~/Data/MedDRA/MedDRA_26_1_English", # nolint
+        add_smq = TRUE
+    )
+    # for reac data
+    raw_reac <- data.table::copy(data_std$reac)
+    data1 <- faers_modify(data_std, "reac",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_identical(data_std$reac, raw_reac)
+    testthat::expect_identical(data1$reac[, !"new_col"], raw_reac)
+    faers_modify(data_std, "reac",
+        .fn = function(x) {
+            testthat::expect_in("meddra_hierarchy_idx", names(x))
+            x
+        }
+    )
+    testthat::expect_error(faers_modify(data_std, "reac",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "reac",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "reac",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "reac",
+        .fn = function(x) {
+            data.table::copy(x)[, meddra_hierarchy_idx := NULL]
+        }
+    ))
+
+    # for indi data
+    raw_indi <- data.table::copy(data_std$indi)
+    data2 <- faers_modify(data_std, "indi",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_identical(data_std$indi, raw_indi)
+    testthat::expect_identical(data2$indi[, !"new_col"], raw_indi)
+    faers_modify(data_std, "indi",
+        .fn = function(x) {
+            testthat::expect_in("meddra_hierarchy_idx", names(x))
+            x
+        }
+    )
+    testthat::expect_error(faers_modify(data_std, "indi",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "indi",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "indi",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "indi",
+        .fn = function(x) {
+            data.table::copy(x)[, meddra_hierarchy_idx := NULL]
+        }
+    ))
+
+    # for demo data
+    raw_demo <- data.table::copy(data_std$demo)
+    faers_modify(data_std, "demo",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_true(all(is.na(data_std$demo$new_col)))
+    faers_modify(data_std, "demo",
+        .fn = ~ .x[, new_col := NULL]
+    )
+    testthat::expect_identical(data_std$demo, raw_demo)
+    testthat::expect_error(faers_modify(data_std, "demo",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "demo",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "demo",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
+
+    # for drug data
+    raw_drug <- data.table::copy(data_std$drug)
+    faers_modify(data_std, "drug",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_true(all(is.na(data_std$drug$new_col)))
+    faers_modify(data_std, "drug",
+        .fn = ~ .x[, new_col := NULL]
+    )
+    testthat::expect_identical(data_std$drug, raw_drug)
+    testthat::expect_error(faers_modify(data_std, "drug",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "drug",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "drug",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
+
+    # for ther data
+    raw_ther <- data.table::copy(data_std$ther)
+    faers_modify(data_std, "ther",
+        .fn = ~ .x[, new_col := NA_integer_]
+    )
+    testthat::expect_true(all(is.na(data_std$ther$new_col)))
+    faers_modify(data_std, "ther",
+        .fn = ~ .x[, new_col := NULL]
+    )
+    testthat::expect_identical(data_std$ther, raw_ther)
+    testthat::expect_error(faers_modify(data_std, "ther",
+        .fn = function(x) {
+            data.table::copy(x)[, year := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "ther",
+        .fn = function(x) {
+            data.table::copy(x)[, quarter := NULL]
+        }
+    ))
+    testthat::expect_error(faers_modify(data_std, "ther",
+        .fn = function(x) {
+            data.table::copy(x)[, primaryid := NULL]
+        }
+    ))
 })
