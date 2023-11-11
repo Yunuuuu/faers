@@ -31,7 +31,10 @@ methods::setGeneric("faers_counts", function(.object, ...) {
 #' combination for all columns will define the interested events.
 #' @param .fn A function or formula defined the preprocessing function before
 #' creating contingency table, with the `.field` data as the input and return a
-#' [data.table][data.table::data.table].
+#' [data.table][data.table::data.table]. Note: for "demo", "drug", "ther",
+#' "rpsr", and "outc", you should be careful when using `set*` or `:=` function
+#' from data.table, as these functions will modify the internal data. In this
+#' case, you'd better use [copy][data.table::copy] firstly. 
 #'
 #'   If a **function**, it is used as is.
 #'
@@ -42,14 +45,14 @@ methods::setGeneric("faers_counts", function(.object, ...) {
 #'
 #'   If a **string**, the function is looked up in `globalenv()`.
 #'
-#' @param .na_rm A bool, whether `NA` value in `.events` column(s) should be
+#' @param .na.rm A bool, whether `NA` value in `.events` column(s) should be
 #' removed.
 #' @rdname faers_counts
 #' @export
 methods::setMethod(
     "faers_counts", c(.object = "FAERSascii"),
-    function(.object, .events = "soc_name", .fn = NULL, ..., .field = "reac", .na_rm = FALSE) {
-        assert_bool(.na_rm)
+    function(.object, .events = "soc_name", .fn = NULL, ..., .field = "reac", .na.rm = FALSE) {
+        assert_bool(.na.rm)
         if (!.object@standardization) {
             cli::cli_abort("{.arg .object} must be standardized using {.fn faers_standardize}")
         }
@@ -57,12 +60,12 @@ methods::setMethod(
         if (!is.null(.fn)) {
             data <- rlang::as_function(.fn)(data, ...)
             if (!data.table::is.data.table(data)) {
-                cli::cli_abort("{.fn .fn} must return an {.cls data.table}")
+                cli::cli_abort("{.fn .fn} must return a {.cls data.table}")
             }
         }
         groups <- c("primaryid", .events)
         data <- unique(data, by = groups, cols = character())
-        if (.na_rm) {
+        if (.na.rm) {
             keep <- !Reduce(`|`, lapply(data[, .SD, .SDcols = .events], is.na))
             data <- data[keep]
         }

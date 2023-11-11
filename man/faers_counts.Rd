@@ -13,7 +13,7 @@ faers_counts(.object, ...)
   .fn = NULL,
   ...,
   .field = "reac",
-  .na_rm = FALSE
+  .na.rm = FALSE
 )
 }
 \arguments{
@@ -28,7 +28,10 @@ combination for all columns will define the interested events.}
 
 \item{.fn}{A function or formula defined the preprocessing function before
 creating contingency table, with the \code{.field} data as the input and return a
-\link[data.table:data.table]{data.table}.
+\link[data.table:data.table]{data.table}. Note: for "demo", "drug", "ther",
+"rpsr", and "outc", you should be careful when using \verb{set*} or \verb{:=} function
+from data.table, as these functions will modify the internal data. In this
+case, you'd better use \link[data.table:copy]{copy} firstly.
 
 If a \strong{function}, it is used as is.
 
@@ -43,7 +46,7 @@ If a \strong{string}, the function is looked up in \code{globalenv()}.}
 use. Only values "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc"
 can be used.}
 
-\item{.na_rm}{A bool, whether \code{NA} value in \code{.events} column(s) should be
+\item{.na.rm}{A bool, whether \code{NA} value in \code{.events} column(s) should be
 removed.}
 }
 \value{
