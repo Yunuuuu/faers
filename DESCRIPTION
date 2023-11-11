@@ -52,7 +52,7 @@ Collate:
     'load.R'
     'merge.R'
     'meta.R'
-    'methods-utils.R'
+    'methods-FAERS.R'
     'parse.R'
     'period.R'
     'phv_.R'
