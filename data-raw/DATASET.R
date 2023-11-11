@@ -13,11 +13,12 @@ faers_sample(2017, "q2", dir = "inst/extdata")
 # associated with immune checkpoint inhibitors: An updated comprehensive
 # disproportionality analysis of the FDA adverse event reporting system,
 # International Immunopharmacology,
-doc <- docxtractr::read_docx("data-raw/1-s2.0-S156757692100134X-mmc1.docx")
+doc <- docxtractr::read_docx("data-raw/irAEs.docx")
 irAEs <- docxtractr::docx_extract_tbl(doc, tbl_number = 2L)
 irAEs <- tidyr::fill(
     dplyr::mutate(irAEs, Toxicity.types = dplyr::na_if(Toxicity.types, "")),
     Toxicity.types
 )
 data.table::setDT(irAEs)
+irAEs <- unique(irAEs)
 saveRDS(irAEs, "inst/extdata/irAEs.rds", compress = "bzip2")
