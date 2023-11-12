@@ -228,7 +228,7 @@ meddra_load_hierarchy <- function(path, primary_soc = TRUE) {
         # one PT can linked more than one hlt, we can choose the primary SOC
         is_primary <- data$mdhier[
             , list(is_primary = sum(primary_soc_fg == "Y", na.rm = TRUE)),
-            by = "pt_code"
+            keyby = "pt_code"
         ]
         if (!all(is_primary$is_primary == 1L)) {
             cli::cli_warn(
@@ -242,7 +242,7 @@ meddra_load_hierarchy <- function(path, primary_soc = TRUE) {
             } else {
                 1L
             }
-        }], by = "pt_code"]
+        }], keyby = "pt_code"]
     } else {
         out <- data$mdhier
     }

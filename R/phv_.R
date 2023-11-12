@@ -178,7 +178,8 @@ phv_chisq <- function(a, b, c, d, correct = TRUE) {
             c(out$statistic, out$p.value)
         }, list(n11 = a, n10 = b, n01 = c, n00 = d), NULL
     )
-    out <- data.table::as.data.table(do.call("rbind", out))
+    out <- data.table::transpose(out)
+    data.table::setDT(out)
     data.table::setnames(out, c("chisq", "pvalue"))
     out[]
 }

@@ -197,7 +197,7 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     out[
         data$drug[order(drug_seq),
             list(aligned_drugs = paste0(drugname, collapse = "/")),
-            by = common_keys
+            keyby = common_keys
         ],
         aligned_drugs := i.aligned_drugs,
         on = common_keys
@@ -211,7 +211,7 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     out[
         data$indi[order(indi_drug_seq, meddra_code),
             list(aligned_indi = paste0(meddra_code, collapse = "/")),
-            by = common_keys
+            keyby = common_keys
         ],
         aligned_indi := i.aligned_indi,
         on = common_keys
@@ -219,7 +219,7 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     out[
         data$ther[order(dsg_drug_seq, start_dt),
             list(aligned_start_dt = paste0(start_dt, collapse = "/")),
-            by = common_keys
+            keyby = common_keys
         ],
         aligned_start_dt := i.aligned_start_dt,
         on = common_keys
@@ -228,7 +228,7 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     out[
         data$reac[order(meddra_code),
             list(aligned_reac = paste0(meddra_code, collapse = "/")),
-            by = common_keys
+            keyby = common_keys
         ],
         aligned_reac := i.aligned_reac,
         on = common_keys

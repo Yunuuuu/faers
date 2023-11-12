@@ -72,7 +72,7 @@ methods::setMethod(
             data <- data[keep]
         }
         eval(substitute(
-            data[, list(N = .N), by = .events],
+            data[, list(N = .N), keyby = .events],
             list(.events = .events)
         ))
     }
