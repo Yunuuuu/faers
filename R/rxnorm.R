@@ -1,4 +1,3 @@
-
 rxnorm_standardize_drug <- function(terms, exact = TRUE, approximate = TRUE, search = 2, pool = 5L) {
     assert_bool(exact)
     assert_bool(approximate)
@@ -9,13 +8,18 @@ rxnorm_standardize_drug <- function(terms, exact = TRUE, approximate = TRUE, sea
     # get other drug details from rxnorm
 }
 
-rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc = NULL, srclist = NULL, search = NULL, pool = 5L) {
+rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc = NULL, srclist = NULL, search = NULL, pool = 5L, retry = 0L) {
+    if (!(exact || approximate)) {
+        cli::cli_abort(
+            "One of {.arg exact} or {.arg approximate} must be {.code TRUE}"
+        )
+    }
     if (exact) {
         cli::cli_alert("Running Exact Match")
         out <- rxnorm_findRxcuiByString(terms,
             allsrc = allsrc,
             srclist = srclist, search = search,
-            pool = pool
+            pool = pool, retry = retry
         )
     } else {
         out <- rep_len(NA_character_, length(terms))
@@ -23,7 +27,7 @@ rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc 
     if (anyNA(out) && approximate) {
         cli::cli_alert("Running Approximate Match")
         out2 <- rxnorm_getApproximateMatch(terms[is.na(out)],
-            max_entries = 1L, pool = pool
+            max_entries = 1L, pool = pool, retry = retry
         )
         out[is.na(out)] <- vapply(out2, function(x) {
             if (is.null(x)) {
@@ -36,7 +40,8 @@ rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc 
     out
 }
 
-rxnorm_getRxNormName <- function(terms, pool = 5L, retry = 3L) {
+###########################################################
+rxnorm_getRxNormName <- function(terms, pool = 5L, retry = 0L) {
     resps <- rxnorm_query("rxcui/%s",
         rxnorm_ids = terms,
         rxnorm_api_name = NULL,
@@ -45,7 +50,7 @@ rxnorm_getRxNormName <- function(terms, pool = 5L, retry = 3L) {
     rxnorm_return_atomic(resps, "//name")
 }
 
-rxnorm_getDrugs <- function(terms, pool = 5L, retry = 3L) {
+rxnorm_getDrugs <- function(terms, pool = 5L, retry = 0L) {
     resps <- rxnorm_query("drugs",
         rxnorm_ids = terms, rxnorm_api_name = "name",
         pool = pool, retry = retry
@@ -53,7 +58,7 @@ rxnorm_getDrugs <- function(terms, pool = 5L, retry = 3L) {
     rxnorm_return_list(resps, "//conceptProperties")
 }
 
-rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL, pool = 5L, retry = 3L) {
+rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL, pool = 5L, retry = 0L) {
     resps <- rxnorm_query("approximateTerm",
         rxnorm_ids = terms, rxnorm_api_name = "term",
         maxEntries = max_entries, option = option,
@@ -70,7 +75,7 @@ rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL,
 #' @param search 0: Exact match only; 1: Normalized match; 2: Best match (exact
 #' or normalized)
 #' @noRd
-rxnorm_findRxcuiByString <- function(terms, allsrc = NULL, srclist = NULL, search = NULL, pool = 5L, retry = 3L) {
+rxnorm_findRxcuiByString <- function(terms, allsrc = NULL, srclist = NULL, search = NULL, pool = 5L, retry = 0L) {
     resps <- rxnorm_query("rxcui",
         rxnorm_ids = terms,
         rxnorm_api_name = "name",
@@ -131,19 +136,19 @@ rxnorm_parse_dt <- function(resp, xpath) {
 #' All values in dots should be named. If rxnorm_api_name is `NULL`, `path` must
 #' contain format strings used by sprintf.
 #'
-#' @return A list of resp objects of the query results from RxNorm
+#' @return A list of response object of the query results from RxNorm
 #' @noRd
-rxnorm_query <- function(path, rxnorm_ids, rxnorm_api_name = NULL, ..., pool = 5L, retry = 3L, format = "xml") {
+rxnorm_query <- function(path, rxnorm_ids, rxnorm_api_name = NULL, ..., pool = 5L, retry = 0L, format = "xml") {
+    assert_internet()
     pool <- max(1L, min(pool, 20L))
     resps <- vector("list", length(rxnorm_ids))
     groups <- seq_along(resps)
     groups <- split(groups, ceiling(groups / pool))
-    assert_internet()
     bar_id <- cli::cli_progress_bar(
         name = "Querying RxNorm",
         format = "{cli::pb_bar} {cli::pb_current}/{cli::pb_total} [{cli::pb_rate}] | {cli::pb_eta_str}",
         format_done = "Querying RxNorm for {.val {cli::pb_total}} quer{?y/ies} in {cli::pb_elapsed}",
-        total = length(resps)
+        total = length(rxnorm_ids)
     )
     for (idx in groups) {
         req_list <- lapply(rxnorm_ids[idx], rxnorm_api,
@@ -154,9 +159,7 @@ rxnorm_query <- function(path, rxnorm_ids, rxnorm_api_name = NULL, ..., pool = 5
         cli::cli_progress_update(inc = length(idx), id = bar_id)
     }
     if (retry > 0L) {
-        fail <- vapply(resps, function(resp) {
-            !rxnorm_non_exist(resp) && rxnorm_fail(resp)
-        }, logical(1))
+        fail <- vapply(resps, rxnorm_fail, logical(1L))
         if (any(fail)) {
             cli::cli_alert("Retry for {sum(fail)} quer{?y/ies}")
             resps[fail] <- Recall(
@@ -185,7 +188,8 @@ rxnorm_non_exist <- function(resp) {
 }
 
 rxnorm_fail <- function(resp) {
-    inherits(resp, "error") || httr2::resp_status(resp) != 200L
+    !rxnorm_non_exist(resp) &&
+        (inherits(resp, "error") || httr2::resp_status(resp) != 200L)
 }
 
 rxnorm_api <- function(path, rxnorm_id, rxnorm_api_name = NULL, ..., format = "xml") {
