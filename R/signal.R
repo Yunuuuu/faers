@@ -6,7 +6,8 @@
 #'    constructed with `faers_phv_table`. You must pass `.full` or `.object2`
 #'    into `faers_phv_table`.
 #' @param .object A [FAERSascii] object. The value `n11` or `a` will be
-#' calculated from `object`
+#' calculated from `.object`. The unique number of primaryids will be regarded
+#' as `n1.`.
 #' @param ... Other arguments passed to specific methods.
 #'  - `faers_phv_table`: other arguments passed to [faers_counts].
 #'  - `faers_phv_signal`: other arguments passed to `faers_phv_table`.
@@ -41,9 +42,10 @@ methods::setGeneric(
 )
 
 #' @param .full A [FAERSascii] object with data from full data. In this way,
-#' `.object` must be a subset of `.full`.
+#' `.object` must be a subset of `.full`. The unique number of primaryids will
+#' be regarded as `n`.
 #' @inheritParams faers_counts
-#' @export 
+#' @export
 #' @rdname faers_phv_signal
 methods::setMethod(
     "faers_phv_table",
@@ -62,8 +64,9 @@ methods::setMethod(
         }
         full_counts <- faers_counts(.full, .events = .events, ...)
         interested_counts <- faers_counts(.object, .events = .events, ...)
-        n <- sum(full_counts$N) # scalar
-        n1. <- sum(interested_counts$N) # scalar
+        # It's not necessary to call unique for de-duplicated data
+        n <- length(unique(full_primaryids))
+        n1. <- length(unique(interested_primaryids))
         data.table::setnames(full_counts, "N", "n.1")
         data.table::setnames(interested_counts, "N", "a")
         out <- merge(full_counts, interested_counts,
@@ -79,9 +82,10 @@ methods::setMethod(
 )
 
 #' @param .object2 A [FAERSascii] object with data from another interested drug,
-#' In this way, `.object` and `.object2` should be not overlapped.
+#' In this way, `.object` and `.object2` should be not overlapped. The unique
+#' number of primaryids will be regarded as `n0.`.
 #' @rdname faers_phv_signal
-#' @export 
+#' @export
 methods::setMethod(
     "faers_phv_table",
     c(.object = "FAERSascii", .full = "missing", .object2 = "FAERSascii"),
@@ -96,12 +100,13 @@ methods::setMethod(
         primaryids2 <- faers_primaryid(.object2)
         overlapped_idx <- primaryids %in% primaryids2
         if (any(overlapped_idx)) {
-            cli::cli_warn("{.val {overlapped_idx}} report{?s} are overlapped between {.arg .object} and {.arg .object2}")
+            cli::cli_warn("{.val {sum(overlapped_idx)}} report{?s} are overlapped between {.arg .object} and {.arg .object2}")
         }
         interested_counts <- faers_counts(.object, .events = .events, ...)
         interested_counts2 <- faers_counts(.object2, .events = .events, ...)
-        n1. <- sum(interested_counts$N)
-        n0. <- sum(interested_counts2$N)
+        # It's not necessary to call unique for de-duplicated data
+        n1. <- length(unique(primaryids))
+        n0. <- length(unique(primaryids2))
         data.table::setnames(interested_counts, "N", "a")
         data.table::setnames(interested_counts2, "N", "c")
         out <- merge(interested_counts, interested_counts2,

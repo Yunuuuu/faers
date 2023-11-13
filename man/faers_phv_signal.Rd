@@ -20,7 +20,8 @@ faers_phv_signal(.object, ...)
 }
 \arguments{
 \item{.object}{A \link{FAERSascii} object. The value \code{n11} or \code{a} will be
-calculated from \code{object}}
+calculated from \code{.object}. The unique number of primaryids will be regarded
+as \code{n1.}.}
 
 \item{...}{Other arguments passed to specific methods.
 \itemize{
@@ -29,10 +30,12 @@ calculated from \code{object}}
 }}
 
 \item{.full}{A \link{FAERSascii} object with data from full data. In this way,
-\code{.object} must be a subset of \code{.full}.}
+\code{.object} must be a subset of \code{.full}. The unique number of primaryids will
+be regarded as \code{n}.}
 
 \item{.object2}{A \link{FAERSascii} object with data from another interested drug,
-In this way, \code{.object} and \code{.object2} should be not overlapped.}
+In this way, \code{.object} and \code{.object2} should be not overlapped. The unique
+number of primaryids will be regarded as \code{n0.}.}
 
 \item{.events}{A character specify the events column(s) in the \code{.field} data
 to count the unique \code{primaryid}. If multiple columns were selected, the
