@@ -71,7 +71,7 @@ validate_faers <- function(object) {
     if (length(object@year) != length(object@quarter)) {
         return("the length of `@year` and `@quarter` must be the same")
     }
-    if (!all(object@quarter %in% faers_file_quarters)) {
+    if (!all(object@quarter %chin% faers_file_quarters)) {
         return(sprintf(
             "`@quarter` must be values in %s",
             oxford_comma(faers_file_quarters, final = "or")
@@ -114,7 +114,7 @@ methods::setClass(
 
 methods::setValidity("FAERSascii", function(object) {
     data <- object@data
-    if (!all(faers_ascii_file_fields %in% names(data))) {
+    if (!all(faers_ascii_file_fields %chin% names(data))) {
         return(sprintf(
             "`@data` must contain the all ascii fields, including %s", oxford_comma(faers_ascii_file_fields)
         ))

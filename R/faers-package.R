@@ -12,5 +12,6 @@
 #' @importFrom data.table .NGRP
 #' @importFrom data.table .SD
 #' @importFrom data.table data.table
+#' @importFrom data.table %chin%
 ## usethis namespace: end
 NULL

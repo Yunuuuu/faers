@@ -111,7 +111,7 @@ phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE,
         )
         added_names <- names(signal_out)
         added_names <- data.table::fcase(
-            added_names %in% c("ci_low", "ci_high"),
+            added_names %chin% c("ci_low", "ci_high"),
             paste(added_names[1L], added_names, sep = "_"),
             added_names == "pvalue",
             paste(method, added_names, sep = "_"),

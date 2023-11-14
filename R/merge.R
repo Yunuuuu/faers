@@ -50,7 +50,7 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, fields = NULL, 
     # to prevent modify in place (change the input object)
     if (object@standardization) {
         indi_reference <- FALSE
-        if (all(c("indi", "reac") %in% fields)) {
+        if (all(c("indi", "reac") %chin% fields)) {
             hierarchy_columns <- c(
                 meddra_columns(meddra_hierarchy_fields),
                 "meddra_hierarchy_from", "meddra_code", "meddra_pt"
@@ -69,7 +69,7 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, fields = NULL, 
     }
 
     # check if `drug_seq` should be matched
-    if (sum(fields %in% c("indi", "ther", "drug")) >= 2L) {
+    if (sum(fields %chin% c("indi", "ther", "drug")) >= 2L) {
         if (any(fields == "indi")) {
             if (indi_reference) {
                 lst$indi <- dt_shallow(lst$indi)

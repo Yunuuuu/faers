@@ -272,7 +272,7 @@ unify_ascii_demo <- function(data, year, quarter) {
     }
     # Adding a new column gender
     data[, gender := data.table::fifelse(
-        sex %in% c("UNK", "NS", "YR"), NA_character_, sex
+        sex %chin% c("UNK", "NS", "YR"), NA_character_, sex
     )]
     # nolint end
 }

@@ -59,7 +59,7 @@ methods::setMethod(
         }
         full_primaryids <- faers_primaryid(.full)
         interested_primaryids <- faers_primaryid(.object)
-        if (!all(interested_primaryids %in% full_primaryids)) {
+        if (!all(interested_primaryids %chin% full_primaryids)) {
             cli::cli_abort("Provided {.arg interested} data must be a subset of {.arg .object}")
         }
         full_counts <- faers_counts(.full, .events = .events, ...)
@@ -98,7 +98,7 @@ methods::setMethod(
         }
         primaryids <- faers_primaryid(.object)
         primaryids2 <- faers_primaryid(.object2)
-        overlapped_idx <- primaryids %in% primaryids2
+        overlapped_idx <- primaryids %chin% primaryids2
         if (any(overlapped_idx)) {
             cli::cli_warn("{.val {sum(overlapped_idx)}} report{?s} are overlapped between {.arg .object} and {.arg .object2}")
         }
