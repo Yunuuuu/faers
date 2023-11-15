@@ -44,7 +44,7 @@ rxnorm_map_to_rxcui <- function(terms, exact = TRUE, approximate = TRUE, allsrc 
 # rxnorm_getRxNormName("131725")
 rxnorm_getRxNormName <- function(rxcuis, pool_size = 5L, retry = 0L) {
     reqs <- lapply(rxcuis, function(term) {
-        rxnorm_api_query(path = sprintf("rxcui/%s", term), name = term)
+        rxnorm_api(.path = sprintf("rxcui/%s", term), name = term)
     })
     resps <- rxnorm_perform_parallel(
         reqs = reqs, pool_size = pool_size, retry = retry
@@ -54,7 +54,7 @@ rxnorm_getRxNormName <- function(rxcuis, pool_size = 5L, retry = 0L) {
 # rxnorm_getDrugs("cymbalta")
 rxnorm_getDrugs <- function(names, pool_size = 5L, retry = 0L) {
     reqs <- lapply(names, function(term) {
-        rxnorm_api_query(path = "drugs", name = term)
+        rxnorm_api(.path = "drugs", name = term)
     })
     resps <- rxnorm_perform_parallel(
         reqs = reqs, pool_size = pool_size, retry = retry
@@ -64,8 +64,8 @@ rxnorm_getDrugs <- function(names, pool_size = 5L, retry = 0L) {
 # rxnorm_getApproximateMatch("zocor 10 mg")
 rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL, pool_size = 5L, retry = 0L) {
     reqs <- lapply(terms, function(term) {
-        rxnorm_api_query(
-            path = "approximateTerm",
+        rxnorm_api(
+            .path = "approximateTerm",
             term = term, maxEntries = max_entries, option = option
         )
     })
@@ -83,9 +83,10 @@ rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL,
 #' @param search 0: Exact match only; 1: Normalized match; 2: Best match (exact
 #' or normalized)
 #' @noRd
-rxnorm_findRxcuiByString <- function(terms, allsrc = NULL, srclist = NULL, search = NULL, pool_size = 5L, retry = 0L) {
-    reqs <- lapply(terms, function(term) {
-        rxnorm_api_query("rxcui",
+# rxnorm_findRxcuiByString(I("Lipitor+10+mg+Tab"), search = 1L)
+rxnorm_findRxcuiByString <- function(names, allsrc = NULL, srclist = NULL, search = NULL, pool_size = 5L, retry = 0L) {
+    reqs <- lapply(names, function(term) {
+        rxnorm_api(.path = "rxcui",
             name = term,
             allsrc = allsrc,
             srclist = srclist, search = search
@@ -101,13 +102,13 @@ rxnorm_findRxcuiByString <- function(terms, allsrc = NULL, srclist = NULL, searc
 ########################################################
 # rxnorm_getTermTypes()
 rxnorm_getTermTypes <- function() {
-    resp <- rxnorm_perform(rxnorm_api_path("termtypes"))
+    resp <- rxnorm_perform(rxnorm_api(.path = "termtypes"))
     xml <- httr2::resp_body_xml(resp, check_type = FALSE)
     xml2::xml_text(xml2::xml_find_all(xml, "//termType"))
 }
 # rxnorm_getRxNormVersion()
 rxnorm_getRxNormVersion <- function() {
-    resp <- rxnorm_perform(rxnorm_api_path("version"))
+    resp <- rxnorm_perform(rxnorm_api(.path = "version"))
     xml <- xml2::xml_find_all(
         httr2::resp_body_xml(resp, check_type = FALSE),
         "//rxnormdata"
@@ -148,9 +149,7 @@ rxnorm_parse_dt <- function(resp, xpath) {
     simplify_list_cols(out)[]
 }
 
-#' All values in dots should be named. If rxnorm_api_name is `NULL`, `path` must
-#' contain format strings used by sprintf.
-#'
+
 #' @return A list of response object of the query results from RxNorm
 #' @noRd
 rxnorm_perform_parallel <- function(reqs, pool_size = 5L, retry = 0L, pool = NULL) {
@@ -193,19 +192,18 @@ rxnorm_perform <- function(req) {
 }
 
 ###########################################################
-rxnorm_api_query <- function(path, ..., format = "xml") {
-    httr2::req_url_query(.req = rxnorm_api_path(path, format), ...)
-}
-
-rxnorm_api_path <- function(path, format = "xml") {
-    httr2::req_url_path_append(
-        req = rxnorm_api_host(),
-        sprintf("%s.%s", path, format)
+#' All values in dots should be named. If rxnorm_api_name is `NULL`, `path` must
+#' contain format strings used by sprintf.
+#' @noRd 
+rxnorm_api <- function(.path, ..., .format = "xml") {
+    req <- httr2::req_url_path_append(
+        req = httr2::req_url_path(req = httr2::request(rxnorm_host), "REST"),
+        sprintf("%s.%s", .path, .format)
     )
-}
-
-rxnorm_api_host <- function() {
-    httr2::req_url_path(req = httr2::request(rxnorm_host), "REST")
+    if (...length()) {
+        req <- httr2::req_url_query(.req = req, ...)
+    }
+    rxnorm_set_headers(req)
 }
 
 rxnorm_set_headers <- function(req) {
