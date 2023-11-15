@@ -10,9 +10,9 @@ Depends:
 Imports: 
     brio,
     cli,
-    curl,
+    curl (>= 5.0.0),
     data.table,
-    httr2,
+    httr2 (>= 1.0.0),
     MCMCpack,
     methods,
     openEBGM,
