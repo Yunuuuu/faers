@@ -1,5 +1,5 @@
 testthat::test_that("`faers_standardize()` works well", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     data <- faers(c(2004, 2017),
         c("q1", "q2"), "ascii",
         dir = internal_file("extdata"),

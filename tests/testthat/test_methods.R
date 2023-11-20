@@ -100,7 +100,7 @@ testthat::test_that("`$` works well", {
 
 
 testthat::test_that("`faers_get()` for standardizated data works well", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     data <- faers(c(2004, 2017),
         c("q1", "q2"), "ascii",
         dir = internal_file("extdata"),
@@ -144,7 +144,7 @@ testthat::test_that("`faers_get()` for standardizated data works well", {
 })
 
 testthat::test_that("`faers_mget()` for standardizated data works well", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     data <- faers(c(2004, 2017),
         c("q1", "q2"), "ascii",
         dir = internal_file("extdata"),
@@ -192,7 +192,7 @@ testthat::test_that("`faers_mget()` for standardizated data works well", {
 })
 
 testthat::test_that("`$` for standardizated data works well", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     data <- faers(c(2004, 2017),
         c("q1", "q2"), "ascii",
         dir = internal_file("extdata"),
@@ -215,7 +215,7 @@ testthat::test_that("`$` for standardizated data works well", {
 })
 
 testthat::test_that("`[[` for standardizated data works well", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     data <- faers(c(2004, 2017),
         c("q1", "q2"), "ascii",
         dir = internal_file("extdata"),
@@ -238,7 +238,7 @@ testthat::test_that("`[[` for standardizated data works well", {
 })
 
 testthat::test_that("`[` for standardizated data works well", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     data <- faers(c(2004, 2017),
         c("q1", "q2"), "ascii",
         dir = internal_file("extdata"),
@@ -526,7 +526,7 @@ testthat::test_that("`faers_modify()` works well", {
 })
 
 testthat::test_that("`faers_modify()` for standardizated data works well", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     data <- faers(c(2004, 2017),
         c("q1", "q2"), "ascii",
         dir = internal_file("extdata"),

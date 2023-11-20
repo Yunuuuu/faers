@@ -46,7 +46,7 @@ testthat::test_that("`faers_combine()` for non-standardizated data works as expe
 })
 
 testthat::test_that("`faers_combine()` for standardizated data works well", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     data1 <- faers_parse(
         internal_file("extdata", "aers_ascii_2004q1.zip"),
         compress_dir = tempdir()
@@ -75,7 +75,7 @@ testthat::test_that("`faers_combine()` for standardizated data works well", {
 })
 
 testthat::test_that("`faers_combine()` for de-duplicated data works as expected", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     data1 <- faers_parse(
         internal_file("extdata", "aers_ascii_2004q1.zip"),
         compress_dir = tempdir()

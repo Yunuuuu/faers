@@ -3,7 +3,7 @@ testthat::test_that("meddra_load_version() works as expected", {
 })
 
 testthat::test_that("meddra works well", {
-    testthat::skip_on_ci()
+    testthat::skip_if_not(dir.exists("~/Data/MedDRA/MedDRA_26_1_English"))
     path <- "~/Data/MedDRA/MedDRA_26_1_English" # nolint
     testthat::expect_true(rlang::is_string(meddra_load_version(path), "26.1"))
     testthat::expect_s3_class(data <- meddra_load_hierarchy(path), "data.table")
