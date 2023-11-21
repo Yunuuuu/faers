@@ -9,7 +9,7 @@
 FAERS is a database for the spontaneous reporting of adverse events and medication errors involving human drugs and therapeutic biological products. faers is the bridge between FAERS and R.
 }
 \author{
-\strong{Maintainer}: Yun Peng \email{yunyunp96@gmail.com}
+\strong{Maintainer}: Yun Peng \email{yunyunp96@gmail.com} (\href{https://orcid.org/0000-0003-2801-3332}{ORCID})
 
 }
 \keyword{internal}
