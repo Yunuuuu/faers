@@ -26,7 +26,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
-biocViews: Software, DataImport
+biocViews: Software, DataImport, BiomedicalInformatics, Pharmacogenomics, Pharmacogenomics
 Encoding: UTF-8
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
