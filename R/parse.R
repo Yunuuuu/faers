@@ -68,12 +68,13 @@ parse_ascii <- function(path, year, quarter) {
     fields <- fields[idx]
     deleted_cases <- read_ascii_deleted_cases(path, year, quarter)
     data_list <- .mapply(function(file, field) {
-        out <- tryCatch(
-            read_ascii(file, verbose = FALSE),
-            warning = function(cnd) {
-                safely_read_ascii(file, year, quarter)
-            }
-        )
+        if (any(year == ascii_file_need_safe_parsing$year &
+            quarter == ascii_file_need_safe_parsing$quarter &
+            field == ascii_file_need_safe_parsing$field)) {
+            out <- safely_read_ascii(file, year, quarter, field = field)
+        } else {
+            out <- read_ascii(file, verbose = FALSE)
+        }
         unify_ascii(out, field = field, year = year, quarter = quarter)
         out[!is.na(primaryid)]
     }, list(file = files, field = fields), NULL)
@@ -125,41 +126,70 @@ read_ascii <- function(file, ...) {
     out
 }
 
-safely_read_ascii <- function(file, year, quarter) {
-    # data.table will stop early for some files
-    # leave a lot of rows not read in
-    # this is mainly due to the presence of collapsed lines (two, or more lines
-    # collapsed as one line)
+
+# data.table will stop early for 4 files
+# leave a lot of rows not read in
+# this is mainly due to the presence of the collapsed lines (two, or more
+# lines collapsed as one line)
+# aers_ascii_2012q1/ascii/DEMO12Q1.TXT
+# aers_ascii_2011q4/ascii/DRUG11Q4.TXT
+# aers_ascii_2011q3/ascii/DRUG11Q3.TXT
+# aers_ascii_2011q2/ascii/DRUG11Q2.TXT
+ascii_file_need_safe_parsing <- data.table(
+    year = c(2011L, 2011L, 2011L, 2012L),
+    quarter = c("q2", "q3", "q4", "q1"),
+    field = c("drug", "drug", "drug", "demo")
+)
+
+safely_read_ascii <- function(file, year, quarter, field) {
     file_text <- brio::read_lines(file)
-    # fix for 2011q4 drug file, there exists a \177 field in line 729342
-    # which induce fread stop early, we just remove this string.
-    if (year == 2011L && quarter == "q4") {
-        file_text <- str_replace(
-            file_text, "LANOXIN (DIGOXIN\177",
-            "LANOXIN (DIGOXIN",
+    if (year == 2011L && quarter == "q2" && field == "drug") {
+        file_text[322967L] <- str_replace(
+            # line: 322967
+            file_text[322967L],
+            "7475791$1016572490$SS$DOXORUBICIN",
+            "\n7475791$1016572490$SS$DOXORUBICIN",
+            fixed = TRUE
+        )
+    }
+    if (year == 2011L && quarter == "q3" && field == "drug") {
+        file_text[247896L] <- str_replace(
+            # line: 247896
+            file_text[247896L],
+            "7652730$1017255397$SS$BEVACIZUMAB",
+            "\n7652730$1017255397$SS$BEVACIZUMAB",
+            fixed = TRUE
+        )
+    }
+    if (year == 2011L && quarter == "q4" && field == "drug") {
+        file_text[446738L] <- str_replace(
+            file_text[446738L],
+            "7941354$1018188213$SS$MEMANTINE HYDROCHLORIDE",
+            "\n7941354$1018188213$SS$MEMANTINE HYDROCHLORIDE",
             fixed = TRUE
         )
     }
     # for 2012q1 demo data:
     # JP-CUBIST-$E2B0000000182, the "$" should be removed
-    if (year == 2012L && quarter == "q1") {
-        file_text <- str_replace(
-            file_text, "JP-CUBIST-$",
-            "JP-CUBIST-",
+    if (year == 2012L && quarter == "q1" && field == "demo") {
+        file_text[105917L] <- str_replace(
+            file_text[105917L],
+            "JP-CUBIST-$E2B0000000182",
+            "JP-CUBIST-E2B0000000182",
             fixed = TRUE
         )
     }
 
-    n_seps <- str_count(file_text, "$", fixed = TRUE)
-    collapsed_lines <- floor(n_seps / n_seps[2L]) > 1L
-    if (any(collapsed_lines)) {
-        cli::cli_warn(c(
-            "omiting {sum(collapsed_lines)} collapsed line{?s}",
-            i = "line number: {which(collapsed_lines)}"
-        ))
-        file_text <- file_text[!collapsed_lines]
-    }
-    file_text <- str_remove(file_text[!collapsed_lines], "\\$$")
+    # n_seps <- str_count(file_text, "$", fixed = TRUE)
+    # collapsed_lines <- floor(n_seps / n_seps[2L]) > 1L
+    # if (any(collapsed_lines)) {
+    #     cli::cli_warn(c(
+    #         "omiting {sum(collapsed_lines)} collapsed line{?s}",
+    #         i = "line number: {which(collapsed_lines)}"
+    #     ))
+    #     file_text <- file_text[!collapsed_lines]
+    # }
+    # file_text <- str_remove(file_text[!collapsed_lines], "\\$$")
     read_text(file_text,
         sep = "$", quote = "", fill = TRUE,
         blank.lines.skip = TRUE,
