@@ -83,8 +83,8 @@ combine_faers_period <- function(lst, call = rlang::caller_env()) {
     out <- data.table::rbindlist(lapply(lst, faers_period))
     if (anyDuplicated(out)) {
         cli::cli_abort(c(
-            "Duplicated FAERS quarterly datas are not allowed",
-            i = "You can check {.fn faers_primaryid}"
+            "duplicated FAERS quarterly datas cannot be combined",
+            i = "You can check {.fn faers_period}"
         ), call = call)
     }
     out
@@ -95,7 +95,7 @@ combine_faers_deduplication <- function(lst, call = rlang::caller_env()) {
     if (all(dedup_vec)) {
         # If we combine deduplicated objects from different quarterly data
         # files, duplicate reports will be introduced. Therefore, we should only
-        # combine objects without performing deduplication.
+        # combine objects before performing deduplication.
         cli::cli_abort(
             "De-duplicated data must not be combined, you should always do de-duplication as a whole",
             call = call

@@ -314,7 +314,10 @@ build_periods <- function(
     call = rlang::caller_env()) {
     if (is.null(years) && is.null(quarters)) {
         if (is.null(periods)) {
-            cli::cli_abort("either both {.arg {arg_years}} and {.arg {arg_quarters}} {.arg {arg_periods}}", call = call)
+            cli::cli_abort(
+                "either both {.arg {arg_years}} and {.arg {arg_quarters}} or exclusively {.arg {arg_periods}} must be provied",
+                call = call
+            )
         }
         return(periods)
     } else if (!is.null(years) && !is.null(quarters)) {
