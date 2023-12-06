@@ -507,7 +507,7 @@ are available in ASCII or SGML formats, include:
     drugs
   - `indi`: contains all “Medical Dictionary for Regulatory Activities”
     (MedDRA) terms coded for the indications for use (diagnoses) for the
-    reported drugs Medical Dictionary for Regulatory Activities
+    reported drugs
 
 Generally, we can use `faers()` function to download and parse all
 quarterly data files from FAERS. Internally, the `faers()` function

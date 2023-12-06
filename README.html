@@ -1072,7 +1072,7 @@ body {
 <li><code>outc</code>: patient outcome information from the reports</li>
 <li><code>rpsr</code>: information on the source of the reports</li>
 <li><code>ther</code>: drug therapy start dates and end dates for the reported drugs</li>
-<li><code>indi</code>: contains all “Medical Dictionary for Regulatory Activities” (MedDRA) terms coded for the indications for use (diagnoses) for the reported drugs Medical Dictionary for Regulatory Activities</li>
+<li><code>indi</code>: contains all “Medical Dictionary for Regulatory Activities” (MedDRA) terms coded for the indications for use (diagnoses) for the reported drugs</li>
 </ul>
 <p>Generally, we can use <code>faers()</code> function to download and parse all quarterly data files from FAERS. Internally, the <code>faers()</code> function seamlessly utilizes <code>faers_download()</code> and <code>faers_parse()</code> to preprocess each quarterly data file from the FAERS repository. The default <code>format</code> was <code>ascii</code> and will return a <code>FAERSascii</code> object. (xml format would also be okay , but presently, the XML file receives only minimal support in the following process.)</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># # you must change `dir`, as the file included in the package is sampled</span></span>

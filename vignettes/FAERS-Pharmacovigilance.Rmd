@@ -81,7 +81,6 @@ for the indicated time ranges. The quarterly data files, which are available in 
   - `ther`: drug therapy start dates and end dates for the reported drugs
   - `indi`: contains all "Medical Dictionary for Regulatory Activities" (MedDRA)
 terms coded for the indications for use (diagnoses) for the reported drugs
-Medical Dictionary for Regulatory Activities 
 
 Generally, we can use `faers()` function to download and parse all quarterly
 data files from FAERS. Internally, the `faers()` function seamlessly utilizes
