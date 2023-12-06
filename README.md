@@ -498,14 +498,16 @@ The FAERS Quarterly Data files contain raw data extracted from the AERS
 database for the indicated time ranges. The quarterly data files, which
 are available in ASCII or SGML formats, include:
 
-  - demographic and administrative information (demo);
-  - drug information from the case reports (drug);
-  - reaction information from the reports (reac);
-  - patient outcome information from the reports (outc);
-  - information on the source of the reports (rpsr);
-  - drug therapy start dates and end dates for the reported drugs
-    (ther);
-  - Medical Dictionary for Regulatory Activities (indi)
+  - `demo`: demographic and administrative information
+  - `drug`: drug information from the case reports
+  - `reac`: reaction information from the reports
+  - `outc`: patient outcome information from the reports
+  - `rpsr`: information on the source of the reports
+  - `ther`: drug therapy start dates and end dates for the reported
+    drugs
+  - `indi`: contains all “Medical Dictionary for Regulatory Activities”
+    (MedDRA) terms coded for the indications for use (diagnoses) for the
+    reported drugs Medical Dictionary for Regulatory Activities
 
 Generally, we can use `faers()` function to download and parse all
 quarterly data files from FAERS. Internally, the `faers()` function
@@ -606,7 +608,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] faers_0.99.0
+#> [1] faers_0.99.2
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] digest_0.6.33     R6_2.5.1          fastmap_1.1.1     rvest_1.0.3      
@@ -614,6 +616,6 @@ sessionInfo()
 #>  [9] stringr_1.5.0     knitr_1.43        htmltools_0.5.5   rmarkdown_2.23   
 #> [13] lifecycle_1.0.3   xml2_1.3.5        cli_3.6.1         vctrs_0.6.3      
 #> [17] data.table_1.14.9 compiler_4.3.1    httr_1.4.6        rstudioapi_0.15.0
-#> [21] tools_4.3.1       curl_5.0.1        evaluate_0.21     yaml_2.3.7       
+#> [21] tools_4.3.1       curl_5.1.0        evaluate_0.21     yaml_2.3.7       
 #> [25] rlang_1.1.1       stringi_1.7.12    selectr_0.4-2
 ```

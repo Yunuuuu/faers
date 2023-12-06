@@ -73,13 +73,15 @@ faers_meta(internal = TRUE)
 The FAERS Quarterly Data files contain raw data extracted from the AERS database
 for the indicated time ranges. The quarterly data files, which are available in ASCII or SGML formats, include: 
 
-- demographic and administrative information (demo);
-- drug information from the case reports (drug);
-- reaction information from the reports (reac);
-- patient outcome information from the reports (outc);
-- information on the source of the reports (rpsr); 
-- drug therapy start dates and end dates for the reported drugs (ther); 
-- Medical Dictionary for Regulatory Activities (indi)
+  - `demo`: demographic and administrative information
+  - `drug`: drug information from the case reports
+  - `reac`: reaction information from the reports
+  - `outc`: patient outcome information from the reports
+  - `rpsr`: information on the source of the reports
+  - `ther`: drug therapy start dates and end dates for the reported drugs
+  - `indi`: contains all "Medical Dictionary for Regulatory Activities" (MedDRA)
+terms coded for the indications for use (diagnoses) for the reported drugs
+Medical Dictionary for Regulatory Activities 
 
 Generally, we can use `faers()` function to download and parse all quarterly
 data files from FAERS. Internally, the `faers()` function seamlessly utilizes
