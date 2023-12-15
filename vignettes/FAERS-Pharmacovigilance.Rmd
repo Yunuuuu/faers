@@ -50,7 +50,7 @@ This package accelarate the process of Pharmacovigilance Analysis using FAERS.
 library(faers)
 ```
 
-### check metadata of FAERS
+### Check metadata of FAERS
 This will return a data.table reporting years, period, quarter, and file urls
 and file sizes. By default, this will use the cached file in
 `rappdirs::user_cache_dir("faers")`.  If it doesn't exist, the internal will
@@ -69,7 +69,7 @@ faers_clearcache("metadata")
 faers_meta(internal = TRUE)
 ```
 
-#### download and parse quarterly data files from FAERS
+#### Download and Parse quarterly data files from FAERS
 The FAERS Quarterly Data files contain raw data extracted from the AERS database
 for the indicated time ranges. The quarterly data files, which are available in ASCII or SGML formats, include: 
 
@@ -85,10 +85,12 @@ terms coded for the indications for use (diagnoses) for the reported drugs
 Generally, we can use `faers()` function to download and parse all quarterly
 data files from FAERS. Internally, the `faers()` function seamlessly utilizes
 `faers_download()` and `faers_parse()` to preprocess each quarterly data file
-from the FAERS repository. The
-default `format` was `ascii` and will return a `FAERSascii` object. (xml format
-would also be okay , but presently, the XML file receives only minimal support
-in the following process.)
+from the FAERS repository. The default `format` was `ascii` and will return a
+`FAERSascii` object. (xml format would also be okay , but presently, the XML
+file receives only minimal support in the following process.)
+
+Some variables has been added into specific field. See `?faers_parse` for
+details. 
 
 ```{r}
 # # you must change `dir`, as the file included in the package is sampled
@@ -109,7 +111,7 @@ data2 <- faers(c(2004, 2017), c("q1", "q2"),
 data2
 ```
 
-#### standardize and De-duplication
+#### Standardize and De-duplication
 The `reac` file provides the adverse drug reactions, where it includes the
 “P.T.” field or the “Preferred Term” level terminology from the Medical
 Dictionary for Regulatory Activities (MedDRA). The `indi` file contains the drug
@@ -117,17 +119,28 @@ indications, which also uses the “P.T.” level of MedDRA as a descriptor for 
 drug indication. In this way, `MedDRA` was necessary to standardize this field
 and add additional informations, such as `System Organ Classes`. 
 
+```{r, eval=FALSE}
+# you must replace `meddra_path` with the path of uncompressed meddra data
+data <- faers_standardize(data2, meddra_path)
+```
+
+To proceed following steps, we just read a standardized data.
+```{r}
+data <- readRDS(system.file("extdata", "standardized_data.rds",
+  package = "faers"
+))
+data
+```
+
 One limitation of FAERS database is Duplicate and incomplete reports. There are
 many instances of duplicative reports and some reports do not contain all the
 necessary information. We deemed two cases to be identical if they exhibited a
 full concordance across drugs administered, and adverse reactions and but showed
 discrepancies in one or none of the following fields: gender, age, reporting
 country, event date, start date, and drug indications. 
-
-```{r, eval=FALSE}
-# you should replace `meddra_path` with the directory of meddra data
-data <- faers_standardize(data2, meddra_path)
+```{r}
 data <- faers_dedup(data)
+data
 ```
 
 #### Pharmacovigilance analysis
@@ -135,13 +148,60 @@ Pharmacovigilance is the science and activities relating to the detection,
 assessment, understanding and prevention of adverse effects or any other
 medicine/vaccine related problem. 
 
-```{r, eval=FALSE}
-# we use faers_filter() to extract data we are interested
-# here, we just sample 100 reports. You should do it based on your purpose.
-faers_phv_signal(
-  faers_filter(data, .fn = ~ sample(faers_primaryid(.x), 100L)),
+To mine the signals of "insulin", we start by using the `faers_filter()`
+function. In this function, the `.fn` argument should be a function that accepts
+data specified in `.field`. It is important to note that `.fn` should always
+return the `primaryid` that you want to keep. 
+
+To enhance our analysis, it would be advantageous to include all drug synonym names for `insulin`. These synonyms can be obtained by querying sources such as https://go.drugbank.com/ or alternative databases. Furthermore, we extract the brand names of insulin from the [Drugs@FDA](https://www.fda.gov/drugs/drug-approvals-and-databases/drugsfda-data-files) dataset, which can be easily obtained using the `fda_drugs()` function. 
+```{r}
+insulin_pattern <- "insulin"
+insulin_pattern <- paste(insulin_pattern, collapse = "|")
+fda_insulin <- fda_drugs()[
+  grepl(insulin_pattern, ActiveIngredient, ignore.case = TRUE)
+]
+insulin_pattern <- paste0(
+  unique(tolower(c(insulin_pattern, fda_insulin$DrugName))),
+  collapse = "|"
+)
+insulin_data <- faers_filter(data, .fn = function(x) {
+  idx <- grepl(insulin_pattern, x$drugname, ignore.case = TRUE) |
+    grepl(insulin_pattern, x$prod_ai, ignore.case = TRUE)
+  x[idx, primaryid]
+}, .field = "drug")
+insulin_data
+```
+
+Then, signal can be easily obtained with `faers_phv_signal()` which internally
+use `faers_phv_table()` to create a contingency table and use `phv_signal()` to
+do signal analysis specified in `.methods` argument. By default, all supported
+signal analysis methods will be run, including "ror", "prr", "chisq",
+"bcpnn_norm", "bcpnn_mcmc", "obsexp_shrink", "fisher", and "ebgm".  
+
+The most important argument for this function is `.object`, which should be a
+de-duplicated FAERSascii object containing the data for the drugs or traits of
+interest. Additionally, you must specify either `.full`, which represents the
+background distributions data (usually the entire FAERS data), or you can
+specify `.object2`, which should be the control data or another drug of interest
+for comparison.
+
+```{r, warning=FALSE}
+insulin_signals <- faers_phv_signal(insulin_data, .full = data)
+insulin_signals
+```
+
+The column containing the events of interest can be specified using an atomic
+character in the `.events` (default: "soc_name") argument. The combination of
+all specified columns will define the unique event. Additionally, we can control
+which field data to find the columns in the `.field` (default: "reac") argument.
+
+```{r, warning=FALSE}
+insulin_signals_hlgt <- faers_phv_signal(
+  insulin_data,
+  .events = "hlgt_name",
   .full = data
 )
+insulin_signals_hlgt
 ```
 
 #### sessionInfo

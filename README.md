@@ -29,7 +29,7 @@ Analysis using FAERS.
 library(faers)
 ```
 
-### check metadata of FAERS
+### Check metadata of FAERS
 
 This will return a data.table reporting years, period, quarter, and file
 urls and file sizes. By default, this will use the cached file in
@@ -492,7 +492,7 @@ faers_meta(internal = TRUE)
 #>  [ reached getOption("max.print") -- omitted 10 rows ]
 ```
 
-#### download and parse quarterly data files from FAERS
+#### Download and Parse quarterly data files from FAERS
 
 The FAERS Quarterly Data files contain raw data extracted from the AERS
 database for the indicated time ranges. The quarterly data files, which
@@ -516,6 +516,9 @@ each quarterly data file from the FAERS repository. The default `format`
 was `ascii` and will return a `FAERSascii` object. (xml format would
 also be okay , but presently, the XML file receives only minimal support
 in the following process.)
+
+Some variables has been added into specific field. See `?faers_parse`
+for details.
 
 ``` r
 # # you must change `dir`, as the file included in the package is sampled
@@ -545,7 +548,7 @@ data2
 #>   Total reports: 200 (with duplicates)
 ```
 
-#### standardize and De-duplication
+#### Standardize and De-duplication
 
 The `reac` file provides the adverse drug reactions, where it includes
 the “P.T.” field or the “Preferred Term” level terminology from the
@@ -554,6 +557,22 @@ contains the drug indications, which also uses the “P.T.” level of
 MedDRA as a descriptor for the drug indication. In this way, `MedDRA`
 was necessary to standardize this field and add additional informations,
 such as `System Organ Classes`.
+
+``` r
+# you must replace `meddra_path` with the path of uncompressed meddra data
+data <- faers_standardize(data2, meddra_path)
+```
+
+To proceed following steps, we just read a standardized data.
+
+``` r
+data <- readRDS(system.file("extdata", "standardized_data.rds",
+  package = "faers"
+))
+data
+#> Standardized FAERS data from 2 Quarterly ascii files
+#>   Total reports: 200 (with duplicates)
+```
 
 One limitation of FAERS database is Duplicate and incomplete reports.
 There are many instances of duplicative reports and some reports do not
@@ -564,9 +583,13 @@ or none of the following fields: gender, age, reporting country, event
 date, start date, and drug indications.
 
 ``` r
-# you should replace `meddra_path` with the directory of meddra data
-data <- faers_standardize(data2, meddra_path)
 data <- faers_dedup(data)
+#> → deduplication from the same source by retain the most recent report
+#> → merging `drug`, `indi`, `ther`, and `reac` data
+#> → deduplication from multiple sources by matching gender, age, reporting country, event date, start date, drug indications, drugs administered, and adverse reactions
+data
+#> Standardized and De-duplicated FAERS data from 2 Quarterly ascii files
+#>   Total unique reports: 200
 ```
 
 #### Pharmacovigilance analysis
@@ -575,13 +598,290 @@ Pharmacovigilance is the science and activities relating to the
 detection, assessment, understanding and prevention of adverse effects
 or any other medicine/vaccine related problem.
 
+To mine the signals of “insulin”, we start by using the `faers_filter()`
+function. In this function, the `.fn` argument should be a function that
+accepts data specified in `.field`. It is important to note that `.fn`
+should always return the `primaryid` that you want to keep.
+
+To enhance our analysis, it would be advantageous to include all drug
+synonym names for `insulin`. These synonyms can be obtained by querying
+sources such as <https://go.drugbank.com/> or alternative databases.
+Furthermore, we extract the brand names of insulin from the
+[Drugs@FDA](https://www.fda.gov/drugs/drug-approvals-and-databases/drugsfda-data-files)
+dataset, which can be easily obtained using the `fda_drugs()` function.
+
 ``` r
-# we use faers_filter() to extract data we are interested
-# here, we just sample 100 reports. You should do it based on your purpose.
-faers_phv_signal(
-  faers_filter(data, .fn = ~ sample(faers_primaryid(.x), 100L)),
+insulin_pattern <- "insulin"
+insulin_pattern <- paste(insulin_pattern, collapse = "|")
+fda_insulin <- fda_drugs()[
+  grepl(insulin_pattern, ActiveIngredient, ignore.case = TRUE)
+]
+#> → Using Drugs@FDA Data from cached
+#>   '/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2023-12-15.zip'
+#>   Snapshot date: 2023-12-15
+#> Warning: One or more parsing issues, call `problems()` on your data frame for details,
+#> e.g.:
+#>   dat <- vroom(...)
+#>   problems(dat)
+insulin_pattern <- paste0(
+  unique(tolower(c(insulin_pattern, fda_insulin$DrugName))),
+  collapse = "|"
+)
+insulin_data <- faers_filter(data, .fn = function(x) {
+  idx <- grepl(insulin_pattern, x$drugname, ignore.case = TRUE) |
+    grepl(insulin_pattern, x$prod_ai, ignore.case = TRUE)
+  x[idx, primaryid]
+}, .field = "drug")
+insulin_data
+#> Standardized and De-duplicated FAERS data from 2 Quarterly ascii files
+#>   Total unique reports: 3
+```
+
+Then, signal can be easily obtained with `faers_phv_signal()` which
+internally use `faers_phv_table()` to create a contingency table and use
+`phv_signal()` to do signal analysis specified in `.methods` argument.
+By default, all supported signal analysis methods will be run, including
+“ror”, “prr”, “chisq”, “bcpnn\_norm”, “bcpnn\_mcmc”, “obsexp\_shrink”,
+“fisher”, and “ebgm”.
+
+The most important argument for this function is `.object`, which should
+be a de-duplicated FAERSascii object containing the data for the drugs
+or traits of interest. Additionally, you must specify either `.full`,
+which represents the background distributions data (usually the entire
+FAERS data), or you can specify `.object2`, which should be the control
+data or another drug of interest for comparison.
+
+``` r
+insulin_signals <- faers_phv_signal(insulin_data, .full = data)
+insulin_signals
+#> Key: <soc_name>
+#>                                                                soc_name     a
+#>                                                                  <char> <int>
+#>  1:                                Blood and lymphatic system disorders     0
+#>  2:                                                   Cardiac disorders     1
+#>  3:                          Congenital, familial and genetic disorders     0
+#>  4:                                         Ear and labyrinth disorders     0
+#>  5:                                                 Endocrine disorders     0
+#>  6:                                                       Eye disorders     1
+#>  7:                                          Gastrointestinal disorders     1
+#>  8:                General disorders and administration site conditions     1
+#>  9:                                             Hepatobiliary disorders     0
+#> 10:                                             Immune system disorders     0
+#> 11:                                         Infections and infestations     2
+#> 12:                      Injury, poisoning and procedural complications     1
+#> 13:                                                      Investigations     2
+#> 14:                                  Metabolism and nutrition disorders     2
+#> 15:                     Musculoskeletal and connective tissue disorders     0
+#>         b     c     d expected        ror ror_ci_low ror_ci_high        prr
+#>     <int> <int> <int>    <num>      <num>      <num>       <num>      <num>
+#>  1:     3    14   183    0.210  0.0000000 0.00000000         NaN  0.0000000
+#>  2:     2     7   190    0.120 13.5714286 1.09612571  168.031524  9.3809524
+#>  3:     3     1   196    0.015  0.0000000 0.00000000         NaN  0.0000000
+#>  4:     3     4   193    0.060  0.0000000 0.00000000         NaN  0.0000000
+#>  5:     3     1   196    0.015  0.0000000 0.00000000         NaN  0.0000000
+#>  6:     2     9   188    0.150 10.4444444 0.86432480  126.209985  7.2962963
+#>  7:     2    33   164    0.510  2.4848485 0.21888790   28.208376  1.9898990
+#>  8:     2    79   118    1.200  0.7468354 0.06658895    8.376212  0.8312236
+#>  9:     3     9   188    0.135  0.0000000 0.00000000         NaN  0.0000000
+#> 10:     3     4   193    0.060  0.0000000 0.00000000         NaN  0.0000000
+#> 11:     1    30   167    0.480 11.1333333 0.97846354  126.679335  4.3777778
+#> 12:     2    30   167    0.465  2.7833333 0.24461589   31.669834  2.1888889
+#> 13:     1    30   167    0.480 11.1333333 0.97846354  126.679335  4.3777778
+#> 14:     1    10   187    0.180 37.4000000 3.12161662  448.088336 13.1333333
+#> 15:     3    19   178    0.285  0.0000000 0.00000000         NaN  0.0000000
+#>     prr_ci_low prr_ci_high        chisq chisq_pvalue bcpnn_norm_ic
+#>          <num>       <num>        <num>        <num>         <num>
+#>  1:  0.0000000         NaN 4.096414e-31  1.000000000   -0.97458175
+#>  2:  1.6173190   54.412435 1.272561e+00  0.259286856    0.63833534
+#>  3:  0.0000000         NaN 1.265951e-26  1.000000000   -0.31739140
+#>  4:  0.0000000         NaN 2.866117e-32  1.000000000   -0.63762418
+#>  5:  0.0000000         NaN 1.265951e-26  1.000000000   -0.31739140
+#>  6:  1.3027676   40.863727 8.727402e-01  0.350197814    0.57607008
+#>  7:  0.3897628   10.159250 6.459270e-31  1.000000000    0.05900067
+#>  8:  0.1662546    4.155871 1.762340e-31  1.000000000   -0.57013768
+#>  9:  0.0000000         NaN 6.503567e-28  1.000000000   -0.83645056
+#> 10:  0.0000000         NaN 2.866117e-32  1.000000000   -0.63762418
+#> 11:  1.8426662   10.400656 2.619652e+00  0.105547591    0.81550390
+#> 12:  0.4272128   11.215100 3.165120e-03  0.955135161    0.11209704
+#> 13:  1.8426662   10.400656 2.619652e+00  0.105547591    0.81550390
+#> 14:  4.8197010   35.787374 1.045469e+01  0.001223383    1.24133970
+#> 15:  0.0000000         NaN 4.555566e-29  1.000000000   -1.09198678
+#>     bcpnn_norm_ic_ci_low bcpnn_norm_ic_ci_high bcpnn_mcmc_ic
+#>                    <num>                 <num>         <num>
+#>  1:            -4.960069              3.010906   -0.50449401
+#>  2:            -2.239177              3.515848    1.27660894
+#>  3:            -4.844759              4.209977   -0.03947607
+#>  4:            -4.773808              3.498560   -0.16092798
+#>  5:            -4.844759              4.209977   -0.03947607
+#>  6:            -2.270036              3.422176    1.20821022
+#>  7:            -2.690902              2.808903    0.57112278
+#>  8:            -3.294337              2.154062   -0.18051848
+#>  9:            -4.858428              3.185527   -0.34296004
+#> 10:            -4.773808              3.498560   -0.16092798
+#> 11:            -1.546257              3.177265    1.35163975
+#> 12:            -2.641970              2.866165    0.63695385
+#> 13:            -1.546257              3.177265    1.35163975
+#> 14:            -1.203821              3.686501    1.87988617
+#> 15:            -5.059438              2.875465   -0.64969772
+#>     bcpnn_mcmc_ic_ci_low bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low
+#>                    <num>                 <num>       <num>           <num>
+#>  1:          -10.3805164             1.7181345 -0.50589093     -10.3053489
+#>  2:           -2.3575189             2.7768097  1.27462238      -2.5084784
+#>  3:           -9.8936214             2.2657509 -0.04264434      -9.9873991
+#>  4:          -10.0349718             2.1150731 -0.16349873     -10.0714410
+#>  5:           -9.9504532             2.2522072 -0.04264434     -10.0409408
+#>  6:           -2.4549778             2.6882805  1.20645088      -2.5766499
+#>  7:           -2.8603230             1.8955875  0.57060721      -3.2124936
+#>  8:           -3.4438061             0.9957419 -0.18057225      -3.9636731
+#>  9:          -10.3225964             1.9141687 -0.34482850     -10.1557536
+#> 10:          -10.0949005             2.1235736 -0.16349873     -10.1712790
+#> 11:           -0.7479781             2.3096183  1.35107444      -1.2419932
+#> 12:           -2.8351913             1.9841298  0.63636165      -3.1467392
+#> 13:           -0.7703094             2.3110648  1.35107444      -1.2419932
+#> 14:           -0.4256531             3.0159208  1.87832144      -0.7147462
+#> 15:          -10.5178719             1.5672414 -0.65076456     -10.3959658
+#>     oe_ratio_ci_high odds_ratio odds_ratio_ci_low odds_ratio_ci_high
+#>                <num>      <num>             <num>              <num>
+#>  1:         1.727048  0.0000000        0.00000000           33.68585
+#>  2:         2.962049 13.0303800        0.20150028          279.21542
+#>  3:         2.245973  0.0000000        0.00000000         2462.50000
+#>  4:         2.101459  0.0000000        0.00000000          145.21133
+#>  5:         2.250247  0.0000000        0.00000000         2462.50000
+#>  6:         2.893877 10.1233187        0.15947006          211.87117
+#>  7:         2.258033  2.4701675        0.04089140           48.73410
+#>  8:         1.506854  0.7478897        0.01250834           14.59249
+#>  9:         1.894089  0.0000000        0.00000000           55.53664
+#> 10:         2.134816  0.0000000        0.00000000          145.21133
+#> 11:         2.742477 10.9151800        0.55237709          657.45882
+#> 12:         2.323788  2.7642969        0.04567010           54.61951
+#> 13:         2.742477 10.9151800        0.55237709          657.45882
+#> 14:         3.269724 35.2158110        1.70522393         2176.34560
+#> 15:         1.571778  0.0000000        0.00000000           23.77817
+#>     fisher_pvalue     ebgm ebgm_ci_low ebgm_ci_high
+#>             <num>    <num>       <num>        <num>
+#>  1:    1.00000000 2.421502        2.38         2.46
+#>  2:    0.11582153 2.421743        2.38         2.46
+#>  3:    1.00000000 2.421595        2.38         2.46
+#>  4:    1.00000000 2.421574        2.38         2.46
+#>  5:    1.00000000 2.421595        2.38         2.46
+#>  6:    0.14330745 2.421729        2.38         2.46
+#>  7:    0.42998325 2.421556        2.38         2.46
+#>  8:    1.00000000 2.421225        2.38         2.46
+#>  9:    1.00000000 2.421538        2.38         2.46
+#> 10:    1.00000000 2.421574        2.38         2.46
+#> 11:    0.06722095 2.421769        2.38         2.46
+#> 12:    0.39832191 2.421578        2.38         2.46
+#> 13:    0.06722095 2.421769        2.38         2.46
+#> 14:    0.00961474 2.421913        2.38         2.46
+#> 15:    1.00000000 2.421466        2.38         2.46
+#>  [ reached getOption("max.print") -- omitted 12 rows ]
+```
+
+The column containing the events of interest can be specified using an
+atomic character in the `.events` (default: “soc\_name”) argument. The
+combination of all specified columns will define the unique event.
+Additionally, we can control which field data to find the columns in the
+`.field` (default: “reac”) argument.
+
+``` r
+insulin_signals_hlgt <- faers_phv_signal(
+  insulin_data,
+  .events = "hlgt_name",
   .full = data
 )
+insulin_signals_hlgt
+#> Key: <hlgt_name>
+#>                                                       hlgt_name     a     b
+#>                                                          <char> <int> <int>
+#>   1:                                        Acid-base disorders     0     3
+#>   2:                              Administration site reactions     0     3
+#>   3:                                        Allergic conditions     0     3
+#>   4:               Anaemias nonhaemolytic and marrow depression     0     3
+#>   5:                                   Angioedema and urticaria     0     3
+#>  ---                                                                       
+#> 138:                                 Viral infectious disorders     0     3
+#> 139:                                           Vision disorders     1     2
+#> 140: Vulvovaginal disorders (excl infections and inflammations)     0     3
+#> 141:              Water, electrolyte and mineral investigations     1     2
+#> 142:                                 White blood cell disorders     0     3
+#>          c     d expected   ror ror_ci_low ror_ci_high      prr prr_ci_low
+#>      <int> <int>    <num> <num>      <num>       <num>    <num>      <num>
+#>   1:     1   196    0.015  0.00   0.000000         NaN  0.00000   0.000000
+#>   2:     9   188    0.135  0.00   0.000000         NaN  0.00000   0.000000
+#>   3:     3   194    0.045  0.00   0.000000         NaN  0.00000   0.000000
+#>   4:     2   195    0.030  0.00   0.000000         NaN  0.00000   0.000000
+#>   5:     1   196    0.015  0.00   0.000000         NaN  0.00000   0.000000
+#>  ---                                                                      
+#> 138:     6   191    0.090  0.00   0.000000         NaN  0.00000   0.000000
+#> 139:     2   195    0.045 48.75   3.038446    782.1638 32.83333   3.971134
+#> 140:     1   196    0.015  0.00   0.000000         NaN  0.00000   0.000000
+#> 141:     1   196    0.030 98.00   4.405403   2180.0503 65.66667   5.249564
+#> 142:     6   191    0.090  0.00   0.000000         NaN  0.00000   0.000000
+#>      prr_ci_high        chisq chisq_pvalue bcpnn_norm_ic bcpnn_norm_ic_ci_low
+#>            <num>        <num>        <num>         <num>                <num>
+#>   1:         NaN 1.265951e-26  1.000000000    -0.3173914            -4.844759
+#>   2:         NaN 6.503567e-28  1.000000000    -0.8364506            -4.858428
+#>   3:         NaN 3.579029e-27  1.000000000    -0.5729454            -4.769182
+#>   4:         NaN 1.292402e-30  1.000000000    -0.4806767            -4.781546
+#>   5:         NaN 1.265951e-26  1.000000000    -0.3173914            -4.844759
+#>  ---                                                                         
+#> 138:         NaN 2.800437e-31  1.000000000    -0.7316939            -4.801687
+#> 139:    271.4660 4.741741e+00  0.029439266     0.8697497            -2.230719
+#> 140:         NaN 1.265951e-26  1.000000000    -0.3173914            -4.844759
+#> 141:    821.4227 7.550975e+00  0.005997761     0.9620184            -2.278658
+#> 142:         NaN 2.800437e-31  1.000000000    -0.7316939            -4.801687
+#>      bcpnn_norm_ic_ci_high bcpnn_mcmc_ic bcpnn_mcmc_ic_ci_low
+#>                      <num>         <num>                <num>
+#>   1:              4.209977   -0.03947607            -9.950253
+#>   2:              3.185527   -0.34296004           -10.193483
+#>   3:              3.623291   -0.12157646           -10.036968
+#>   4:              3.820193   -0.08111417            -9.930364
+#>   5:              4.209977   -0.03947607           -10.027199
+#>  ---                                                         
+#> 138:              3.338300   -0.23653305           -10.190701
+#> 139:              3.970219    1.46338605            -2.230773
+#> 140:              4.209977   -0.03947607            -9.974732
+#> 141:              4.202695    1.50384833            -2.217366
+#> 142:              3.338300   -0.23653305           -10.213946
+#>      bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low oe_ratio_ci_high
+#>                      <num>       <num>           <num>            <num>
+#>   1:              2.257810 -0.04264434      -10.028608         2.267654
+#>   2:              1.914658 -0.34482850      -10.100818         1.917663
+#>   3:              2.155443 -0.12432814      -10.089395         2.161137
+#>   4:              2.220315 -0.08406426       -9.966827         2.199547
+#>   5:              2.256147 -0.04264434      -10.011552         2.259165
+#>  ---                                                                   
+#> 138:              2.026060 -0.23878686      -10.094433         2.021954
+#> 139:              3.003833  1.46063437       -2.322466         3.148061
+#> 140:              2.242318 -0.04264434      -10.013724         2.227504
+#> 141:              3.058207  1.50089824       -2.282203         3.188325
+#> 142:              2.030362 -0.23878686      -10.175191         2.038959
+#>      odds_ratio odds_ratio_ci_low odds_ratio_ci_high fisher_pvalue     ebgm
+#>           <num>             <num>              <num>         <num>    <num>
+#>   1:    0.00000         0.0000000         2462.50000    1.00000000 3.670936
+#>   2:    0.00000         0.0000000           55.53664    1.00000000 3.459110
+#>   3:    0.00000         0.0000000          213.09160    1.00000000 3.615584
+#>   4:    0.00000         0.0000000          408.94448    1.00000000 3.643050
+#>   5:    0.00000         0.0000000         2462.50000    1.00000000 3.670936
+#>  ---                                                                       
+#> 138:    0.00000         0.0000000           88.65547    1.00000000 3.535617
+#> 139:   43.06704         0.5524356         1247.00745    0.04454850 4.117845
+#> 140:    0.00000         0.0000000         2462.50000    1.00000000 3.670936
+#> 141:   80.16649         0.8340751         7069.12541    0.02984925 4.149126
+#> 142:    0.00000         0.0000000           88.65547    1.00000000 3.535617
+#>      ebgm_ci_low ebgm_ci_high
+#>            <num>        <num>
+#>   1:        1.66         7.14
+#>   2:        1.56         6.73
+#>   3:        1.63         7.03
+#>   4:        1.65         7.09
+#>   5:        1.66         7.14
+#>  ---                         
+#> 138:        1.60         6.88
+#> 139:        1.96         7.71
+#> 140:        1.66         7.14
+#> 141:        1.98         7.77
+#> 142:        1.60         6.88
 ```
 
 #### sessionInfo
@@ -611,11 +911,19 @@ sessionInfo()
 #> [1] faers_0.99.2
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] digest_0.6.33     R6_2.5.1          fastmap_1.1.1     rvest_1.0.3      
-#>  [5] xfun_0.39         magrittr_2.0.3    rappdirs_0.3.3    glue_1.6.2       
-#>  [9] stringr_1.5.0     knitr_1.43        htmltools_0.5.5   rmarkdown_2.23   
-#> [13] lifecycle_1.0.3   xml2_1.3.5        cli_3.6.1         vctrs_0.6.3      
-#> [17] data.table_1.14.9 compiler_4.3.1    httr_1.4.6        rstudioapi_0.15.0
-#> [21] tools_4.3.1       curl_5.1.0        evaluate_0.21     yaml_2.3.7       
-#> [25] rlang_1.1.1       stringi_1.7.12    selectr_0.4-2
+#>  [1] generics_0.1.3     rappdirs_0.3.3     utf8_1.2.4         xml2_1.3.6        
+#>  [5] stringi_1.8.3      openEBGM_0.9.1     lattice_0.22-5     digest_0.6.33     
+#>  [9] magrittr_2.0.3     evaluate_0.23      grid_4.3.1         MCMCpack_1.6-3    
+#> [13] fastmap_1.1.1      Matrix_1.6-4       survival_3.5-7     mcmc_0.9-7        
+#> [17] httr_1.4.7         rvest_1.0.3        fansi_1.0.6        selectr_0.4-2     
+#> [21] scales_1.3.0       cli_3.6.2          rlang_1.1.2        crayon_1.5.2      
+#> [25] munsell_0.5.0      bit64_4.0.5        splines_4.3.1      yaml_2.3.8        
+#> [29] tools_4.3.1        parallel_4.3.1     SparseM_1.81       tzdb_0.4.0        
+#> [33] MatrixModels_0.5-2 coda_0.19-4        dplyr_1.1.4        colorspace_2.1-0  
+#> [37] ggplot2_3.4.4      curl_5.2.0         vctrs_0.6.5        R6_2.5.1          
+#> [41] lifecycle_1.0.4    stringr_1.5.1      bit_4.0.5          vroom_1.6.5       
+#> [45] MASS_7.3-60        pkgconfig_2.0.3    archive_1.1.6      pillar_1.9.0      
+#> [49] gtable_0.3.4       data.table_1.14.9  glue_1.6.2         xfun_0.41         
+#> [53] tibble_3.2.1       tidyselect_1.2.0   knitr_1.45         htmltools_0.5.7   
+#> [57] rmarkdown_2.25     compiler_4.3.1     quantreg_5.96
 ```

@@ -1,3 +1,27 @@
+#' @section Unification:
+#' For all fields data: 
+#' - All names have been converted to lowercase.
+#' - Rename "isr" into "primaryid" for periods before 2012q3.
+#' 
+#' Field specific operations:
+#' - `demo`:
+#'   - Rename "gndr_cod" into "sex" for periods before 2014q2.
+#'   - Rename "case" and "i_f_cod" into "caseid" and "i_f_code" for legacy aers,
+#'     before 2012q3. 
+#'   - "age_in_years" was added, measured in years.
+#'   - "country_code" was added (encoded according to the `iso2c` standards), it
+#'      will be convenient to translate it into other code with
+#'      [countrycode][countrycode::countrycode].
+#'   - "gender" was added, which recoded "UNK", "NS", and "YR" in "sex" as `NA`.
+#' - `ther`:
+#'   Rename "drug_seq" into "dsg_drug_seq" for legacy aers, before 2012q3.
+#' - `indi`:
+#'   Rename "drug_seq" into "indi_drug_seq" for legacy aers, before 2012q3.
+#' - `outc`:
+#'   Rename "outc_code" into "outc_cod" for `2012q4` data
+#' @name faers_parse
+NULL
+
 #' Used in internal function, unify data
 #' @return Always change their input by reference
 #' @noRd
@@ -289,11 +313,13 @@ unify_ascii_ther <- function(data, year, quarter) {
         data.table::setnames(data, "drug_seq", "dsg_drug_seq")
     }
 }
+
 unify_ascii_indi <- function(data, year, quarter) {
     if (is_from_laers(year, quarter)) {
         data.table::setnames(data, "drug_seq", "indi_drug_seq")
     }
 }
+
 unify_ascii_outc <- function(data, year, quarter) {
     if (year == 2012L && quarter == "q4") {
         data.table::setnames(data, "outc_code", "outc_cod")

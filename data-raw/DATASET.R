@@ -8,6 +8,12 @@ saveRDS(
 
 faers_sample(2004, "q1", dir = "inst/extdata")
 faers_sample(2017, "q2", dir = "inst/extdata")
+data <- faers(c(2004, 2017), c("q1", "q2"),
+  dir = system.file("extdata", package = "faers"),
+  compress_dir = tempdir()
+)
+data <- faers_standardize(data, "~/Data/MedDRA/MedDRA_26_1_English") # nolint
+saveRDS(data, "inst/extdata/standardized_data.rds")
 
 # - Chen Chen, Bin Wu, ChenYu Zhang, Ting Xu,Immune-related adverse events
 # associated with immune checkpoint inhibitors: An updated comprehensive

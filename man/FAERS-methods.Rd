@@ -76,12 +76,13 @@ return an atomic integer or character of \code{primaryid} you want to keep or
 remove based on argument \code{.invert}.
 
 Note: When using the \verb{set*} or \verb{:=} function from \code{data.table} to modify the
-internal data, exercise caution with un-standardized data and the "demo",
-"drug", "ther", "rpsr", and "outc" field in standardized data as these
-functions will modify the data directly. In such cases, it is advisable to
-use the \link[data.table:copy]{copy} function first. Note that for the "indi" and
-"reac" field in standardized data, a shallow copy will automatically be made
-to add meddra data.
+internal data, exercise caution with all fields from un-standardized data and
+the "demo", "drug", "ther", "rpsr", and "outc" field data in standardized
+data as these functions will modify the data directly. In such cases, it is
+advisable to use the \link[data.table:copy]{copy} function first. Note that for
+the "indi" and "reac" field in standardized data, a shallow copy will
+automatically be made to add meddra data, so no need to run
+\link[data.table:copy]{copy}.
 
 If a \strong{function}, it is used as is.
 
