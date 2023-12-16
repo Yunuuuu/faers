@@ -1,8 +1,42 @@
-athena_standardize_drug <- function(terms, path = NULL, force = FALSE) {
-    data <- athena_parse(
-        c("concept", "concept_synonym"),
-        path = path, force = force
-    )
+#' Read and Parse ATHENA VOCABULARIES data
+#' @param use An atomic character specifying the files to use with values in
+#' `r quote_strings(use_athena)`.
+#' @param list A boolean value, should it only list files in the ATHENA
+#' VOCABULARIES data?
+#' @param force A boolean value. If set to `TRUE`, it indicates the retrieval of
+#' VOCABULARIES data in the `url` directly, bypassing the cache.
+#' @param url A string of url for ATHENA VOCABULARIES data. You must provide it
+#' to cache the file when you firstly run this function.
+#' @return
+#' - if `list = TRUE`, an atomic character.
+#' - if `list = FALSE`, a [data.table][data.table::data.table] if `use` is a
+#'   string or otherwise a list of [data.table][data.table::data.table].
+#' @export
+athena <- function(use = NULL, list = FALSE, force = FALSE, url = NULL) {
+    assert_bool(list)
+    assert_bool(force)
+    assert_string(url, null_ok = TRUE)
+    if (!is.null(url) && !startsWith(url, "https")) {
+        cli::cli_abort("{.arg url} must start with {.val https}")
+    }
+    file <- athena_file(url, force)
+    path <- unzip2(file, dir)
+    if (list) {
+        list.files(path)
+    } else {
+        assert_inclusive(use, use_athena, null_ok = TRUE)
+        use <- use %||% use_athena
+        out <- athena_loads(path, use)
+        if (length(use) == 1L) {
+            out[[1L]]
+        } else {
+            out
+        }
+    }
+}
+
+athena_standardize_drug <- function(terms, force = FALSE, url = NULL) {
+    data <- athena(c("concept", "concept_synonym"), force = force, url = url)
     data$concept <- data$concept[domain_id == "Drug"] # nolint
     data$concept_synonym <- data$concept_synonym[
         concept_id %in% data$concept$concept_id # nolint
@@ -24,49 +58,30 @@ athena_standardize_drug <- function(terms, path = NULL, force = FALSE) {
 
 utils::globalVariables(c("domain_id", "concept_id", "athena_drug_names"))
 
-#' @param use An atomic character specifying the files to use with values in
-#' "concept", "domain", "concept_class", "concept_relationship",
-#' "concept_ancestor", "concept_synonym", "drug_strength", "relationship",
-#' "vocabulary".
-#' @noRd
-athena_parse <- function(use = NULL, path = NULL, dir = faers_cache_dir("athena"), force = FALSE) {
-    path <- path %||% "https://athena.ohdsi.org/api/v1/vocabularies/zip/1ff93442-eb50-4dac-a38c-a374ac383da7"
-    if (startsWith(path, "https")) {
-        path <- athena_download(path, force = force, dir = dir)
-    }
-    path <- dir_or_unzip(path,
-        compress_dir = dir,
-        pattern = "\\.zip$",
-        none_msg = "Athena vocabularies Data should be a zip file"
+athena_loads <- function(file, use, dir = faers_cache_dir("athena")) {
+    files <- use_files(file, use = use, ext = "csv")
+    lapply(files, athena_read)
+}
+
+athena_read <- function(file) {
+    data.table::fread(file = file, quote = "")
+}
+
+athena_file <- function(
+    url, force, dir = faers_cache_dir("athena"),
+    arg = rlang::caller_arg(url)) {
+    cache_file(
+        force = force,
+        url = url,
+        prefix = "athena_vocabularies",
+        ext = "zip",
+        name = "ATHENA VOCABULARIES",
+        dir = dir,
+        arg = arg
     )
-    files <- locate_files(path, "\\.csv$")
-    ids <- str_remove(tolower(basename(files)), "\\.csv$")
-    use <- use %||% athena_files
-    idx <- match(use, ids)
-    if (anyNA(idx)) {
-        cli::cli_abort(sprintf(
-            "Cannot find %s",
-            oxford_comma(style_file(paste0(toupper(use[is.na(idx)]), ".csv")))
-        ))
-    }
-    files <- files[idx]
-    ids <- ids[idx]
-    data_list <- lapply(files, function(file) {
-        data.table::fread(file = file, quote = "")
-    })
-    data.table::setattr(data_list, "names", ids)
-    data_list
 }
 
-athena_download <- function(url, force = FALSE, dir = faers_cache_dir("athena")) {
-    rxnorm_file <- file.path(dir, "athena_rxnorm.zip")
-    if (isTRUE(force) && file.exists(rxnorm_file)) {
-        file.remove(rxnorm_file)
-    }
-    download_inform(url, rxnorm_file)
-}
-
-athena_files <- c(
+use_athena <- c(
     "concept", "domain", "concept_class",
     "concept_relationship", "concept_ancestor", "concept_synonym", "drug_strength", "relationship", "vocabulary"
 )
