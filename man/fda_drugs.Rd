@@ -4,12 +4,13 @@
 \alias{fda_drugs}
 \title{Read and Parse Drugs@FDA data}
 \usage{
-fda_drugs(use = "Products", list = FALSE, force = FALSE)
+fda_drugs(pattern = "Products", list = FALSE, force = FALSE)
 }
 \arguments{
-\item{use}{File pattern to use. Must define a file exactly, you can set \code{list = TRUE} to see what files can be used.}
+\item{pattern}{File pattern to use. Must define a file exactly, you can set
+\code{list = TRUE} to see what files can be used.}
 
-\item{list}{A boolean value, should it only list files in the Drugs@FDA
+\item{list}{A boolean value, should it only list files in the \code{Drugs@FDA}
 dataset?}
 
 \item{force}{A boolean value. If set to \code{TRUE}, it indicates the retrieval of
@@ -18,7 +19,7 @@ dataset?}
 \value{
 \itemize{
 \item if \code{list = TRUE}, an atomic character.
-\item if \code{list = FALSE}, a \link[data.table:data.table]{data.table}
+\item if \code{list = FALSE}, a \link[data.table:data.table]{data.table}.
 }
 }
 \description{

@@ -213,8 +213,8 @@ clean_reac_pt <- function(x, hierarchy) {
 }
 
 ########################################################
-faers_standardize_drug <- function(terms, athena = NULL, force = FALSE, exact = TRUE, approximate = TRUE, search = 2L) {
-    athena_standardize_drug(terms = terms, path = athena, force = force)
+faers_standardize_drug <- function(terms, force = FALSE, url = NULL) {
+    athena_standardize_drug(terms = terms, force = force, url = url)
 }
 
 utils::globalVariables(c("cleaned_pt", "indi_pt", "pt"))

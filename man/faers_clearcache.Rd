@@ -8,8 +8,8 @@ faers_clearcache(caches = NULL, force = FALSE)
 }
 \arguments{
 \item{caches}{An atomic character, indicates what caches to remove? Only
-\code{"metadata"}, \code{"fdadrugs"}, \code{"rxnorm"}, and \code{"athena"} can be used. If
-\code{NULL}, all caches will be removed.}
+"metadata", "fdadrugs", and "athena" can be used. If \code{NULL}, all caches will be
+removed.}
 
 \item{force}{logical.  Should permissions be changed (if possible) to
     allow the file or directory to be removed?}

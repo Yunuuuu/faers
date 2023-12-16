@@ -1,72 +1,49 @@
 #' Read and Parse Drugs@@FDA data
 #'
-#' @param use File pattern to use. Must define a file exactly, you can set `list
-#' = TRUE` to see what files can be used.
-#' @param list A boolean value, should it only list files in the Drugs@@FDA
+#' @param pattern File pattern to use. Must define a file exactly, you can set
+#' `list = TRUE` to see what files can be used.
+#' @param list A boolean value, should it only list files in the `Drugs@@FDA`
 #' dataset?
 #' @param force A boolean value. If set to `TRUE`, it indicates the retrieval of
 #' `Drugs@@FDA` data in the FDA directly, bypassing the cache.
 #' @return
 #' - if `list = TRUE`, an atomic character.
-#' - if `list = FALSE`, a [data.table][data.table::data.table]
+#' - if `list = FALSE`, a [data.table][data.table::data.table].
 #' @seealso
 #' <https://www.fda.gov/drugs/drug-approvals-and-databases/drugsfda-data-files>
 #' @examples
 #' fda_drugs(list = TRUE)
 #' fda_drugs()
 #' @export
-fda_drugs <- function(use = "Products", list = FALSE, force = FALSE) {
+fda_drugs <- function(pattern = "Products", list = FALSE, force = FALSE) {
     assert_bool(list)
     assert_bool(force)
-    if (force) {
-        file <- fda_drugs_download(dir = faers_cache_dir("fdadrugs"))
-    } else {
-        file <- fda_drugs_file()
-    }
-    fda_drugs_load(file, use = use, list = list)
+    file <- fda_drugs_file(force)
+    fda_drugs_load(file, pattern = pattern, list = list)
 }
 
-fda_drugs_load <- function(file, use = "Products", list = FALSE, dir = faers_cache_dir("fdadrugs")) {
+fda_drugs_load <- function(file, pattern = "Products", list = FALSE, dir = faers_cache_dir("fdadrugs")) {
     path <- unzip2(file, dir)
     if (list) {
         list.files(path)
     } else {
-        file <- locate_file(path, use, ignore.case = TRUE)
+        assert_string(pattern)
+        file <- locate_file(path, pattern, ignore.case = TRUE)
         # Don't use data.table: error, Stopped early on line
         out <- vroom::vroom(file, show_col_types = FALSE)
         data.table::setDT(out)[]
     }
 }
 
-fda_drugs_file <- function(dir = faers_cache_dir("fdadrugs")) {
-    file <- tryCatch(
-        locate_files(dir, "^fda_drugs_data.*\\.zip", ignore.case = FALSE),
-        no_file = function(cnd) FALSE
+fda_drugs_file <- function(force, dir = faers_cache_dir("fdadrugs")) {
+    cache_file(
+        force = force,
+        url = fda_drugs_url(),
+        prefix = "fda_drugs_data",
+        ext = "zip",
+        name = "Drugs@FDA data",
+        dir = dir
     )
-    if (isFALSE(file)) {
-        file <- fda_drugs_download(dir = dir)
-    } else {
-        date <- as.Date(
-            str_extract(basename(file), "\\d+-\\d+-\\d+"),
-            format = "%Y-%m-%d"
-        )
-        if (length(file) > 1L) {
-            i <- order(date, decreasing = TRUE)[1L]
-            file <- file[i]
-            date <- date[i]
-        }
-        cli::cli_inform(c(
-            ">" = "Using Drugs@FDA Data from cached {.file {file}}",
-            " " = "Snapshot date: {date}"
-        ))
-    }
-    file
-}
-
-fda_drugs_download <- function(dir = faers_cache_dir("fdadrugs"), call = rlang::caller_env()) {
-    assert_internet(call = call)
-    file <- file.path(dir, sprintf("fda_drugs_data_%s.zip", Sys.Date()))
-    download_inform(fda_drugs_url(), file)
 }
 
 fda_drugs_url <- function() {

@@ -4,6 +4,10 @@ pkg_nm <- function() {
     utils::packageName(topenv(environment()))
 }
 
+quote_strings <- function(x, ...) {
+    oxford_comma(sprintf('"%s"', x), ...)
+}
+
 # https://github.com/Rdatatable/data.table/issues/3214#issuecomment-462490046
 dt_shallow <- function(x) {
     x[TRUE]

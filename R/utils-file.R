@@ -1,8 +1,8 @@
 #' Remove caches
 #'
 #' @param caches An atomic character, indicates what caches to remove? Only
-#' `"metadata"`, `"fdadrugs"`, `"rxnorm"`, and `"athena"` can be used. If
-#' `NULL`, all caches will be removed.
+#' `r quote_strings(cached_nms)` can be used. If `NULL`, all caches will be
+#' removed.
 #' @inheritParams base::unlink
 #' @return Path of the deleted directory invisiblely
 #' @examples
@@ -12,7 +12,7 @@ faers_clearcache <- function(caches = NULL, force = FALSE) {
     if (is.null(caches)) {
         paths <- faers_user_cache_dir(create = FALSE)
     } else {
-        assert_inclusive(caches, c("metadata", "fdadrugs", "rxnorm", "athena"))
+        assert_inclusive(caches, cached_nms)
         paths <- faers_cache_dir(caches, create = FALSE)
     }
     for (path in paths) {
@@ -21,9 +21,10 @@ faers_clearcache <- function(caches = NULL, force = FALSE) {
     invisible(paths)
 }
 
+cached_nms <- c("metadata", "fdadrugs", "athena")
+
 delete_cache <- function(path, ..., name = NULL) {
     if (dir.exists(path)) {
-        # Not deleting a non-existent file is not a failure
         if (unlink(path, recursive = TRUE, ...)) {
             cli::cli_warn("Cannot remove {.path {path}}")
         } else {
@@ -37,6 +38,57 @@ delete_cache <- function(path, ..., name = NULL) {
         }
         cli::cli_alert_info(msg)
     }
+}
+
+cache_file <- function(
+    force, url, prefix,
+    ext = NULL, name, dir,
+    arg = rlang::caller_arg(url),
+    call = rlang::caller_env()) {
+    if (!force) {
+        pattern <- sprintf("^%s_\\d+-\\d+-\\d+", prefix)
+        if (!is.null(ext)) {
+            pattern <- paste0(pattern, "\\.", ext, "$")
+        } else {
+            pattern <- paste0(pattern, "$")
+        }
+        file <- tryCatch(
+            locate_files(dir, pattern, ignore.case = FALSE),
+            no_file = function(cnd) {
+                force <<- TRUE
+            }
+        )
+    }
+    if (force) {
+        if (is.null(url)) {
+            cli::cli_abort("You must provide {.arg {arg}}", call = call)
+        }
+        file <- cache_download(url, prefix = prefix, ext = ext, dir = dir)
+    } else {
+        date <- as.Date(
+            str_extract(basename(file), "\\d+-\\d+-\\d+"),
+            format = "%Y-%m-%d"
+        )
+        if (length(file) > 1L) {
+            i <- order(date, decreasing = TRUE)[1L]
+            file <- file[i]
+            date <- date[i]
+        }
+        cli::cli_inform(c(
+            ">" = "Using {name} from cached {.file {file}}",
+            " " = "Snapshot date: {date}"
+        ))
+    }
+    file
+}
+
+cache_download <- function(url, prefix, ext, dir, call = rlang::caller_env()) {
+    assert_internet(call = call)
+    file <- file.path(dir, paste(prefix, Sys.Date(), sep = "_"))
+    if (!is.null(ext)) {
+        file <- paste(file, ext, sep = ".")
+    }
+    download_inform(url, file)
 }
 
 # name used: metadata, fdadrugs, rxnorm, athena
@@ -147,6 +199,24 @@ locate_files <- function(path, pattern = NULL, ignore.case = TRUE) {
     files
 }
 
+use_files <- function(dir, use, ext = NULL) {
+    if (!is.null(ext)) {
+        pattern <- sprintf("\\.%s$", ext)
+    } else {
+        pattern <- NULL
+    }
+    files <- locate_files(dir, pattern)
+    ids <- tolower(path_ext_remove(basename(files)))
+    use <- as.character(use)
+    idx <- data.table::chmatch(use, ids)
+    if (anyNA(idx)) {
+        cli::cli_abort(sprintf("Cannot find %s", oxford_comma(use[is.na(idx)])))
+    }
+    files <- files[idx]
+    names(files) <- ids[idx]
+    files
+}
+
 dir_create2 <- function(dir, ...) {
     if (!dir.exists(dir)) {
         if (!dir.create(dir, showWarnings = FALSE, ...)) {
@@ -158,4 +228,8 @@ dir_create2 <- function(dir, ...) {
 
 internal_file <- function(...) {
     system.file(..., package = pkg_nm(), mustWork = TRUE)
+}
+
+path_ext_remove <- function(x) {
+    sub("([^.]+)\\.[[:alnum:]]+$", "\\1", x)
 }
