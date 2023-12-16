@@ -134,34 +134,25 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
     # with different caseid in `demo`, so we remove this by keeping the latest
     # one, we remove `deleted_cases` firstly if it exist
 
-    # we don't use `setorderv` as it will change data by reference
     # 1. fda_dt: Date FDA received Case. In subsequent versions of a case, the
     #    latest manufacturer received date will be provided (YYYYMMDD format)
     # 2. i_f_code: I Initial; F Follow-up. latest should be "F". "F" < "I"
     # 3. event_dt: Date the adverse event occurred or began
-    if (is.null(deleted_cases)) {
-        out <- unique(
-            data$demo[
-                order(-year, -quarter, -fda_dt, i_f_code, -event_dt)
-            ],
-            by = "primaryid", cols = c(
-                "year", "quarter", "caseid", "caseversion",
-                "fda_dt", "i_f_code", "age_in_years", "gender",
-                "country_code", "event_dt"
-            )
-        )
-    } else {
-        out <- unique(
-            data$demo[!deleted_cases, on = "caseid"][
-                order(-year, -quarter, -fda_dt, i_f_code, -event_dt)
-            ],
-            by = "primaryid", cols = c(
-                "year", "quarter", "caseid", "caseversion",
-                "fda_dt", "i_f_code", "age_in_years", "gender",
-                "country_code", "event_dt"
-            )
-        )
+    out <- data$demo
+    if (!is.null(deleted_cases)) {
+        out <- out[!deleted_cases, on = "caseid"]
     }
+    data.table::setorderv(
+        out,
+        c("year", "quarter", "fda_dt", "i_f_code", "event_dt"),
+        order = c(-1L, -1L, -1L, 1L, -1L),
+        na.last = TRUE
+    )
+    out <- unique(out, by = "primaryid", cols = c(
+        "year", "quarter", "caseid", "caseversion",
+        "fda_dt", "i_f_code", "age_in_years", "gender",
+        "country_code", "event_dt"
+    ))
 
     # then we keep the `latest` informations for the patients
     # Such as caseid "11232882" in 2017q2 2019q2, 2019q3

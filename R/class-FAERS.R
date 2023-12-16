@@ -304,32 +304,3 @@ methods::setGeneric("faers_header", function(object) {
 methods::setMethod("faers_header", "FAERSxml", function(object) {
     object@header
 })
-
-#############################################################
-build_periods <- function(
-    periods, years, quarters,
-    arg_periods = rlang::caller_arg(periods),
-    arg_years = rlang::caller_arg(years),
-    arg_quarters = rlang::caller_arg(quarters),
-    call = rlang::caller_env()) {
-    if (is.null(years) && is.null(quarters)) {
-        if (is.null(periods)) {
-            cli::cli_abort(
-                "either both {.arg {arg_years}} and {.arg {arg_quarters}} or exclusively {.arg {arg_periods}} must be provied",
-                call = call
-            )
-        }
-        return(periods)
-    } else if (!is.null(years) && !is.null(quarters)) {
-        assert_inclusive(quarters, faers_file_quarters,
-            arg = arg_quarters, call = call
-        )
-        return(paste0(as.integer(years), quarters))
-    } else if (!is.null(periods)) {
-        cli::cli_abort(c(
-            "{.arg {arg_periods}} can be used when both {.arg {arg_years}} and {.arg {arg_quarters}} are absent",
-            i = "You should set both {.arg {arg_years}} and {.arg {arg_quarters}} or set {.arg {arg_periods}} only"
-        ), call = call)
-    }
-    cli::cli_abort("both {.arg {arg_years}} and {.arg {arg_quarters}} should be set", call = call)
-}

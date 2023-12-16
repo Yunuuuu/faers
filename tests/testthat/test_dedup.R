@@ -20,7 +20,6 @@ testthat::test_that("`faers_dedup()` works well", {
     testthat::expect_true(data_dedup@deduplication)
     testthat::expect_equal(anyDuplicated(faers_primaryid(data_dedup)), 0L)
 
-
     testthat::expect_identical(data_dedup$demo, raw_demo)
     testthat::expect_identical(data_dedup$drug, raw_drug)
     testthat::expect_identical(data_dedup$indi, raw_indi)

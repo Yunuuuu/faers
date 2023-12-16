@@ -1124,9 +1124,9 @@ body {
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>fda_insulin &lt;-<span class="st"> </span><span class="kw">fda_drugs</span>()[</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>  <span class="kw">grepl</span>(insulin_pattern, ActiveIngredient, <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>]</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="co">#&gt; → Using Drugs@FDA Data from cached</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="co">#&gt;   &#39;/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2023-12-15.zip&#39;</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a><span class="co">#&gt;   Snapshot date: 2023-12-15</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="co">#&gt; → Using Drugs@FDA data from cached</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="co">#&gt;   &#39;/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2023-12-16.zip&#39;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a><span class="co">#&gt;   Snapshot date: 2023-12-16</span></span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a><span class="co">#&gt; Warning: One or more parsing issues, call `problems()` on your data frame for details,</span></span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a><span class="co">#&gt; e.g.:</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a><span class="co">#&gt;   dat &lt;- vroom(...)</span></span>
@@ -1218,38 +1218,38 @@ body {
 <span id="cb11-71"><a href="#cb11-71" aria-hidden="true"></a><span class="co">#&gt; 15:            -5.059438              2.875465   -0.64969772</span></span>
 <span id="cb11-72"><a href="#cb11-72" aria-hidden="true"></a><span class="co">#&gt;     bcpnn_mcmc_ic_ci_low bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low</span></span>
 <span id="cb11-73"><a href="#cb11-73" aria-hidden="true"></a><span class="co">#&gt;                    &lt;num&gt;                 &lt;num&gt;       &lt;num&gt;           &lt;num&gt;</span></span>
-<span id="cb11-74"><a href="#cb11-74" aria-hidden="true"></a><span class="co">#&gt;  1:          -10.3805164             1.7181345 -0.50589093     -10.3053489</span></span>
-<span id="cb11-75"><a href="#cb11-75" aria-hidden="true"></a><span class="co">#&gt;  2:           -2.3575189             2.7768097  1.27462238      -2.5084784</span></span>
-<span id="cb11-76"><a href="#cb11-76" aria-hidden="true"></a><span class="co">#&gt;  3:           -9.8936214             2.2657509 -0.04264434      -9.9873991</span></span>
-<span id="cb11-77"><a href="#cb11-77" aria-hidden="true"></a><span class="co">#&gt;  4:          -10.0349718             2.1150731 -0.16349873     -10.0714410</span></span>
-<span id="cb11-78"><a href="#cb11-78" aria-hidden="true"></a><span class="co">#&gt;  5:           -9.9504532             2.2522072 -0.04264434     -10.0409408</span></span>
-<span id="cb11-79"><a href="#cb11-79" aria-hidden="true"></a><span class="co">#&gt;  6:           -2.4549778             2.6882805  1.20645088      -2.5766499</span></span>
-<span id="cb11-80"><a href="#cb11-80" aria-hidden="true"></a><span class="co">#&gt;  7:           -2.8603230             1.8955875  0.57060721      -3.2124936</span></span>
-<span id="cb11-81"><a href="#cb11-81" aria-hidden="true"></a><span class="co">#&gt;  8:           -3.4438061             0.9957419 -0.18057225      -3.9636731</span></span>
-<span id="cb11-82"><a href="#cb11-82" aria-hidden="true"></a><span class="co">#&gt;  9:          -10.3225964             1.9141687 -0.34482850     -10.1557536</span></span>
-<span id="cb11-83"><a href="#cb11-83" aria-hidden="true"></a><span class="co">#&gt; 10:          -10.0949005             2.1235736 -0.16349873     -10.1712790</span></span>
-<span id="cb11-84"><a href="#cb11-84" aria-hidden="true"></a><span class="co">#&gt; 11:           -0.7479781             2.3096183  1.35107444      -1.2419932</span></span>
-<span id="cb11-85"><a href="#cb11-85" aria-hidden="true"></a><span class="co">#&gt; 12:           -2.8351913             1.9841298  0.63636165      -3.1467392</span></span>
-<span id="cb11-86"><a href="#cb11-86" aria-hidden="true"></a><span class="co">#&gt; 13:           -0.7703094             2.3110648  1.35107444      -1.2419932</span></span>
-<span id="cb11-87"><a href="#cb11-87" aria-hidden="true"></a><span class="co">#&gt; 14:           -0.4256531             3.0159208  1.87832144      -0.7147462</span></span>
-<span id="cb11-88"><a href="#cb11-88" aria-hidden="true"></a><span class="co">#&gt; 15:          -10.5178719             1.5672414 -0.65076456     -10.3959658</span></span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true"></a><span class="co">#&gt;  1:          -10.3227280             1.7097008 -0.50589093     -10.3882898</span></span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true"></a><span class="co">#&gt;  2:           -2.3655391             2.7746712  1.27462238      -2.5084784</span></span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true"></a><span class="co">#&gt;  3:          -10.0215171             2.2542258 -0.04264434      -9.9520669</span></span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true"></a><span class="co">#&gt;  4:          -10.0098340             2.1264994 -0.16349873     -10.0243790</span></span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true"></a><span class="co">#&gt;  5:           -9.9353969             2.2481277 -0.04264434      -9.9976267</span></span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true"></a><span class="co">#&gt;  6:           -2.4113479             2.6932162  1.20645088      -2.5766499</span></span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true"></a><span class="co">#&gt;  7:           -2.8700834             1.8915814  0.57060721      -3.2124936</span></span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true"></a><span class="co">#&gt;  8:           -3.5041218             0.9905238 -0.18057225      -3.9636731</span></span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true"></a><span class="co">#&gt;  9:          -10.2883764             1.9221028 -0.34482850     -10.2279901</span></span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true"></a><span class="co">#&gt; 10:           -9.9715096             2.0990512 -0.16349873     -10.1426249</span></span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true"></a><span class="co">#&gt; 11:           -0.7880866             2.3055106  1.35107444      -1.2419932</span></span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true"></a><span class="co">#&gt; 12:           -2.8025074             1.9833057  0.63636165      -3.1467392</span></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true"></a><span class="co">#&gt; 13:           -0.7691758             2.3151794  1.35107444      -1.2419932</span></span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true"></a><span class="co">#&gt; 14:           -0.4359694             3.0233355  1.87832144      -0.7147462</span></span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true"></a><span class="co">#&gt; 15:          -10.5114367             1.5589373 -0.65076456     -10.4720362</span></span>
 <span id="cb11-89"><a href="#cb11-89" aria-hidden="true"></a><span class="co">#&gt;     oe_ratio_ci_high odds_ratio odds_ratio_ci_low odds_ratio_ci_high</span></span>
 <span id="cb11-90"><a href="#cb11-90" aria-hidden="true"></a><span class="co">#&gt;                &lt;num&gt;      &lt;num&gt;             &lt;num&gt;              &lt;num&gt;</span></span>
-<span id="cb11-91"><a href="#cb11-91" aria-hidden="true"></a><span class="co">#&gt;  1:         1.727048  0.0000000        0.00000000           33.68585</span></span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true"></a><span class="co">#&gt;  1:         1.717446  0.0000000        0.00000000           33.68585</span></span>
 <span id="cb11-92"><a href="#cb11-92" aria-hidden="true"></a><span class="co">#&gt;  2:         2.962049 13.0303800        0.20150028          279.21542</span></span>
-<span id="cb11-93"><a href="#cb11-93" aria-hidden="true"></a><span class="co">#&gt;  3:         2.245973  0.0000000        0.00000000         2462.50000</span></span>
-<span id="cb11-94"><a href="#cb11-94" aria-hidden="true"></a><span class="co">#&gt;  4:         2.101459  0.0000000        0.00000000          145.21133</span></span>
-<span id="cb11-95"><a href="#cb11-95" aria-hidden="true"></a><span class="co">#&gt;  5:         2.250247  0.0000000        0.00000000         2462.50000</span></span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true"></a><span class="co">#&gt;  3:         2.257209  0.0000000        0.00000000         2462.50000</span></span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true"></a><span class="co">#&gt;  4:         2.120288  0.0000000        0.00000000          145.21133</span></span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true"></a><span class="co">#&gt;  5:         2.259757  0.0000000        0.00000000         2462.50000</span></span>
 <span id="cb11-96"><a href="#cb11-96" aria-hidden="true"></a><span class="co">#&gt;  6:         2.893877 10.1233187        0.15947006          211.87117</span></span>
 <span id="cb11-97"><a href="#cb11-97" aria-hidden="true"></a><span class="co">#&gt;  7:         2.258033  2.4701675        0.04089140           48.73410</span></span>
 <span id="cb11-98"><a href="#cb11-98" aria-hidden="true"></a><span class="co">#&gt;  8:         1.506854  0.7478897        0.01250834           14.59249</span></span>
-<span id="cb11-99"><a href="#cb11-99" aria-hidden="true"></a><span class="co">#&gt;  9:         1.894089  0.0000000        0.00000000           55.53664</span></span>
-<span id="cb11-100"><a href="#cb11-100" aria-hidden="true"></a><span class="co">#&gt; 10:         2.134816  0.0000000        0.00000000          145.21133</span></span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true"></a><span class="co">#&gt;  9:         1.901241  0.0000000        0.00000000           55.53664</span></span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true"></a><span class="co">#&gt; 10:         2.127870  0.0000000        0.00000000          145.21133</span></span>
 <span id="cb11-101"><a href="#cb11-101" aria-hidden="true"></a><span class="co">#&gt; 11:         2.742477 10.9151800        0.55237709          657.45882</span></span>
 <span id="cb11-102"><a href="#cb11-102" aria-hidden="true"></a><span class="co">#&gt; 12:         2.323788  2.7642969        0.04567010           54.61951</span></span>
 <span id="cb11-103"><a href="#cb11-103" aria-hidden="true"></a><span class="co">#&gt; 13:         2.742477 10.9151800        0.55237709          657.45882</span></span>
 <span id="cb11-104"><a href="#cb11-104" aria-hidden="true"></a><span class="co">#&gt; 14:         3.269724 35.2158110        1.70522393         2176.34560</span></span>
-<span id="cb11-105"><a href="#cb11-105" aria-hidden="true"></a><span class="co">#&gt; 15:         1.571778  0.0000000        0.00000000           23.77817</span></span>
+<span id="cb11-105"><a href="#cb11-105" aria-hidden="true"></a><span class="co">#&gt; 15:         1.575781  0.0000000        0.00000000           23.77817</span></span>
 <span id="cb11-106"><a href="#cb11-106" aria-hidden="true"></a><span class="co">#&gt;     fisher_pvalue     ebgm ebgm_ci_low ebgm_ci_high</span></span>
 <span id="cb11-107"><a href="#cb11-107" aria-hidden="true"></a><span class="co">#&gt;             &lt;num&gt;    &lt;num&gt;       &lt;num&gt;        &lt;num&gt;</span></span>
 <span id="cb11-108"><a href="#cb11-108" aria-hidden="true"></a><span class="co">#&gt;  1:    1.00000000 2.421502        2.38         2.46</span></span>
@@ -1317,30 +1317,30 @@ body {
 <span id="cb12-46"><a href="#cb12-46" aria-hidden="true"></a><span class="co">#&gt; 142:         NaN 2.800437e-31  1.000000000    -0.7316939            -4.801687</span></span>
 <span id="cb12-47"><a href="#cb12-47" aria-hidden="true"></a><span class="co">#&gt;      bcpnn_norm_ic_ci_high bcpnn_mcmc_ic bcpnn_mcmc_ic_ci_low</span></span>
 <span id="cb12-48"><a href="#cb12-48" aria-hidden="true"></a><span class="co">#&gt;                      &lt;num&gt;         &lt;num&gt;                &lt;num&gt;</span></span>
-<span id="cb12-49"><a href="#cb12-49" aria-hidden="true"></a><span class="co">#&gt;   1:              4.209977   -0.03947607            -9.950253</span></span>
-<span id="cb12-50"><a href="#cb12-50" aria-hidden="true"></a><span class="co">#&gt;   2:              3.185527   -0.34296004           -10.193483</span></span>
-<span id="cb12-51"><a href="#cb12-51" aria-hidden="true"></a><span class="co">#&gt;   3:              3.623291   -0.12157646           -10.036968</span></span>
-<span id="cb12-52"><a href="#cb12-52" aria-hidden="true"></a><span class="co">#&gt;   4:              3.820193   -0.08111417            -9.930364</span></span>
-<span id="cb12-53"><a href="#cb12-53" aria-hidden="true"></a><span class="co">#&gt;   5:              4.209977   -0.03947607           -10.027199</span></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true"></a><span class="co">#&gt;   1:              4.209977   -0.03947607            -9.936350</span></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true"></a><span class="co">#&gt;   2:              3.185527   -0.34296004           -10.324187</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true"></a><span class="co">#&gt;   3:              3.623291   -0.12157646           -10.144909</span></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true"></a><span class="co">#&gt;   4:              3.820193   -0.08111417           -10.044329</span></span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true"></a><span class="co">#&gt;   5:              4.209977   -0.03947607            -9.937904</span></span>
 <span id="cb12-54"><a href="#cb12-54" aria-hidden="true"></a><span class="co">#&gt;  ---                                                         </span></span>
-<span id="cb12-55"><a href="#cb12-55" aria-hidden="true"></a><span class="co">#&gt; 138:              3.338300   -0.23653305           -10.190701</span></span>
-<span id="cb12-56"><a href="#cb12-56" aria-hidden="true"></a><span class="co">#&gt; 139:              3.970219    1.46338605            -2.230773</span></span>
-<span id="cb12-57"><a href="#cb12-57" aria-hidden="true"></a><span class="co">#&gt; 140:              4.209977   -0.03947607            -9.974732</span></span>
-<span id="cb12-58"><a href="#cb12-58" aria-hidden="true"></a><span class="co">#&gt; 141:              4.202695    1.50384833            -2.217366</span></span>
-<span id="cb12-59"><a href="#cb12-59" aria-hidden="true"></a><span class="co">#&gt; 142:              3.338300   -0.23653305           -10.213946</span></span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true"></a><span class="co">#&gt; 138:              3.338300   -0.23653305           -10.164893</span></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true"></a><span class="co">#&gt; 139:              3.970219    1.46338605            -2.217522</span></span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true"></a><span class="co">#&gt; 140:              4.209977   -0.03947607           -10.033860</span></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true"></a><span class="co">#&gt; 141:              4.202695    1.50384833            -2.188318</span></span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true"></a><span class="co">#&gt; 142:              3.338300   -0.23653305           -10.066599</span></span>
 <span id="cb12-60"><a href="#cb12-60" aria-hidden="true"></a><span class="co">#&gt;      bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low oe_ratio_ci_high</span></span>
 <span id="cb12-61"><a href="#cb12-61" aria-hidden="true"></a><span class="co">#&gt;                      &lt;num&gt;       &lt;num&gt;           &lt;num&gt;            &lt;num&gt;</span></span>
-<span id="cb12-62"><a href="#cb12-62" aria-hidden="true"></a><span class="co">#&gt;   1:              2.257810 -0.04264434      -10.028608         2.267654</span></span>
-<span id="cb12-63"><a href="#cb12-63" aria-hidden="true"></a><span class="co">#&gt;   2:              1.914658 -0.34482850      -10.100818         1.917663</span></span>
-<span id="cb12-64"><a href="#cb12-64" aria-hidden="true"></a><span class="co">#&gt;   3:              2.155443 -0.12432814      -10.089395         2.161137</span></span>
-<span id="cb12-65"><a href="#cb12-65" aria-hidden="true"></a><span class="co">#&gt;   4:              2.220315 -0.08406426       -9.966827         2.199547</span></span>
-<span id="cb12-66"><a href="#cb12-66" aria-hidden="true"></a><span class="co">#&gt;   5:              2.256147 -0.04264434      -10.011552         2.259165</span></span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true"></a><span class="co">#&gt;   1:              2.267840 -0.04264434       -9.987751         2.263439</span></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true"></a><span class="co">#&gt;   2:              1.911937 -0.34482850      -10.335599         1.908490</span></span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true"></a><span class="co">#&gt;   3:              2.172273 -0.12432814      -10.042727         2.166006</span></span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true"></a><span class="co">#&gt;   4:              2.206658 -0.08406426      -10.083733         2.223030</span></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true"></a><span class="co">#&gt;   5:              2.260174 -0.04264434       -9.921420         2.248651</span></span>
 <span id="cb12-67"><a href="#cb12-67" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                   </span></span>
-<span id="cb12-68"><a href="#cb12-68" aria-hidden="true"></a><span class="co">#&gt; 138:              2.026060 -0.23878686      -10.094433         2.021954</span></span>
-<span id="cb12-69"><a href="#cb12-69" aria-hidden="true"></a><span class="co">#&gt; 139:              3.003833  1.46063437       -2.322466         3.148061</span></span>
-<span id="cb12-70"><a href="#cb12-70" aria-hidden="true"></a><span class="co">#&gt; 140:              2.242318 -0.04264434      -10.013724         2.227504</span></span>
-<span id="cb12-71"><a href="#cb12-71" aria-hidden="true"></a><span class="co">#&gt; 141:              3.058207  1.50089824       -2.282203         3.188325</span></span>
-<span id="cb12-72"><a href="#cb12-72" aria-hidden="true"></a><span class="co">#&gt; 142:              2.030362 -0.23878686      -10.175191         2.038959</span></span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true"></a><span class="co">#&gt; 138:              2.015313 -0.23878686      -10.169003         2.036207</span></span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true"></a><span class="co">#&gt; 139:              3.008917  1.46063437       -2.322466         3.148061</span></span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true"></a><span class="co">#&gt; 140:              2.250537 -0.04264434      -10.065103         2.242616</span></span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true"></a><span class="co">#&gt; 141:              3.051391  1.50089824       -2.282203         3.188325</span></span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true"></a><span class="co">#&gt; 142:              2.012159 -0.23878686      -10.133274         2.022040</span></span>
 <span id="cb12-73"><a href="#cb12-73" aria-hidden="true"></a><span class="co">#&gt;      odds_ratio odds_ratio_ci_low odds_ratio_ci_high fisher_pvalue     ebgm</span></span>
 <span id="cb12-74"><a href="#cb12-74" aria-hidden="true"></a><span class="co">#&gt;           &lt;num&gt;             &lt;num&gt;              &lt;num&gt;         &lt;num&gt;    &lt;num&gt;</span></span>
 <span id="cb12-75"><a href="#cb12-75" aria-hidden="true"></a><span class="co">#&gt;   1:    0.00000         0.0000000         2462.50000    1.00000000 3.670936</span></span>
@@ -1389,7 +1389,7 @@ body {
 <span id="cb13-19"><a href="#cb13-19" aria-hidden="true"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span id="cb13-20"><a href="#cb13-20" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb13-21"><a href="#cb13-21" aria-hidden="true"></a><span class="co">#&gt; other attached packages:</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true"></a><span class="co">#&gt; [1] faers_0.99.2</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true"></a><span class="co">#&gt; [1] faers_0.99.3</span></span>
 <span id="cb13-23"><a href="#cb13-23" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb13-24"><a href="#cb13-24" aria-hidden="true"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span id="cb13-25"><a href="#cb13-25" aria-hidden="true"></a><span class="co">#&gt;  [1] generics_0.1.3     rappdirs_0.3.3     utf8_1.2.4         xml2_1.3.6        </span></span>

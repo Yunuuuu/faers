@@ -55,8 +55,8 @@ faers_modify(.object, ...)
 \item{...}{Other arguments passed to specific methods. For \code{faers_filter}:
 other arguments passed to \code{.fn}.}
 
-\item{field}{A string indicates the FAERS fields to use. Only values "demo",
-"drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.}
+\item{field}{A string indicates the FAERS fields to use. Only values
+"demo", "drug", "indi", "reac", "ther", "rpsr", and "outc" can be used.}
 
 \item{fields}{A character vector specifying the fields to use. Only values
 "demo", "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.}
@@ -74,15 +74,6 @@ keep. If \code{NULL}, will do nothing.}
 \item{.fn}{A function or formula, accept the field data as the input and
 return an atomic integer or character of \code{primaryid} you want to keep or
 remove based on argument \code{.invert}.
-
-Note: When using the \verb{set*} or \verb{:=} function from \code{data.table} to modify the
-internal data, exercise caution with all fields from un-standardized data and
-the "demo", "drug", "ther", "rpsr", and "outc" field data in standardized
-data as these functions will modify the data directly. In such cases, it is
-advisable to use the \link[data.table:copy]{copy} function first. Note that for
-the "indi" and "reac" field in standardized data, a shallow copy will
-automatically be made to add meddra data, so no need to run
-\link[data.table:copy]{copy}.
 
 If a \strong{function}, it is used as is.
 

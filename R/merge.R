@@ -39,17 +39,11 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, fields = NULL, 
     } else {
         fields <- intersect(faers_ascii_file_fields, fields)
     }
-
-    # for LAERS, caseid only exist in `demo` data.
-    # So we just keep the caseid of `demo`
     if (length(fields) == 1L) {
         return(faers_get(object, field = fields))
     }
     lst <- faers_mget(object, fields = fields)
-    # indi_reference: check if we need copy indi
-    # to prevent modify in place (change the input object)
     if (object@standardization) {
-        indi_reference <- FALSE
         if (all(c("indi", "reac") %chin% fields)) {
             hierarchy_columns <- c(
                 meddra_columns(meddra_hierarchy_fields),
@@ -64,20 +58,14 @@ methods::setMethod("faers_merge", "FAERSascii", function(object, fields = NULL, 
                 function(x) paste("reac", x, sep = "_")
             )
         }
-    } else {
-        indi_reference <- TRUE
     }
 
     # check if `drug_seq` should be matched
     if (sum(fields %chin% c("indi", "ther", "drug")) >= 2L) {
         if (any(fields == "indi")) {
-            if (indi_reference) {
-                lst$indi <- dt_shallow(lst$indi)
-            }
             data.table::setnames(lst$indi, "indi_drug_seq", "drug_seq")
         }
         if (any(fields == "ther")) {
-            lst$ther <- dt_shallow(lst$ther)
             data.table::setnames(lst$ther, "dsg_drug_seq", "drug_seq")
         }
     }

@@ -49,23 +49,26 @@ methods::setGeneric("faers_get", function(object, ...) {
     methods::makeStandardGeneric("faers_get")
 })
 
-#' @param field A string indicates the FAERS fields to use. Only values "demo",
-#' "drug", "indi", "ther", "reac", "rpsr", and "outc" can be used.
+#' @param field A string indicates the FAERS fields to use. Only values
+#' `r quote_strings(faers_ascii_file_fields)` can be used.
 #' @export
 #' @method faers_get FAERSascii
 #' @rdname FAERS-methods
 methods::setMethod("faers_get", "FAERSascii", function(object, field) {
     field <- match.arg(field, faers_ascii_file_fields)
-    out <- object@data[[field]]
-    if (object@standardization && any(field == c("indi", "reac"))) {
-        out <- faers_add_hierarchy(out, object@meddra@hierarchy)
-    }
-    out
+    get_field(object, field)
 })
 
-faers_add_hierarchy <- function(data, hierarchy, remove_idx = TRUE) {
+get_field <- function(object, field) {
+    out <- dt_shallow(object@data[[field]]) # make a shallow copy
+    if (object@standardization && any(field == c("indi", "reac"))) {
+        out <- faers_add_meddra(out, object@meddra@hierarchy)
+    }
+    out
+}
+
+faers_add_meddra <- function(data, hierarchy, remove_idx = TRUE) {
     .__idx__. <- data$meddra_hierarchy_idx
-    data <- dt_shallow(data)
     data[, names(hierarchy) := hierarchy[.__idx__.]]
     if (remove_idx) data[, meddra_hierarchy_idx := NULL]
     data[] # in case of not printing
@@ -85,13 +88,8 @@ methods::setGeneric("faers_mget", function(object, ...) {
 #' @rdname FAERS-methods
 methods::setMethod("faers_mget", "FAERSascii", function(object, fields) {
     assert_inclusive(fields, faers_ascii_file_fields)
-    out <- object@data[fields]
-    if (object@standardization) {
-        ii <- intersect(names(out), c("indi", "reac"))
-        for (i in ii) {
-            out[[i]] <- faers_add_hierarchy(out[[i]], object@meddra@hierarchy)
-        }
-    }
+    out <- lapply(fields, get_field, object = object)
+    data.table::setattr(out, "names", fields)
     out
 })
 utils::globalVariables(c("meddra_hierarchy_idx"))
@@ -180,15 +178,6 @@ methods::setGeneric("faers_filter", function(.object, ...) {
 #' return an atomic integer or character of `primaryid` you want to keep or
 #' remove based on argument `.invert`.
 #'
-#' Note: When using the `set*` or `:=` function from `data.table` to modify the
-#' internal data, exercise caution with all fields from un-standardized data and
-#' the "demo", "drug", "ther", "rpsr", and "outc" field data in standardized
-#' data as these functions will modify the data directly. In such cases, it is
-#' advisable to use the [copy][data.table::copy] function first. Note that for
-#' the "indi" and "reac" field in standardized data, a shallow copy will
-#' automatically be made to add meddra data, so no need to run
-#' [copy][data.table::copy].
-#'
 #'   If a **function**, it is used as is.
 #'
 #'   If a **formula**, e.g. `~ .x + 2`, it is converted to a function with up to
@@ -197,6 +186,7 @@ methods::setGeneric("faers_filter", function(.object, ...) {
 #'   very compact anonymous functions (lambdas) with up to two inputs.
 #'
 #'   If a **string**, the function is looked up in `globalenv()`.
+#'
 #' @param .field A string indicating the FAERS data to be used as input for the
 #' `.fn` function to extract the primaryid or modify data. Only the following
 #' values can be used: "demo", "drug", "indi", "ther", "reac", "rpsr", and
@@ -240,28 +230,25 @@ methods::setGeneric("faers_modify", function(.object, ...) {
 #' @rdname FAERS-methods
 methods::setMethod("faers_modify", "FAERSascii", function(.object, .field, .fn, ...) {
     .field <- match.arg(.field, faers_ascii_file_fields)
-    out <- .object@data[[.field]]
+    out <- dt_shallow(.object@data[[.field]])
     cannot_be_removed_cols <- c("year", "quarter", "primaryid")
-    .fn <- rlang::as_function(.fn)
     if (.object@standardization && any(.field == c("indi", "reac"))) {
         meddra_data <- .object@meddra@hierarchy
-        out <- faers_add_hierarchy(out, meddra_data, remove_idx = FALSE)
-        out <- .fn(out, ...)
-        if (!data.table::is.data.table(out)) {
-            cli::cli_abort("{.fn .fn} must return a {.cls data.table}")
-        }
-        # removing meddra columns before re-assign into original object
-        meddra_cols <- intersect(names(out), names(meddra_data))
-        data.table::set(out, j = meddra_cols, value = NULL)
+        out <- faers_add_meddra(out, meddra_data, remove_idx = FALSE)
         cannot_be_removed_cols <- c(
             cannot_be_removed_cols,
             "meddra_hierarchy_idx"
         )
-    } else {
-        out <- .fn(out, ...)
-        if (!data.table::is.data.table(out)) {
-            cli::cli_abort("{.fn .fn} must return a {.cls data.table}")
-        }
+    }
+    .fn <- rlang::as_function(.fn)
+    out <- .fn(out, ...)
+    if (!data.table::is.data.table(out)) {
+        cli::cli_abort("{.fn .fn} must return a {.cls data.table}")
+    }
+    # removing meddra columns before re-assign into original object
+    if (exists("meddra_data", inherits = FALSE)) {
+        meddra_cols <- intersect(names(out), names(meddra_data))
+        data.table::set(out, j = meddra_cols, value = NULL)
     }
     missing_cols <- setdiff(cannot_be_removed_cols, names(out))
     if (length(missing_cols)) {
@@ -270,34 +257,3 @@ methods::setMethod("faers_modify", "FAERSascii", function(.object, .field, .fn, 
     .object@data[[.field]] <- out[] # in case of not printing
     invisible(.object)
 })
-
-#########################################################
-use_indices <- function(i, names, arg = rlang::caller_arg(i), call = rlang::caller_env()) {
-    if (anyNA(i)) {
-        cli::cli_abort(
-            sprintf("%s cannot contain `NA`", style_arg(arg)),
-            call = call
-        )
-    }
-    if (is.character(i)) {
-        outbounded_values <- setdiff(i, names)
-        if (length(outbounded_values)) {
-            cli::cli_abort(sprintf(
-                "%s contains outbounded values: {outbounded_values}",
-                style_arg(arg)
-            ), call = call)
-        }
-    } else if (is.numeric(i)) {
-        if (any(i < 1L) || any(i > length(names))) {
-            cli::cli_abort(sprintf(
-                "%s contains out-of-bounds indices", style_arg(arg)
-            ), call = call)
-        }
-    } else {
-        cli::cli_abort(sprintf(
-            "%s must be an atomic numeric or character",
-            style_arg(arg)
-        ), call = call)
-    }
-    i
-}

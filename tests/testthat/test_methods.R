@@ -394,16 +394,21 @@ testthat::test_that("`faers_modify()` works well", {
         dir = internal_file("extdata"),
         compress_dir = tempdir()
     )
-    # for reac data
+
+    # for reac data --------------------------------
     raw_reac <- data.table::copy(data$reac)
-    faers_modify(data, "reac",
+    data1 <- faers_modify(data, "reac",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_true(all(is.na(data$reac$new_col)))
-    faers_modify(data, "reac",
-        .fn = ~ .x[, new_col := NULL]
+    testthat::expect_true(
+        !is.null(data1$reac$new_col) &&
+            all(is.na(data1$reac$new_col))
     )
-    testthat::expect_identical(data$reac, raw_reac)
+    # don't modify data by reference
+    testthat::expect_identical(data1$reac[, !"new_col"], data$reac)
+    testthat::expect_identical(data1$reac[, !"new_col"], raw_reac)
+
+    # important column don't deleted
     testthat::expect_error(faers_modify(data, "reac",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]
@@ -420,16 +425,20 @@ testthat::test_that("`faers_modify()` works well", {
         }
     ))
 
-    # for indi data
+    # for indi data ---------------------------------
     raw_indi <- data.table::copy(data$indi)
-    faers_modify(data, "indi",
+    data2 <- faers_modify(data, "indi",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_true(all(is.na(data$indi$new_col)))
-    faers_modify(data, "indi",
-        .fn = ~ .x[, new_col := NULL]
+    testthat::expect_true(
+        !is.null(data2$indi$new_col) &&
+            all(is.na(data2$indi$new_col))
     )
-    testthat::expect_identical(data$indi, raw_indi)
+    # don't modify data by reference
+    testthat::expect_identical(data2$indi[, !"new_col"], data$indi)
+    testthat::expect_identical(data2$indi[, !"new_col"], raw_indi)
+
+    # important column don't deleted
     testthat::expect_error(faers_modify(data, "indi",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]
@@ -446,16 +455,20 @@ testthat::test_that("`faers_modify()` works well", {
         }
     ))
 
-    # for demo data
+    # for demo data -----------------------------
     raw_demo <- data.table::copy(data$demo)
-    faers_modify(data, "demo",
+    data3 <- faers_modify(data, "demo",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_true(all(is.na(data$demo$new_col)))
-    faers_modify(data, "demo",
-        .fn = ~ .x[, new_col := NULL]
+    testthat::expect_true(
+        !is.null(data3$demo$new_col) &&
+            all(is.na(data3$demo$new_col))
     )
-    testthat::expect_identical(data$demo, raw_demo)
+    # don't modify data by reference
+    testthat::expect_identical(data3$demo[, !"new_col"], data$demo)
+    testthat::expect_identical(data3$demo[, !"new_col"], raw_demo)
+
+    # important column don't deleted
     testthat::expect_error(faers_modify(data, "demo",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]
@@ -472,16 +485,20 @@ testthat::test_that("`faers_modify()` works well", {
         }
     ))
 
-    # for drug data
+    # for drug data -----------------------------
     raw_drug <- data.table::copy(data$drug)
-    faers_modify(data, "drug",
+    data4 <- faers_modify(data, "drug",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_true(all(is.na(data$drug$new_col)))
-    faers_modify(data, "drug",
-        .fn = ~ .x[, new_col := NULL]
+    testthat::expect_true(
+        !is.null(data4$drug$new_col) &&
+            all(is.na(data4$drug$new_col))
     )
-    testthat::expect_identical(data$drug, raw_drug)
+    # don't modify data by reference
+    testthat::expect_identical(data4$drug[, !"new_col"], data$drug)
+    testthat::expect_identical(data4$drug[, !"new_col"], raw_drug)
+
+    # important column don't deleted
     testthat::expect_error(faers_modify(data, "drug",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]
@@ -500,14 +517,18 @@ testthat::test_that("`faers_modify()` works well", {
 
     # for ther data
     raw_ther <- data.table::copy(data$ther)
-    faers_modify(data, "ther",
+    data5 <- faers_modify(data, "ther",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_true(all(is.na(data$ther$new_col)))
-    faers_modify(data, "ther",
-        .fn = ~ .x[, new_col := NULL]
+    testthat::expect_true(
+        !is.null(data5$ther$new_col) &&
+            all(is.na(data5$ther$new_col))
     )
-    testthat::expect_identical(data$ther, raw_ther)
+    # don't modify data by reference
+    testthat::expect_identical(data5$ther[, !"new_col"], data$ther)
+    testthat::expect_identical(data5$ther[, !"new_col"], raw_ther)
+
+    # important column don't deleted
     testthat::expect_error(faers_modify(data, "ther",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]
@@ -536,19 +557,27 @@ testthat::test_that("`faers_modify()` for standardizated data works well", {
         "~/Data/MedDRA/MedDRA_26_1_English", # nolint
         add_smq = TRUE
     )
-    # for reac data
+
+    # for reac data --------------------------------
     raw_reac <- data.table::copy(data_std$reac)
     data1 <- faers_modify(data_std, "reac",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_identical(data_std$reac, raw_reac)
+    testthat::expect_true(
+        !is.null(data1$reac$new_col) &&
+            all(is.na(data1$reac$new_col))
+    )
+    # don't modify data by reference
+    testthat::expect_identical(data1$reac[, !"new_col"], data_std$reac)
     testthat::expect_identical(data1$reac[, !"new_col"], raw_reac)
+    # meddra_hierarchy_idx imported in .fn
     faers_modify(data_std, "reac",
         .fn = function(x) {
             testthat::expect_in("meddra_hierarchy_idx", names(x))
             x
         }
     )
+    # important column don't deleted
     testthat::expect_error(faers_modify(data_std, "reac",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]
@@ -570,19 +599,26 @@ testthat::test_that("`faers_modify()` for standardizated data works well", {
         }
     ))
 
-    # for indi data
+    # for indi data ---------------------------------
     raw_indi <- data.table::copy(data_std$indi)
     data2 <- faers_modify(data_std, "indi",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_identical(data_std$indi, raw_indi)
+    testthat::expect_true(
+        !is.null(data2$indi$new_col) &&
+            all(is.na(data2$indi$new_col))
+    )
+    # don't modify data by reference
+    testthat::expect_identical(data2$indi[, !"new_col"], data_std$indi)
     testthat::expect_identical(data2$indi[, !"new_col"], raw_indi)
+    # meddra_hierarchy_idx imported in .fn
     faers_modify(data_std, "indi",
         .fn = function(x) {
             testthat::expect_in("meddra_hierarchy_idx", names(x))
             x
         }
     )
+    # important column don't deleted
     testthat::expect_error(faers_modify(data_std, "indi",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]
@@ -604,16 +640,20 @@ testthat::test_that("`faers_modify()` for standardizated data works well", {
         }
     ))
 
-    # for demo data
+    # for demo data -----------------------------
     raw_demo <- data.table::copy(data_std$demo)
-    faers_modify(data_std, "demo",
+    data3 <- faers_modify(data_std, "demo",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_true(all(is.na(data_std$demo$new_col)))
-    faers_modify(data_std, "demo",
-        .fn = ~ .x[, new_col := NULL]
+    testthat::expect_true(
+        !is.null(data3$demo$new_col) &&
+            all(is.na(data3$demo$new_col))
     )
-    testthat::expect_identical(data_std$demo, raw_demo)
+    # don't modify data by reference
+    testthat::expect_identical(data3$demo[, !"new_col"], data_std$demo)
+    testthat::expect_identical(data3$demo[, !"new_col"], raw_demo)
+
+    # important column don't deleted
     testthat::expect_error(faers_modify(data_std, "demo",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]
@@ -630,16 +670,20 @@ testthat::test_that("`faers_modify()` for standardizated data works well", {
         }
     ))
 
-    # for drug data
+    # for drug data -----------------------------
     raw_drug <- data.table::copy(data_std$drug)
-    faers_modify(data_std, "drug",
+    data4 <- faers_modify(data_std, "drug",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_true(all(is.na(data_std$drug$new_col)))
-    faers_modify(data_std, "drug",
-        .fn = ~ .x[, new_col := NULL]
+    testthat::expect_true(
+        !is.null(data4$drug$new_col) &&
+            all(is.na(data4$drug$new_col))
     )
-    testthat::expect_identical(data_std$drug, raw_drug)
+    # don't modify data by reference
+    testthat::expect_identical(data4$drug[, !"new_col"], data_std$drug)
+    testthat::expect_identical(data4$drug[, !"new_col"], raw_drug)
+
+    # important column don't deleted
     testthat::expect_error(faers_modify(data_std, "drug",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]
@@ -658,14 +702,18 @@ testthat::test_that("`faers_modify()` for standardizated data works well", {
 
     # for ther data
     raw_ther <- data.table::copy(data_std$ther)
-    faers_modify(data_std, "ther",
+    data5 <- faers_modify(data_std, "ther",
         .fn = ~ .x[, new_col := NA_integer_]
     )
-    testthat::expect_true(all(is.na(data_std$ther$new_col)))
-    faers_modify(data_std, "ther",
-        .fn = ~ .x[, new_col := NULL]
+    testthat::expect_true(
+        !is.null(data5$ther$new_col) &&
+            all(is.na(data5$ther$new_col))
     )
-    testthat::expect_identical(data_std$ther, raw_ther)
+    # don't modify data by reference
+    testthat::expect_identical(data5$ther[, !"new_col"], data_std$ther)
+    testthat::expect_identical(data5$ther[, !"new_col"], raw_ther)
+
+    # important column don't deleted
     testthat::expect_error(faers_modify(data_std, "ther",
         .fn = function(x) {
             data.table::copy(x)[, year := NULL]

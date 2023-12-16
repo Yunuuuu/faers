@@ -13,7 +13,9 @@ testthat::test_that("`faers_standardize()` works well", {
         add_smq = TRUE
     ))
     testthat::expect_identical(data$indi, raw_indi)
+    testthat::expect_identical(data$indi, data$indi)
     testthat::expect_identical(data$reac, raw_reac)
+    testthat::expect_identical(data$reac, data$reac)
 
     # other details works as expected
     testthat::expect_true(data_std@standardization)
