@@ -145,7 +145,7 @@ methods::setGeneric("faers_keep", function(object, ...) {
 #' @export
 #' @param primaryid An atomic character or integer specifies the reports to
 #' keep. If `NULL`, will do nothing.
-#' @param invert, A bool. If `TRUE`, will keep reports not in `primaryid`.
+#' @param invert A bool. If `TRUE`, will keep reports not in `primaryid`.
 #' @method faers_keep FAERSascii
 #' @rdname FAERS-methods
 methods::setMethod("faers_keep", "FAERSascii", function(object, primaryid = NULL, invert = FALSE) {

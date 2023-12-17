@@ -69,7 +69,7 @@ okay to use integer indices.}
 \item{primaryid}{An atomic character or integer specifies the reports to
 keep. If \code{NULL}, will do nothing.}
 
-\item{invert, }{A bool. If \code{TRUE}, will keep reports not in \code{primaryid}.}
+\item{invert}{A bool. If \code{TRUE}, will keep reports not in \code{primaryid}.}
 
 \item{.fn}{A function or formula, accept the field data as the input and
 return an atomic integer or character of \code{primaryid} you want to keep or
