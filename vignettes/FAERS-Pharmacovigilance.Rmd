@@ -111,6 +111,12 @@ data2 <- faers(c(2004, 2017), c("q1", "q2"),
 data2
 ```
 
+You can use `faers_get()` to get specific field data, a data.table will be
+returned. 
+```{r}
+faers_get(data2, "demo")
+```
+
 #### Standardize and De-duplication
 The `reac` file provides the adverse drug reactions, where it includes the
 “P.T.” field or the “Preferred Term” level terminology from the Medical
@@ -132,7 +138,34 @@ data <- readRDS(system.file("extdata", "standardized_data.rds",
 data
 ```
 
-One limitation of FAERS database is Duplicate and incomplete reports. There are
+The internal will save the complete MedDRA data in the `@meddra` slot, MedDRA
+consists of two components: hierarchy and SMQ data. We can specify these
+components using the use argument.
+```{r}
+faers_meddra(data)
+faers_meddra(data, use = "hierarchy")
+```
+
+The internal will include a `meddra_hierarchy_idx` column that represents the
+index of the MedDRA hierarchy data in the `indi` and `reac` field when
+standardized. Additionally, the columns `meddra_hierarchy_from`, `meddra_code`,
+and `meddra_pt` will also be added which provide standardized names of the
+original PT (indi: indi_pt; reac: pt) (refer to `ASC_NTS.pdf` or `ASC_NTS.docx`
+in the FAERS quarterly file for the meanings of the original names, most
+original names will remain unchanged except for some names different between
+FAERS quarterly files, see `?faers_parse` for details).  We can retrieve this
+data using the `faers_meddra()` function.  When we use `faers_get()` to retrieve
+`indi` or `reac` data from the standardized `FAERSascii` object, the meddra
+hierarchy columns are automatically added to the returned data.table. 
+```{r}
+faers_get(data, "indi")
+```
+
+```{r}
+faers_get(data, "reac")
+```
+
+One limitation of FAERS database is duplicate and incomplete reports. There are
 many instances of duplicative reports and some reports do not contain all the
 necessary information. We deemed two cases to be identical if they exhibited a
 full concordance across drugs administered, and adverse reactions and but showed

@@ -548,6 +548,91 @@ data2
 #>   Total reports: 200 (with duplicates)
 ```
 
+You can use `faers_get()` to get specific field data, a data.table will
+be returned.
+
+``` r
+faers_get(data2, "demo")
+#>       year quarter primaryid   caseid i_f_code foll_seq     image event_dt
+#>      <int>  <char>    <char>   <char>   <char>    <int>    <char>    <int>
+#>   1:  2004      q1   4263742  4061110        I       NA 4263742-7 20031115
+#>   2:  2004      q1   4264028  4064419        I       NA 4264028-7 20031127
+#>   3:  2004      q1   4265584  4057482        I       NA 4265584-5 20031029
+#>   4:  2004      q1   4268593  4066346        I       NA 4268593-5 20031009
+#>   5:  2004      q1   4268863  4066975        I       NA 4268863-0 20031228
+#>  ---                                                                      
+#> 196:  2017      q2 136878411 13687841        I       NA      <NA>   201704
+#> 197:  2017      q2 136932671 13693267        I       NA      <NA>     2016
+#> 198:  2017      q2 136959401 13695940        I       NA      <NA>       NA
+#> 199:  2017      q2 136970751 13697075        I       NA      <NA> 20170623
+#> 200:  2017      q2  93588412  9358841        F       NA      <NA> 20120407
+#>        mfr_dt   fda_dt rept_cod                      mfr_num
+#>         <int>    <int>   <char>                       <char>
+#>   1: 20031218 20040102      EXP               DSA_23619_2003
+#>   2: 20031216 20040102      EXP                 GBT031201111
+#>   3:       NA 20040107      DIR                         <NA>
+#>   4: 20031225 20040108      EXP                   K200301940
+#>   5: 20031230 20040108      EXP                  2003UW17317
+#>  ---                                                        
+#> 196: 20170616 20170626      EXP     US-AMGEN-USASL2017093163
+#> 197: 20170621 20170627      EXP CA-ABBVIE-17K-028-2017994-00
+#> 198: 20170616 20170628      PER     US-AMGEN-USASP2017095323
+#> 199: 20170626 20170628      EXP US-ABBVIE-17K-163-2020858-00
+#> 200: 20170518 20170522      EXP     CN-PFIZER INC-2013181479
+#>                          mfr_sndr   age age_cod    sex  e_sub    wt wt_cod
+#>                            <char> <num>  <char> <char> <char> <num> <char>
+#>   1: BIOVAIL PHARMACEUTICALS INC.    42      YR      F      N    NA   <NA>
+#>   2:        ELI LILLY AND COMPANY    43      YR      F      N    71     KG
+#>   3:                         <NA>    44      YR      F      N   152    LBS
+#>   4:   KING PHARMACEUTICALS, INC.    75      YR      M      N    NA   <NA>
+#>   5:  ASTRAZENECA PHARMACEUTICALS    72      YR      F      N   109    LBS
+#>  ---                                                                      
+#> 196:                        AMGEN    64      YR      M      Y    NA   <NA>
+#> 197:                       ABBVIE    NA    <NA>      F      Y    NA   <NA>
+#> 198:                        AMGEN    NA    <NA>   <NA>      Y    NA   <NA>
+#> 199:                       ABBVIE    71      YR      F      Y    NA   <NA>
+#> 200:                       PFIZER    16      YR      M      Y    40     KG
+#>       rept_dt occp_cod death_dt to_mfr confid    v23 caseversion age_in_years
+#>         <int>   <char>   <lgcl> <char> <char> <lgcl>       <int>        <num>
+#>   1: 20031231       OT       NA   <NA>   <NA>     NA           0           42
+#>   2: 20031223       MD       NA   <NA>   <NA>     NA           0           43
+#>   3: 20040106       MD       NA      N      N     NA           0           44
+#>   4: 20040107       OT       NA   <NA>   <NA>     NA           0           75
+#>   5: 20040107     <NA>       NA   <NA>   <NA>     NA           0           72
+#>  ---                                                                         
+#> 196: 20170625       OT       NA   <NA>   <NA>     NA           1           64
+#> 197: 20170627       CN       NA   <NA>   <NA>     NA           1           NA
+#> 198: 20170627       MD       NA   <NA>   <NA>     NA           1           NA
+#> 199: 20170628       CN       NA   <NA>   <NA>     NA           1           71
+#> 200: 20170522       OT       NA   <NA>   <NA>     NA           2           16
+#>      country_code gender init_fda_dt auth_num lit_ref age_grp reporter_country
+#>            <char> <char>       <int>   <char>  <char>  <char>           <char>
+#>   1:         <NA>      F          NA     <NA>    <NA>    <NA>             <NA>
+#>   2:         <NA>      F          NA     <NA>    <NA>    <NA>             <NA>
+#>   3:         <NA>      F          NA     <NA>    <NA>    <NA>             <NA>
+#>   4:         <NA>      M          NA     <NA>    <NA>    <NA>             <NA>
+#>   5:         <NA>      F          NA     <NA>    <NA>    <NA>             <NA>
+#>  ---                                                                          
+#> 196:           US      M    20170626     <NA>    <NA>       A               US
+#> 197:           CA      F    20170627     <NA>    <NA>    <NA>               CA
+#> 198:           US   <NA>    20170628     <NA>    <NA>    <NA>               US
+#> 199:           US      F    20170628     <NA>    <NA>    <NA>               US
+#> 200:           CN      M    20130620     <NA>    <NA>    <NA>               CN
+#>      occr_country
+#>            <char>
+#>   1:         <NA>
+#>   2:         <NA>
+#>   3:         <NA>
+#>   4:         <NA>
+#>   5:         <NA>
+#>  ---             
+#> 196:           US
+#> 197:           CA
+#> 198:           US
+#> 199:           US
+#> 200:           CN
+```
+
 #### Standardize and De-duplication
 
 The `reac` file provides the adverse drug reactions, where it includes
@@ -574,7 +659,377 @@ data
 #>   Total reports: 200 (with duplicates)
 ```
 
-One limitation of FAERS database is Duplicate and incomplete reports.
+The internal will save the complete MedDRA data in the `@meddra` slot,
+MedDRA consists of two components: hierarchy and SMQ data. We can
+specify these components using the use argument.
+
+``` r
+faers_meddra(data)
+#> Hierarchy data for MedDRA (version 26.1)
+faers_meddra(data, use = "hierarchy")
+#>        llt_code
+#>           <int>
+#>     1: 10000001
+#>     2: 10000002
+#>     3: 10000003
+#>     4: 10000004
+#>     5: 10000005
+#>    ---         
+#> 87588: 10089903
+#> 87589: 10089904
+#> 87590: 10089905
+#> 87591: 10089906
+#> 87592: 10089907
+#>                                                                llt_name
+#>                                                                  <char>
+#>     1:                                        "Ventilation" pneumonitis
+#>     2:                                   11-beta-hydroxylase deficiency
+#>     3:                                      11-oxysteroid activity incr
+#>     4:                                 11-oxysteroid activity increased
+#>     5:                                            17 ketosteroids urine
+#>    ---                                                                 
+#> 87588:                                Unintentional exposure to product
+#> 87589:                       Unintentional exposure to product by child
+#> 87590:                                Smouldering systemic mastocytosis
+#> 87591: Systemic mastocytosis with an associated haematological neoplasm
+#> 87592:                                              Smouldering myeloma
+#>         pt_code                                 pt_name hlt_code
+#>           <int>                                  <char>    <int>
+#>     1: 10081988            Hypersensitivity pneumonitis 10024972
+#>     2: 10000002          11-beta-hydroxylase deficiency 10021608
+#>     3: 10033315            Oxycorticosteroids increased 10001339
+#>     4: 10033315            Oxycorticosteroids increased 10001339
+#>     5: 10000005                   17 ketosteroids urine 10038589
+#>    ---                                                          
+#> 87588: 10073317          Accidental exposure to product 10073316
+#> 87589: 10073318 Accidental exposure to product by child 10073316
+#> 87590: 10089905       Smouldering systemic mastocytosis 10018845
+#> 87591: 10089805          Advanced systemic mastocytosis 10018845
+#> 87592: 10035226                     Plasma cell myeloma 10074470
+#>                                                               hlt_name
+#>                                                                 <char>
+#>     1: Lower respiratory tract inflammatory and immunologic conditions
+#>     2:                              Inborn errors of steroid synthesis
+#>     3:                                            Adrenal cortex tests
+#>     4:                                            Adrenal cortex tests
+#>     5:                                   Reproductive hormone analyses
+#>    ---                                                                
+#> 87588:                                 Accidental exposures to product
+#> 87589:                                 Accidental exposures to product
+#> 87590:                                      Haematologic neoplasms NEC
+#> 87591:                                      Haematologic neoplasms NEC
+#> 87592:                                            Plasma cell myelomas
+#>        hlgt_code
+#>            <int>
+#>     1:  10024967
+#>     2:  10027424
+#>     3:  10014706
+#>     4:  10014706
+#>     5:  10014706
+#>    ---          
+#> 87588:  10079145
+#> 87589:  10079145
+#> 87590:  10018865
+#> 87591:  10018865
+#> 87592:  10035227
+#>                                                                 hlgt_name
+#>                                                                    <char>
+#>     1: Lower respiratory tract disorders (excl obstruction and infection)
+#>     2:                     Metabolic and nutritional disorders congenital
+#>     3:                       Endocrine investigations (incl sex hormones)
+#>     4:                       Endocrine investigations (incl sex hormones)
+#>     5:                       Endocrine investigations (incl sex hormones)
+#>    ---                                                                   
+#> 87588:          Medication errors and other product use errors and issues
+#> 87589:          Medication errors and other product use errors and issues
+#> 87590:           Haematopoietic neoplasms (excl leukaemias and lymphomas)
+#> 87591:           Haematopoietic neoplasms (excl leukaemias and lymphomas)
+#> 87592:                                              Plasma cell neoplasms
+#>        soc_code
+#>           <int>
+#>     1: 10038738
+#>     2: 10010331
+#>     3: 10022891
+#>     4: 10022891
+#>     5: 10022891
+#>    ---         
+#> 87588: 10022117
+#> 87589: 10022117
+#> 87590: 10029104
+#> 87591: 10029104
+#> 87592: 10029104
+#>                                                                   soc_name
+#>                                                                     <char>
+#>     1:                     Respiratory, thoracic and mediastinal disorders
+#>     2:                          Congenital, familial and genetic disorders
+#>     3:                                                      Investigations
+#>     4:                                                      Investigations
+#>     5:                                                      Investigations
+#>    ---                                                                    
+#> 87588:                      Injury, poisoning and procedural complications
+#> 87589:                      Injury, poisoning and procedural complications
+#> 87590: Neoplasms benign, malignant and unspecified (incl cysts and polyps)
+#> 87591: Neoplasms benign, malignant and unspecified (incl cysts and polyps)
+#> 87592: Neoplasms benign, malignant and unspecified (incl cysts and polyps)
+#>        soc_abbrev primary_soc_fg
+#>            <char>         <char>
+#>     1:       Resp              Y
+#>     2:       Cong              Y
+#>     3:        Inv              Y
+#>     4:        Inv              Y
+#>     5:        Inv              Y
+#>    ---                          
+#> 87588:      Inj&P              Y
+#> 87589:      Inj&P              Y
+#> 87590:      Neopl              Y
+#> 87591:      Neopl              Y
+#> 87592:      Neopl              Y
+```
+
+The internal will include a `meddra_hierarchy_idx` column that
+represents the index of the MedDRA hierarchy data in the `indi` and
+`reac` field when standardized. Additionally, the columns
+`meddra_hierarchy_from`, `meddra_code`, and `meddra_pt` will also be
+added which provide standardized names of the original PT (indi:
+indi\_pt; reac: pt) (refer to `ASC_NTS.pdf` or `ASC_NTS.docx` in the
+FAERS quarterly file for the meanings of the original names, most
+original names will remain unchanged except for some names different
+between FAERS quarterly files, see `?faers_parse` for details). We can
+retrieve this data using the `faers_meddra()` function. When we use
+`faers_get()` to retrieve `indi` or `reac` data from the standardized
+`FAERSascii` object, the meddra hierarchy columns are automatically
+added to the returned data.table.
+
+``` r
+faers_get(data, "indi")
+#>       year quarter primaryid indi_drug_seq
+#>      <int>  <char>    <char>         <int>
+#>   1:  2004      q1   4264028    1004493847
+#>   2:  2004      q1   4264028    1004530015
+#>   3:  2004      q1   4264028    1004530020
+#>   4:  2004      q1   4264028    1004530025
+#>   5:  2004      q1   4265584    1004498166
+#>  ---                                      
+#> 352:  2017      q2 136932671             1
+#> 353:  2017      q2 136959401             1
+#> 354:  2017      q2 136970751             1
+#> 355:  2017      q2  93588412             1
+#> 356:  2017      q2  93588412             2
+#>                                       indi_pt   caseid meddra_hierarchy_from
+#>                                        <char>   <char>                <char>
+#>   1:                            BREAST CANCER     <NA>                   llt
+#>   2:                            BREAST CANCER     <NA>                   llt
+#>   3:                            BREAST CANCER     <NA>                   llt
+#>   4:                            BREAST CANCER     <NA>                   llt
+#>   5: ATTENTION DEFICIT/HYPERACTIVITY DISORDER     <NA>                   llt
+#>  ---                                                                        
+#> 352:                    Psoriatic arthropathy 13693267                   llt
+#> 353:      Product used for unknown indication 13695940                   llt
+#> 354:                          Crohn's disease 13697075                   llt
+#> 355:                   Anti-infective therapy  9358841                   llt
+#> 356:                   Anti-infective therapy  9358841                   llt
+#>      meddra_code                                meddra_pt llt_code
+#>           <char>                                   <char>    <int>
+#>   1:    10006187                            Breast cancer 10006187
+#>   2:    10006187                            Breast cancer 10006187
+#>   3:    10006187                            Breast cancer 10006187
+#>   4:    10006187                            Breast cancer 10006187
+#>   5:    10003736 Attention deficit/hyperactivity disorder 10003736
+#>  ---                                                              
+#> 352:    10037162                    Psoriatic arthropathy 10037162
+#> 353:    10070592      Product used for unknown indication 10070592
+#> 354:    10011401                          Crohn's disease 10011401
+#> 355:    10058316                   Anti-infective therapy 10058316
+#> 356:    10058316                   Anti-infective therapy 10058316
+#>                                      llt_name  pt_code
+#>                                        <char>    <int>
+#>   1:                            Breast cancer 10006187
+#>   2:                            Breast cancer 10006187
+#>   3:                            Breast cancer 10006187
+#>   4:                            Breast cancer 10006187
+#>   5: Attention deficit/hyperactivity disorder 10083622
+#>  ---                                                  
+#> 352:                    Psoriatic arthropathy 10037162
+#> 353:      Product used for unknown indication 10070592
+#> 354:                          Crohn's disease 10011401
+#> 355:                   Anti-infective therapy 10058316
+#> 356:                   Anti-infective therapy 10058316
+#>                                       pt_name hlt_code
+#>                                        <char>    <int>
+#>   1:                            Breast cancer 10006290
+#>   2:                            Breast cancer 10006290
+#>   3:                            Breast cancer 10006290
+#>   4:                            Breast cancer 10006290
+#>   5: Attention deficit hyperactivity disorder 10003730
+#>  ---                                                  
+#> 352:                    Psoriatic arthropathy 10037163
+#> 353:      Product used for unknown indication 10027700
+#> 354:                          Crohn's disease 10009888
+#> 355:                   Anti-infective therapy 10002790
+#> 356:                   Anti-infective therapy 10002790
+#>                                                  hlt_name hlgt_code
+#>                                                    <char>     <int>
+#>   1:                Breast and nipple neoplasms malignant  10006291
+#>   2:                Breast and nipple neoplasms malignant  10006291
+#>   3:                Breast and nipple neoplasms malignant  10006291
+#>   4:                Breast and nipple neoplasms malignant  10006291
+#>   5: Attention deficit and disruptive behaviour disorders  10009841
+#>  ---                                                               
+#> 352:                              Psoriatic arthropathies  10023213
+#> 353:                           Therapeutic procedures NEC  10043413
+#> 354:                             Colitis (excl infective)  10017969
+#> 355:                              Antiinfective therapies  10043413
+#> 356:                              Antiinfective therapies  10043413
+#>                                                     hlgt_name soc_code
+#>                                                        <char>    <int>
+#>   1: Breast neoplasms malignant and unspecified (incl nipple) 10029104
+#>   2: Breast neoplasms malignant and unspecified (incl nipple) 10029104
+#>   3: Breast neoplasms malignant and unspecified (incl nipple) 10029104
+#>   4: Breast neoplasms malignant and unspecified (incl nipple) 10029104
+#>   5:       Cognitive and attention disorders and disturbances 10037175
+#>  ---                                                                  
+#> 352:                                          Joint disorders 10028395
+#> 353:           Therapeutic procedures and supportive care NEC 10042613
+#> 354:                 Gastrointestinal inflammatory conditions 10017947
+#> 355:           Therapeutic procedures and supportive care NEC 10042613
+#> 356:           Therapeutic procedures and supportive care NEC 10042613
+#>                                                                 soc_name
+#>                                                                   <char>
+#>   1: Neoplasms benign, malignant and unspecified (incl cysts and polyps)
+#>   2: Neoplasms benign, malignant and unspecified (incl cysts and polyps)
+#>   3: Neoplasms benign, malignant and unspecified (incl cysts and polyps)
+#>   4: Neoplasms benign, malignant and unspecified (incl cysts and polyps)
+#>   5:                                               Psychiatric disorders
+#>  ---                                                                    
+#> 352:                     Musculoskeletal and connective tissue disorders
+#> 353:                                     Surgical and medical procedures
+#> 354:                                          Gastrointestinal disorders
+#> 355:                                     Surgical and medical procedures
+#> 356:                                     Surgical and medical procedures
+#>      soc_abbrev primary_soc_fg
+#>          <char>         <char>
+#>   1:      Neopl              Y
+#>   2:      Neopl              Y
+#>   3:      Neopl              Y
+#>   4:      Neopl              Y
+#>   5:      Psych              Y
+#>  ---                          
+#> 352:       Musc              Y
+#> 353:       Surg              Y
+#> 354:      Gastr              Y
+#> 355:       Surg              Y
+#> 356:       Surg              Y
+```
+
+``` r
+faers_get(data, "reac")
+#>       year quarter primaryid                               pt     v3   caseid
+#>      <int>  <char>    <char>                           <char> <lgcl>   <char>
+#>   1:  2004      q1   4263742                        DIARRHOEA     NA     <NA>
+#>   2:  2004      q1   4263742             INTENTIONAL OVERDOSE     NA     <NA>
+#>   3:  2004      q1   4263742                        MYDRIASIS     NA     <NA>
+#>   4:  2004      q1   4263742                           NAUSEA     NA     <NA>
+#>   5:  2004      q1   4263742         PLATELET COUNT INCREASED     NA     <NA>
+#>  ---                                                                         
+#> 698:  2017      q2 136959401          Injection site reaction     NA 13695940
+#> 699:  2017      q2 136970751           Intestinal obstruction     NA 13697075
+#> 700:  2017      q2  93588412 Generalised tonic-clonic seizure     NA  9358841
+#> 701:  2017      q2  93588412               Petit mal epilepsy     NA  9358841
+#> 702:  2017      q2  93588412                              Tic     NA  9358841
+#>      drug_rec_act meddra_hierarchy_from meddra_code
+#>            <lgcl>                <char>      <char>
+#>   1:           NA                   llt    10012735
+#>   2:           NA                   llt    10022523
+#>   3:           NA                   llt    10028521
+#>   4:           NA                   llt    10028813
+#>   5:           NA                   llt    10051608
+#>  ---                                               
+#> 698:           NA                   llt    10022095
+#> 699:           NA                   llt    10022687
+#> 700:           NA                   llt    10018100
+#> 701:           NA                   llt    10034759
+#> 702:           NA                   llt    10043833
+#>                             meddra_pt llt_code                         llt_name
+#>                                <char>    <int>                           <char>
+#>   1:                        Diarrhoea 10012735                        Diarrhoea
+#>   2:             Intentional overdose 10022523             Intentional overdose
+#>   3:                        Mydriasis 10028521                        Mydriasis
+#>   4:                           Nausea 10028813                           Nausea
+#>   5:         Platelet count increased 10051608         Platelet count increased
+#>  ---                                                                           
+#> 698:          Injection site reaction 10022095          Injection site reaction
+#> 699:           Intestinal obstruction 10022687           Intestinal obstruction
+#> 700: Generalised tonic-clonic seizure 10018100 Generalised tonic-clonic seizure
+#> 701:               Petit mal epilepsy 10034759               Petit mal epilepsy
+#> 702:                              Tic 10043833                              Tic
+#>       pt_code                          pt_name hlt_code
+#>         <int>                           <char>    <int>
+#>   1: 10012735                        Diarrhoea 10012736
+#>   2: 10022523             Intentional overdose 10076292
+#>   3: 10028521                        Mydriasis 10037514
+#>   4: 10028813                           Nausea 10028817
+#>   5: 10051608         Platelet count increased 10035523
+#>  ---                                                   
+#> 698: 10022095          Injection site reaction 10022097
+#> 699: 10022687           Intestinal obstruction 10018009
+#> 700: 10018100 Generalised tonic-clonic seizure 10018101
+#> 701: 10034759               Petit mal epilepsy 10000332
+#> 702: 10043833                              Tic 10043835
+#>                                           hlt_name hlgt_code
+#>                                             <char>     <int>
+#>   1:                    Diarrhoea (excl infective)  10017977
+#>   2:                                 Overdoses NEC  10079159
+#>   3:                               Pupil disorders  10030061
+#>   4:                  Nausea and vomiting symptoms  10018012
+#>   5:                             Platelet analyses  10018851
+#>  ---                                                        
+#> 698:                      Injection site reactions  10001316
+#> 699: Gastrointestinal stenosis and obstruction NEC  10018008
+#> 700:             Generalised tonic-clonic seizures  10039911
+#> 701:                              Absence seizures  10039911
+#> 702:                                 Tic disorders  10008401
+#>                                                 hlgt_name soc_code
+#>                                                    <char>    <int>
+#>   1: Gastrointestinal motility and defaecation conditions 10017947
+#>   2:                         Overdoses and underdoses NEC 10022117
+#>   3:                       Ocular neuromuscular disorders 10015919
+#>   4:                  Gastrointestinal signs and symptoms 10017947
+#>   5:       Haematology investigations (incl blood groups) 10022891
+#>  ---                                                              
+#> 698:                        Administration site reactions 10018065
+#> 699:            Gastrointestinal stenosis and obstruction 10017947
+#> 700:                             Seizures (incl subtypes) 10029205
+#> 701:                             Seizures (incl subtypes) 10029205
+#> 702:                         Changes in physical activity 10037175
+#>                                                  soc_name soc_abbrev
+#>                                                    <char>     <char>
+#>   1:                           Gastrointestinal disorders      Gastr
+#>   2:       Injury, poisoning and procedural complications      Inj&P
+#>   3:                                        Eye disorders        Eye
+#>   4:                           Gastrointestinal disorders      Gastr
+#>   5:                                       Investigations        Inv
+#>  ---                                                                
+#> 698: General disorders and administration site conditions      Genrl
+#> 699:                           Gastrointestinal disorders      Gastr
+#> 700:                             Nervous system disorders       Nerv
+#> 701:                             Nervous system disorders       Nerv
+#> 702:                                Psychiatric disorders      Psych
+#>      primary_soc_fg
+#>              <char>
+#>   1:              Y
+#>   2:              Y
+#>   3:              Y
+#>   4:              Y
+#>   5:              Y
+#>  ---               
+#> 698:              Y
+#> 699:              Y
+#> 700:              Y
+#> 701:              Y
+#> 702:              Y
+```
+
+One limitation of FAERS database is duplicate and incomplete reports.
 There are many instances of duplicative reports and some reports do not
 contain all the necessary information. We deemed two cases to be
 identical if they exhibited a full concordance across drugs
@@ -725,38 +1180,38 @@ insulin_signals
 #> 15:            -5.059438              2.875465   -0.64969772
 #>     bcpnn_mcmc_ic_ci_low bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low
 #>                    <num>                 <num>       <num>           <num>
-#>  1:          -10.3227280             1.7097008 -0.50589093     -10.3882898
-#>  2:           -2.3655391             2.7746712  1.27462238      -2.5084784
-#>  3:          -10.0215171             2.2542258 -0.04264434      -9.9520669
-#>  4:          -10.0098340             2.1264994 -0.16349873     -10.0243790
-#>  5:           -9.9353969             2.2481277 -0.04264434      -9.9976267
-#>  6:           -2.4113479             2.6932162  1.20645088      -2.5766499
-#>  7:           -2.8700834             1.8915814  0.57060721      -3.2124936
-#>  8:           -3.5041218             0.9905238 -0.18057225      -3.9636731
-#>  9:          -10.2883764             1.9221028 -0.34482850     -10.2279901
-#> 10:           -9.9715096             2.0990512 -0.16349873     -10.1426249
-#> 11:           -0.7880866             2.3055106  1.35107444      -1.2419932
-#> 12:           -2.8025074             1.9833057  0.63636165      -3.1467392
-#> 13:           -0.7691758             2.3151794  1.35107444      -1.2419932
-#> 14:           -0.4359694             3.0233355  1.87832144      -0.7147462
-#> 15:          -10.5114367             1.5589373 -0.65076456     -10.4720362
+#>  1:          -10.3317489             1.7283623 -0.50589093     -10.3237654
+#>  2:           -2.3407886             2.7726499  1.27462238      -2.5084784
+#>  3:          -10.0061093             2.2571416 -0.04264434      -9.9756850
+#>  4:           -9.9713561             2.1185831 -0.16349873     -10.1277161
+#>  5:           -9.9641434             2.2527566 -0.04264434      -9.9882612
+#>  6:           -2.3672567             2.6862853  1.20645088      -2.5766499
+#>  7:           -2.8497824             1.9008600  0.57060721      -3.2124936
+#>  8:           -3.4967615             0.9876046 -0.18057225      -3.9636731
+#>  9:          -10.0901076             1.9077602 -0.34482850     -10.1872240
+#> 10:          -10.0098865             2.1076118 -0.16349873     -10.0083530
+#> 11:           -0.7573926             2.3128579  1.35107444      -1.2419932
+#> 12:           -2.8328941             1.9837945  0.63636165      -3.1467392
+#> 13:           -0.7555282             2.3084890  1.35107444      -1.2419932
+#> 14:           -0.4210446             3.0214754  1.87832144      -0.7147462
+#> 15:          -10.4857578             1.5524149 -0.65076456     -10.5334635
 #>     oe_ratio_ci_high odds_ratio odds_ratio_ci_low odds_ratio_ci_high
 #>                <num>      <num>             <num>              <num>
-#>  1:         1.717446  0.0000000        0.00000000           33.68585
+#>  1:         1.734787  0.0000000        0.00000000           33.68585
 #>  2:         2.962049 13.0303800        0.20150028          279.21542
-#>  3:         2.257209  0.0000000        0.00000000         2462.50000
-#>  4:         2.120288  0.0000000        0.00000000          145.21133
-#>  5:         2.259757  0.0000000        0.00000000         2462.50000
+#>  3:         2.259942  0.0000000        0.00000000         2462.50000
+#>  4:         2.108052  0.0000000        0.00000000          145.21133
+#>  5:         2.257014  0.0000000        0.00000000         2462.50000
 #>  6:         2.893877 10.1233187        0.15947006          211.87117
 #>  7:         2.258033  2.4701675        0.04089140           48.73410
 #>  8:         1.506854  0.7478897        0.01250834           14.59249
-#>  9:         1.901241  0.0000000        0.00000000           55.53664
-#> 10:         2.127870  0.0000000        0.00000000          145.21133
+#>  9:         1.901575  0.0000000        0.00000000           55.53664
+#> 10:         2.130614  0.0000000        0.00000000          145.21133
 #> 11:         2.742477 10.9151800        0.55237709          657.45882
 #> 12:         2.323788  2.7642969        0.04567010           54.61951
 #> 13:         2.742477 10.9151800        0.55237709          657.45882
 #> 14:         3.269724 35.2158110        1.70522393         2176.34560
-#> 15:         1.575781  0.0000000        0.00000000           23.77817
+#> 15:         1.577846  0.0000000        0.00000000           23.77817
 #>     fisher_pvalue     ebgm ebgm_ci_low ebgm_ci_high
 #>             <num>    <num>       <num>        <num>
 #>  1:    1.00000000 2.421502        2.38         2.46
@@ -832,30 +1287,30 @@ insulin_signals_hlgt
 #> 142:         NaN 2.800437e-31  1.000000000    -0.7316939            -4.801687
 #>      bcpnn_norm_ic_ci_high bcpnn_mcmc_ic bcpnn_mcmc_ic_ci_low
 #>                      <num>         <num>                <num>
-#>   1:              4.209977   -0.03947607            -9.936350
-#>   2:              3.185527   -0.34296004           -10.324187
-#>   3:              3.623291   -0.12157646           -10.144909
-#>   4:              3.820193   -0.08111417           -10.044329
-#>   5:              4.209977   -0.03947607            -9.937904
+#>   1:              4.209977   -0.03947607           -10.031838
+#>   2:              3.185527   -0.34296004           -10.196627
+#>   3:              3.623291   -0.12157646            -9.983107
+#>   4:              3.820193   -0.08111417           -10.000743
+#>   5:              4.209977   -0.03947607            -9.979654
 #>  ---                                                         
-#> 138:              3.338300   -0.23653305           -10.164893
-#> 139:              3.970219    1.46338605            -2.217522
-#> 140:              4.209977   -0.03947607           -10.033860
-#> 141:              4.202695    1.50384833            -2.188318
-#> 142:              3.338300   -0.23653305           -10.066599
+#> 138:              3.338300   -0.23653305           -10.165525
+#> 139:              3.970219    1.46338605            -2.203669
+#> 140:              4.209977   -0.03947607            -9.960982
+#> 141:              4.202695    1.50384833            -2.184148
+#> 142:              3.338300   -0.23653305           -10.066983
 #>      bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low oe_ratio_ci_high
 #>                      <num>       <num>           <num>            <num>
-#>   1:              2.267840 -0.04264434       -9.987751         2.263439
-#>   2:              1.911937 -0.34482850      -10.335599         1.908490
-#>   3:              2.172273 -0.12432814      -10.042727         2.166006
-#>   4:              2.206658 -0.08406426      -10.083733         2.223030
-#>   5:              2.260174 -0.04264434       -9.921420         2.248651
+#>   1:              2.256211 -0.04264434       -9.903524         2.254197
+#>   2:              1.904126 -0.34482850      -10.340359         1.913541
+#>   3:              2.145214 -0.12432814      -10.088559         2.169377
+#>   4:              2.213887 -0.08406426      -10.005938         2.221035
+#>   5:              2.253682 -0.04264434      -10.005551         2.241251
 #>  ---                                                                   
-#> 138:              2.015313 -0.23878686      -10.169003         2.036207
-#> 139:              3.008917  1.46063437       -2.322466         3.148061
-#> 140:              2.250537 -0.04264434      -10.065103         2.242616
-#> 141:              3.051391  1.50089824       -2.282203         3.188325
-#> 142:              2.012159 -0.23878686      -10.133274         2.022040
+#> 138:              2.010294 -0.23878686      -10.131488         2.023390
+#> 139:              3.002075  1.46063437       -2.322466         3.148061
+#> 140:              2.240702 -0.04264434       -9.925329         2.259773
+#> 141:              3.050325  1.50089824       -2.282203         3.188325
+#> 142:              2.042342 -0.23878686      -10.130615         2.022234
 #>      odds_ratio odds_ratio_ci_low odds_ratio_ci_high fisher_pvalue     ebgm
 #>           <num>             <num>              <num>         <num>    <num>
 #>   1:    0.00000         0.0000000         2462.50000    1.00000000 3.670936
