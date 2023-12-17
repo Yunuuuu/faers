@@ -46,7 +46,8 @@ fda_drugs_file <- function(force, dir = faers_cache_dir("fdadrugs")) {
     )
 }
 
-fda_drugs_url <- function() {
+fda_drugs_url <- function(call = rlang::caller_env()) {
+    assert_internet(call = call)
     url <- sprintf(
         "%s/drugs/drug-approvals-and-databases/drugsfda-data-files",
         fda_host("www")
