@@ -86,7 +86,8 @@ rxnorm_getApproximateMatch <- function(terms, max_entries = NULL, option = NULL,
 # rxnorm_findRxcuiByString(I("Lipitor+10+mg+Tab"), search = 1L)
 rxnorm_findRxcuiByString <- function(names, allsrc = NULL, srclist = NULL, search = NULL, pool_size = 5L, retry = 0L) {
     reqs <- lapply(names, function(term) {
-        rxnorm_api(.path = "rxcui",
+        rxnorm_api(
+            .path = "rxcui",
             name = term,
             allsrc = allsrc,
             srclist = srclist, search = search
@@ -194,7 +195,7 @@ rxnorm_perform <- function(req) {
 ###########################################################
 #' All values in dots should be named. If rxnorm_api_name is `NULL`, `path` must
 #' contain format strings used by sprintf.
-#' @noRd 
+#' @noRd
 rxnorm_api <- function(.path, ..., .format = "xml") {
     req <- httr2::req_url_path_append(
         req = httr2::req_url_path(req = httr2::request(rxnorm_host), "REST"),

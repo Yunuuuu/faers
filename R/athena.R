@@ -36,7 +36,7 @@ athena <- function(use = NULL, list = FALSE, force = FALSE, url = NULL) {
 }
 
 #' @inheritDotParams athena -use -list
-#' @noRd 
+#' @noRd
 athena_standardize_drug <- function(terms, ...) {
     data <- athena(use = c("concept", "concept_synonym"), ..., list = FALSE)
     data$concept <- data$concept[domain_id == "Drug"] # nolint

@@ -310,7 +310,8 @@ dedup_faers_ascii <- function(data, deleted_cases = NULL) {
 
 utils::globalVariables(c(
     "drug_seq", "drugname", "indi_meddra_code", "start_dt",
-    "indi_drug_seq", "dsg_drug_seq", "primaryid", "caseversion", "fda_dt", "i_f_code", "event_dt", "year", "caseid", "age_in_years_round",
+    "indi_drug_seq", "dsg_drug_seq", "primaryid", "caseversion", "fda_dt",
+    "i_f_code", "event_dt", "year", "caseid", "age_in_years_round",
     "meddra_code",
     paste0(c("", "i."), rep(
         c(

@@ -1,13 +1,13 @@
 #' @section Unification:
-#' For all fields data: 
+#' For all fields data:
 #' - All names have been converted to lowercase.
 #' - Rename "isr" into "primaryid" for periods before 2012q3.
-#' 
+#'
 #' Field specific operations:
 #' - `demo`:
 #'   - Rename "gndr_cod" into "sex" for periods before 2014q2.
 #'   - Rename "case" and "i_f_cod" into "caseid" and "i_f_code" for legacy aers,
-#'     before 2012q3. 
+#'     before 2012q3.
 #'   - "age_in_years" was added, measured in years.
 #'   - "country_code" was added (encoded according to the `iso2c` standards), it
 #'      will be convenient to translate it into other code with

@@ -70,4 +70,8 @@ data <- faers_standardize(data, meddra_path)
 data <- faers_dedup(data)
 faers_counts(data)
 }
+std_data <- readRDS(system.file("extdata", "standardized_data.rds",
+    package = "faers"
+))
+faers_counts(std_data)
 }

@@ -64,7 +64,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Style
-        run: styler::style_pkg()
+        run: styler::style_pkg(style = styler::tidyverse_style, indent_by = 4)
         shell: Rscript {0}
 
       - name: commit

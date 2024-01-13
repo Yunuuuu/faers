@@ -1,8 +1,10 @@
 ---
 title: "FAERS-Pharmacovigilance"
 output: 
-  rmarkdown::html_vignette: default
-  github_document: default
+  BiocStyle::html_document: 
+    toc: true
+  github_document: 
+    toc: true
 vignette: >
   %\VignetteIndexEntry{FAERS-Pharmacovigilance}
   %\VignetteEngine{knitr::rmarkdown}
@@ -19,23 +21,49 @@ knit: (function(input, ...) {
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
-## Installation
+## Introduction
 
-You can install the development version of `faers` from [GitHub](https://github.com/) with:
+The FDA Adverse Event Reporting System (FAERS) stands as a database dedicated to
+the monitoring of post-marketing drug safety and exercises a notable influence
+over FDA safety guidance documents, including the modification of drug labels.
+The quantity of cases stored within FAERS has experienced an exponential surge
+due to the refinement of submission techniques and adherence to standardized
+data protocols, making it a pivotal asset for the realm of regulatory science.
+While FAERS has predominantly focused on safety signal detection, the faers
+package acts as the intermediary, seamlessly bridging the gap between the FAERS
+database and the programming language R. Moreover, the faers package provides a
+unified methodology for the seamless execution of pharmacovigilance analysis,
+facilitating the integration of genetic tools in R. With an ultimate ambition
+towards precision medicine, it aspires to scrutinize the vast expanse of the
+human genome, revealing drug pathways that may be intricately tied to
+potentially functional, population-differentiated polymorphisms.
+
+
+## Installation
+To install from Bioconductor, use the following code:
+
+```{r, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+}
+BiocManager::install("faers")
+```
+
+You can install the development version of `faers` from [GitHub](https://github.com/Yunuuuu/faers) with:
 
 ```{r, eval=FALSE}
 if (!requireNamespace("pak")) {
-  install.packages("pak",
-    repos = sprintf(
-      "https://r-lib.github.io/p/pak/devel/%s/%s/%s",
-      .Platform$pkgType, R.Version()$os, R.Version()$arch
+    install.packages("pak",
+        repos = sprintf(
+            "https://r-lib.github.io/p/pak/devel/%s/%s/%s",
+            .Platform$pkgType, R.Version()$os, R.Version()$arch
+        )
     )
-  )
 }
 pak::pkg_install("Yunuuuu/faers")
 ```
@@ -69,7 +97,7 @@ faers_clearcache("metadata")
 faers_meta(internal = TRUE)
 ```
 
-#### Download and Parse quarterly data files from FAERS
+### Download and Parse quarterly data files from FAERS
 The FAERS Quarterly Data files contain raw data extracted from the AERS database
 for the indicated time ranges. The quarterly data files, which are available in ASCII or SGML formats, include: 
 
@@ -95,8 +123,8 @@ details.
 ```{r}
 # # you must change `dir`, as the file included in the package is sampled
 data1 <- faers(2004, "q1",
-  dir = system.file("extdata", package = "faers"),
-  compress_dir = tempdir()
+    dir = system.file("extdata", package = "faers"),
+    compress_dir = tempdir()
 )
 data1
 ```
@@ -105,8 +133,8 @@ Furthermore, in cases where multiple quarterly data files are requisite, the
 `faers_combine()` function is judiciously employed. 
 ```{r}
 data2 <- faers(c(2004, 2017), c("q1", "q2"),
-  dir = system.file("extdata", package = "faers"),
-  compress_dir = tempdir()
+    dir = system.file("extdata", package = "faers"),
+    compress_dir = tempdir()
 )
 data2
 ```
@@ -117,7 +145,7 @@ returned.
 faers_get(data2, "demo")
 ```
 
-#### Standardize and De-duplication
+### Standardize and De-duplication
 The `reac` file provides the adverse drug reactions, where it includes the
 “P.T.” field or the “Preferred Term” level terminology from the Medical
 Dictionary for Regulatory Activities (MedDRA). The `indi` file contains the drug
@@ -133,7 +161,7 @@ data <- faers_standardize(data2, meddra_path)
 To proceed following steps, we just read a standardized data.
 ```{r}
 data <- readRDS(system.file("extdata", "standardized_data.rds",
-  package = "faers"
+    package = "faers"
 ))
 data
 ```
@@ -176,7 +204,7 @@ data <- faers_dedup(data)
 data
 ```
 
-#### Pharmacovigilance analysis
+### Pharmacovigilance analysis
 Pharmacovigilance is the science and activities relating to the detection,
 assessment, understanding and prevention of adverse effects or any other
 medicine/vaccine related problem. 
@@ -191,16 +219,16 @@ To enhance our analysis, it would be advantageous to include all drug synonym na
 insulin_pattern <- "insulin"
 insulin_pattern <- paste(insulin_pattern, collapse = "|")
 fda_insulin <- fda_drugs()[
-  grepl(insulin_pattern, ActiveIngredient, ignore.case = TRUE)
+    grepl(insulin_pattern, ActiveIngredient, ignore.case = TRUE)
 ]
 insulin_pattern <- paste0(
-  unique(tolower(c(insulin_pattern, fda_insulin$DrugName))),
-  collapse = "|"
+    unique(tolower(c(insulin_pattern, fda_insulin$DrugName))),
+    collapse = "|"
 )
 insulin_data <- faers_filter(data, .fn = function(x) {
-  idx <- grepl(insulin_pattern, x$drugname, ignore.case = TRUE) |
-    grepl(insulin_pattern, x$prod_ai, ignore.case = TRUE)
-  x[idx, primaryid]
+    idx <- grepl(insulin_pattern, x$drugname, ignore.case = TRUE) |
+        grepl(insulin_pattern, x$prod_ai, ignore.case = TRUE)
+    x[idx, primaryid]
 }, .field = "drug")
 insulin_data
 ```
@@ -219,6 +247,7 @@ specify `.object2`, which should be the control data or another drug of interest
 for comparison.
 
 ```{r, warning=FALSE}
+set.seed(1L)
 insulin_signals <- faers_phv_signal(insulin_data, .full = data)
 insulin_signals
 ```
@@ -229,15 +258,16 @@ all specified columns will define the unique event. Additionally, we can control
 which field data to find the columns in the `.field` (default: "reac") argument.
 
 ```{r, warning=FALSE}
+set.seed(1L)
 insulin_signals_hlgt <- faers_phv_signal(
-  insulin_data,
-  .events = "hlgt_name",
-  .full = data
+    insulin_data,
+    .events = "hlgt_name",
+    .full = data
 )
 insulin_signals_hlgt
 ```
 
-#### sessionInfo
+## sessionInfo
 ```{r}
 sessionInfo()
 ```

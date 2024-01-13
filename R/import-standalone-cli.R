@@ -85,7 +85,7 @@ is_installed <- local({
                 out <- requireNamespace(pkg, quietly = TRUE) &&
                     utils::packageVersion(pkg) >= version
             }
-            cache[[id]] <<- out
+            cache[[id]] <- out
         }
         out
     }

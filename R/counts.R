@@ -15,6 +15,10 @@
 #' data <- faers_dedup(data)
 #' faers_counts(data)
 #' }
+#' std_data <- readRDS(system.file("extdata", "standardized_data.rds",
+#'     package = "faers"
+#' ))
+#' faers_counts(std_data)
 #' @export
 #' @name faers_counts
 methods::setGeneric("faers_counts", function(.object, ...) {
@@ -31,8 +35,8 @@ methods::setGeneric("faers_counts", function(.object, ...) {
 #' combination for all columns will define the interested events.
 #' @param .fn A function or formula defined the preprocessing function before
 #' creating contingency table, with the `.field` data as the input and return a
-#' [data.table][data.table::data.table]. 
-#' 
+#' [data.table][data.table::data.table].
+#'
 #' Note: When using the `set*` or `:=` function from `data.table` with the
 #' "demo", "drug", "ther", "rpsr", and "outc" data, exercise caution as these
 #' functions directly modify the internal data. In such cases, it is advisable

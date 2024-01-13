@@ -1,19 +1,59 @@
 FAERS-Pharmacovigilance
 ================
 
+  - [Introduction](#introduction)
+  - [Installation](#installation)
+  - [Pharmacovigilance Analysis using
+    FAERS](#pharmacovigilance-analysis-using-faers)
+      - [Check metadata of FAERS](#check-metadata-of-faers)
+      - [Download and Parse quarterly data files from
+        FAERS](#download-and-parse-quarterly-data-files-from-faers)
+      - [Standardize and
+        De-duplication](#standardize-and-de-duplication)
+      - [Pharmacovigilance analysis](#pharmacovigilance-analysis)
+  - [sessionInfo](#sessioninfo)
+
+## Introduction
+
+The FDA Adverse Event Reporting System (FAERS) stands as a database
+dedicated to the monitoring of post-marketing drug safety and exercises
+a notable influence over FDA safety guidance documents, including the
+modification of drug labels. The quantity of cases stored within FAERS
+has experienced an exponential surge due to the refinement of submission
+techniques and adherence to standardized data protocols, making it a
+pivotal asset for the realm of regulatory science. While FAERS has
+predominantly focused on safety signal detection, the faers package acts
+as the intermediary, seamlessly bridging the gap between the FAERS
+database and the programming language R. Moreover, the faers package
+provides a unified methodology for the seamless execution of
+pharmacovigilance analysis, facilitating the integration of genetic
+tools in R. With an ultimate ambition towards precision medicine, it
+aspires to scrutinize the vast expanse of the human genome, revealing
+drug pathways that may be intricately tied to potentially functional,
+population-differentiated polymorphisms.
+
 ## Installation
 
+To install from Bioconductor, use the following code:
+
+``` r
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager")
+}
+BiocManager::install("faers")
+```
+
 You can install the development version of `faers` from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/Yunuuuu/faers) with:
 
 ``` r
 if (!requireNamespace("pak")) {
-  install.packages("pak",
-    repos = sprintf(
-      "https://r-lib.github.io/p/pak/devel/%s/%s/%s",
-      .Platform$pkgType, R.Version()$os, R.Version()$arch
+    install.packages("pak",
+        repos = sprintf(
+            "https://r-lib.github.io/p/pak/devel/%s/%s/%s",
+            .Platform$pkgType, R.Version()$os, R.Version()$arch
+        )
     )
-  )
 }
 pak::pkg_install("Yunuuuu/faers")
 ```
@@ -492,7 +532,7 @@ faers_meta(internal = TRUE)
 #>  [ reached getOption("max.print") -- omitted 10 rows ]
 ```
 
-#### Download and Parse quarterly data files from FAERS
+### Download and Parse quarterly data files from FAERS
 
 The FAERS Quarterly Data files contain raw data extracted from the AERS
 database for the indicated time ranges. The quarterly data files, which
@@ -523,8 +563,8 @@ for details.
 ``` r
 # # you must change `dir`, as the file included in the package is sampled
 data1 <- faers(2004, "q1",
-  dir = system.file("extdata", package = "faers"),
-  compress_dir = tempdir()
+    dir = system.file("extdata", package = "faers"),
+    compress_dir = tempdir()
 )
 #> Finding 1 file already downloaded: 'aers_ascii_2004q1.zip'
 data1
@@ -537,8 +577,8 @@ the `faers_combine()` function is judiciously employed.
 
 ``` r
 data2 <- faers(c(2004, 2017), c("q1", "q2"),
-  dir = system.file("extdata", package = "faers"),
-  compress_dir = tempdir()
+    dir = system.file("extdata", package = "faers"),
+    compress_dir = tempdir()
 )
 #> Finding 2 files already downloaded: 'aers_ascii_2004q1.zip' and
 #> 'faers_ascii_2017q2.zip'
@@ -633,7 +673,7 @@ faers_get(data2, "demo")
 #> 200:           CN
 ```
 
-#### Standardize and De-duplication
+### Standardize and De-duplication
 
 The `reac` file provides the adverse drug reactions, where it includes
 the “P.T.” field or the “Preferred Term” level terminology from the
@@ -652,7 +692,7 @@ To proceed following steps, we just read a standardized data.
 
 ``` r
 data <- readRDS(system.file("extdata", "standardized_data.rds",
-  package = "faers"
+    package = "faers"
 ))
 data
 #> Standardized FAERS data from 2 Quarterly ascii files
@@ -1047,7 +1087,7 @@ data
 #>   Total unique reports: 200
 ```
 
-#### Pharmacovigilance analysis
+### Pharmacovigilance analysis
 
 Pharmacovigilance is the science and activities relating to the
 detection, assessment, understanding and prevention of adverse effects
@@ -1069,23 +1109,23 @@ dataset, which can be easily obtained using the `fda_drugs()` function.
 insulin_pattern <- "insulin"
 insulin_pattern <- paste(insulin_pattern, collapse = "|")
 fda_insulin <- fda_drugs()[
-  grepl(insulin_pattern, ActiveIngredient, ignore.case = TRUE)
+    grepl(insulin_pattern, ActiveIngredient, ignore.case = TRUE)
 ]
 #> → Using Drugs@FDA data from cached
-#>   '/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2023-12-16.zip'
-#>   Snapshot date: 2023-12-16
+#>   '/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2024-01-13.zip'
+#>   Snapshot date: 2024-01-13
 #> Warning: One or more parsing issues, call `problems()` on your data frame for details,
 #> e.g.:
 #>   dat <- vroom(...)
 #>   problems(dat)
 insulin_pattern <- paste0(
-  unique(tolower(c(insulin_pattern, fda_insulin$DrugName))),
-  collapse = "|"
+    unique(tolower(c(insulin_pattern, fda_insulin$DrugName))),
+    collapse = "|"
 )
 insulin_data <- faers_filter(data, .fn = function(x) {
-  idx <- grepl(insulin_pattern, x$drugname, ignore.case = TRUE) |
-    grepl(insulin_pattern, x$prod_ai, ignore.case = TRUE)
-  x[idx, primaryid]
+    idx <- grepl(insulin_pattern, x$drugname, ignore.case = TRUE) |
+        grepl(insulin_pattern, x$prod_ai, ignore.case = TRUE)
+    x[idx, primaryid]
 }, .field = "drug")
 insulin_data
 #> Standardized and De-duplicated FAERS data from 2 Quarterly ascii files
@@ -1107,6 +1147,7 @@ FAERS data), or you can specify `.object2`, which should be the control
 data or another drug of interest for comparison.
 
 ``` r
+set.seed(1L)
 insulin_signals <- faers_phv_signal(insulin_data, .full = data)
 insulin_signals
 #> Key: <soc_name>
@@ -1180,38 +1221,38 @@ insulin_signals
 #> 15:            -5.059438              2.875465   -0.64969772
 #>     bcpnn_mcmc_ic_ci_low bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low
 #>                    <num>                 <num>       <num>           <num>
-#>  1:          -10.3317489             1.7283623 -0.50589093     -10.3237654
-#>  2:           -2.3407886             2.7726499  1.27462238      -2.5084784
-#>  3:          -10.0061093             2.2571416 -0.04264434      -9.9756850
-#>  4:           -9.9713561             2.1185831 -0.16349873     -10.1277161
-#>  5:           -9.9641434             2.2527566 -0.04264434      -9.9882612
-#>  6:           -2.3672567             2.6862853  1.20645088      -2.5766499
-#>  7:           -2.8497824             1.9008600  0.57060721      -3.2124936
-#>  8:           -3.4967615             0.9876046 -0.18057225      -3.9636731
-#>  9:          -10.0901076             1.9077602 -0.34482850     -10.1872240
-#> 10:          -10.0098865             2.1076118 -0.16349873     -10.0083530
-#> 11:           -0.7573926             2.3128579  1.35107444      -1.2419932
-#> 12:           -2.8328941             1.9837945  0.63636165      -3.1467392
-#> 13:           -0.7555282             2.3084890  1.35107444      -1.2419932
-#> 14:           -0.4210446             3.0214754  1.87832144      -0.7147462
-#> 15:          -10.4857578             1.5524149 -0.65076456     -10.5334635
+#>  1:          -10.2469847             1.7329970 -0.50589093     -10.3355050
+#>  2:           -2.3687685             2.7746570  1.27462238      -2.5084784
+#>  3:          -10.0299469             2.2485350 -0.04264434      -9.8952571
+#>  4:          -10.0496990             2.1208626 -0.16349873      -9.9729602
+#>  5:           -9.9443639             2.2546058 -0.04264434     -10.0159789
+#>  6:           -2.3721307             2.6989335  1.20645088      -2.5766499
+#>  7:           -2.8497104             1.8982781  0.57060721      -3.2124936
+#>  8:           -3.4827207             0.9902367 -0.18057225      -3.9636731
+#>  9:          -10.2104872             1.9009499 -0.34482850     -10.1693395
+#> 10:          -10.0393748             2.1095254 -0.16349873      -9.9466376
+#> 11:           -0.7632789             2.3062119  1.35107444      -1.2419932
+#> 12:           -2.8130859             1.9851334  0.63636165      -3.1467392
+#> 13:           -0.7832653             2.3098357  1.35107444      -1.2419932
+#> 14:           -0.4409460             3.0182365  1.87832144      -0.7147462
+#> 15:          -10.4784638             1.5675396 -0.65076456     -10.5718176
 #>     oe_ratio_ci_high odds_ratio odds_ratio_ci_low odds_ratio_ci_high
 #>                <num>      <num>             <num>              <num>
-#>  1:         1.734787  0.0000000        0.00000000           33.68585
+#>  1:         1.726128  0.0000000        0.00000000           33.68585
 #>  2:         2.962049 13.0303800        0.20150028          279.21542
-#>  3:         2.259942  0.0000000        0.00000000         2462.50000
-#>  4:         2.108052  0.0000000        0.00000000          145.21133
-#>  5:         2.257014  0.0000000        0.00000000         2462.50000
+#>  3:         2.236123  0.0000000        0.00000000         2462.50000
+#>  4:         2.129039  0.0000000        0.00000000          145.21133
+#>  5:         2.268819  0.0000000        0.00000000         2462.50000
 #>  6:         2.893877 10.1233187        0.15947006          211.87117
 #>  7:         2.258033  2.4701675        0.04089140           48.73410
 #>  8:         1.506854  0.7478897        0.01250834           14.59249
-#>  9:         1.901575  0.0000000        0.00000000           55.53664
-#> 10:         2.130614  0.0000000        0.00000000          145.21133
+#>  9:         1.914874  0.0000000        0.00000000           55.53664
+#> 10:         2.114262  0.0000000        0.00000000          145.21133
 #> 11:         2.742477 10.9151800        0.55237709          657.45882
 #> 12:         2.323788  2.7642969        0.04567010           54.61951
 #> 13:         2.742477 10.9151800        0.55237709          657.45882
 #> 14:         3.269724 35.2158110        1.70522393         2176.34560
-#> 15:         1.577846  0.0000000        0.00000000           23.77817
+#> 15:         1.557832  0.0000000        0.00000000           23.77817
 #>     fisher_pvalue     ebgm ebgm_ci_low ebgm_ci_high
 #>             <num>    <num>       <num>        <num>
 #>  1:    1.00000000 2.421502        2.38         2.46
@@ -1239,10 +1280,11 @@ Additionally, we can control which field data to find the columns in the
 `.field` (default: “reac”) argument.
 
 ``` r
+set.seed(1L)
 insulin_signals_hlgt <- faers_phv_signal(
-  insulin_data,
-  .events = "hlgt_name",
-  .full = data
+    insulin_data,
+    .events = "hlgt_name",
+    .full = data
 )
 insulin_signals_hlgt
 #> Key: <hlgt_name>
@@ -1287,30 +1329,30 @@ insulin_signals_hlgt
 #> 142:         NaN 2.800437e-31  1.000000000    -0.7316939            -4.801687
 #>      bcpnn_norm_ic_ci_high bcpnn_mcmc_ic bcpnn_mcmc_ic_ci_low
 #>                      <num>         <num>                <num>
-#>   1:              4.209977   -0.03947607           -10.031838
-#>   2:              3.185527   -0.34296004           -10.196627
-#>   3:              3.623291   -0.12157646            -9.983107
-#>   4:              3.820193   -0.08111417           -10.000743
-#>   5:              4.209977   -0.03947607            -9.979654
+#>   1:              4.209977   -0.03947607            -9.870668
+#>   2:              3.185527   -0.34296004           -10.137252
+#>   3:              3.623291   -0.12157646           -10.072216
+#>   4:              3.820193   -0.08111417           -10.027072
+#>   5:              4.209977   -0.03947607            -9.920536
 #>  ---                                                         
-#> 138:              3.338300   -0.23653305           -10.165525
-#> 139:              3.970219    1.46338605            -2.203669
-#> 140:              4.209977   -0.03947607            -9.960982
-#> 141:              4.202695    1.50384833            -2.184148
-#> 142:              3.338300   -0.23653305           -10.066983
+#> 138:              3.338300   -0.23653305           -10.119996
+#> 139:              3.970219    1.46338605            -2.221526
+#> 140:              4.209977   -0.03947607            -9.976006
+#> 141:              4.202695    1.50384833            -2.215082
+#> 142:              3.338300   -0.23653305           -10.139379
 #>      bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low oe_ratio_ci_high
 #>                      <num>       <num>           <num>            <num>
-#>   1:              2.256211 -0.04264434       -9.903524         2.254197
-#>   2:              1.904126 -0.34482850      -10.340359         1.913541
-#>   3:              2.145214 -0.12432814      -10.088559         2.169377
-#>   4:              2.213887 -0.08406426      -10.005938         2.221035
-#>   5:              2.253682 -0.04264434      -10.005551         2.241251
+#>   1:              2.262782 -0.04264434       -9.901054         2.248909
+#>   2:              1.905408 -0.34482850      -10.194800         1.912105
+#>   3:              2.155367 -0.12432814       -9.995913         2.168232
+#>   4:              2.209895 -0.08406426      -10.144027         2.209777
+#>   5:              2.256206 -0.04264434      -10.092572         2.265663
 #>  ---                                                                   
-#> 138:              2.010294 -0.23878686      -10.131488         2.023390
-#> 139:              3.002075  1.46063437       -2.322466         3.148061
-#> 140:              2.240702 -0.04264434       -9.925329         2.259773
-#> 141:              3.050325  1.50089824       -2.282203         3.188325
-#> 142:              2.042342 -0.23878686      -10.130615         2.022234
+#> 138:              2.032943 -0.23878686      -10.201472         2.039077
+#> 139:              3.013392  1.46063437       -2.322466         3.148061
+#> 140:              2.253660 -0.04264434       -9.954685         2.252572
+#> 141:              3.064956  1.50089824       -2.282203         3.188325
+#> 142:              2.052593 -0.23878686      -10.221601         2.044580
 #>      odds_ratio odds_ratio_ci_low odds_ratio_ci_high fisher_pvalue     ebgm
 #>           <num>             <num>              <num>         <num>    <num>
 #>   1:    0.00000         0.0000000         2462.50000    1.00000000 3.670936
@@ -1339,7 +1381,7 @@ insulin_signals_hlgt
 #> 142:        1.60         6.88
 ```
 
-#### sessionInfo
+## sessionInfo
 
 ``` r
 sessionInfo()
@@ -1378,7 +1420,7 @@ sessionInfo()
 #> [37] ggplot2_3.4.4      curl_5.2.0         vctrs_0.6.5        R6_2.5.1          
 #> [41] lifecycle_1.0.4    stringr_1.5.1      bit_4.0.5          vroom_1.6.5       
 #> [45] MASS_7.3-60        pkgconfig_2.0.3    archive_1.1.6      pillar_1.9.0      
-#> [49] gtable_0.3.4       data.table_1.14.9  glue_1.6.2         xfun_0.41         
+#> [49] gtable_0.3.4       data.table_1.14.99 glue_1.6.2         xfun_0.41         
 #> [53] tibble_3.2.1       tidyselect_1.2.0   knitr_1.45         htmltools_0.5.7   
 #> [57] rmarkdown_2.25     compiler_4.3.1     quantreg_5.96
 ```

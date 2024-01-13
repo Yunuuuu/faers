@@ -6,7 +6,14 @@
 \alias{_PACKAGE}
 \title{faers: R interface for FDA Adverse Event Reporting System}
 \description{
-FAERS is a database for the spontaneous reporting of adverse events and medication errors involving human drugs and therapeutic biological products. faers is the bridge between FAERS and R.
+The FDA Adverse Event Reporting System (FAERS) is a database used for the spontaneous reporting of adverse events and medication errors related to human drugs and therapeutic biological products. faers pacakge serves as the interface between the FAERS database and R. Furthermore, faers pacakge offers a standardized approach for performing pharmacovigilance analysis.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item Report bugs at \url{https://github.com/Yunuuuu/faers}
+}
+
 }
 \author{
 \strong{Maintainer}: Yun Peng \email{yunyunp96@gmail.com} (\href{https://orcid.org/0000-0003-2801-3332}{ORCID})

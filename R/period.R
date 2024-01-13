@@ -38,4 +38,3 @@ is_before_period <- function(years, quarters, y, q, inclusive = TRUE) {
 is_from_laers <- function(years, quarters) {
     is_before_period(years, quarters, 2012L, "q3")
 }
-
