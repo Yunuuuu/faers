@@ -17,6 +17,7 @@
 #' @export
 faers_meta <- function(force = FALSE, internal = !curl::has_internet()) {
     assert_bool(force)
+    assert_bool(internal)
     if (force || is.null(out <- faers_meta_cache_read(internal = internal))) {
         out <- faers_meta_parse()
         faers_meta_cache_save(out)
