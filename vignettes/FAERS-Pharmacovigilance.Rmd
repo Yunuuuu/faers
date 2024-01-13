@@ -247,8 +247,10 @@ specify `.object2`, which should be the control data or another drug of interest
 for comparison.
 
 ```{r, warning=FALSE}
-set.seed(1L)
-insulin_signals <- faers_phv_signal(insulin_data, .full = data)
+insulin_signals <- faers_phv_signal(insulin_data,
+    .full = data,
+    BPPARAM = BiocParallel::SerialParam(RNGseed = 1L)
+)
 insulin_signals
 ```
 
@@ -258,11 +260,10 @@ all specified columns will define the unique event. Additionally, we can control
 which field data to find the columns in the `.field` (default: "reac") argument.
 
 ```{r, warning=FALSE}
-set.seed(1L)
 insulin_signals_hlgt <- faers_phv_signal(
     insulin_data,
-    .events = "hlgt_name",
-    .full = data
+    .events = "hlgt_name", .full = data,
+    BPPARAM = BiocParallel::SerialParam(RNGseed = 1L)
 )
 insulin_signals_hlgt
 ```

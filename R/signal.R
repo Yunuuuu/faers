@@ -132,17 +132,18 @@ methods::setGeneric("faers_phv_signal", function(.object, ...) {
 
 #' @param .methods Just an alias of `method` in [phv_signal].
 #' @param .phv_signal_params Other arguments passed to [phv_signal].
+#' @inheritParams phv_signal
 #' @seealso [phv_signal]
 #' @export
 #' @method faers_phv_signal FAERSascii
 #' @rdname faers_phv_signal
-methods::setMethod("faers_phv_signal", "FAERSascii", function(.object, .methods = NULL, ..., .phv_signal_params = list()) {
+methods::setMethod("faers_phv_signal", "FAERSascii", function(.object, .methods = NULL, ..., .phv_signal_params = list(), BPPARAM = SerialParam()) {
     assert_(.phv_signal_params, is.list, "a list")
     out <- faers_phv_table(.object = .object, ...)
     .__signal__. <- do.call(
         phv_signal, c(
             out[, c("a", "b", "c", "d")],
-            list(methods = .methods),
+            list(methods = .methods, BPPARAM = BPPARAM),
             .phv_signal_params
         )
     )

@@ -24,20 +24,29 @@ phv_signal(
   alpha1 = 0.5,
   alpha2 = 0.5,
   theta_init = NULL,
-  squashing = TRUE
+  squashing = TRUE,
+  BPPARAM = SerialParam()
 )
 
 phv_ror(a, b, c, d, alpha = 0.05)
 
 phv_prr(a, b, c, d, alpha = 0.05)
 
-phv_chisq(a, b, c, d, correct = TRUE)
+phv_chisq(a, b, c, d, correct = TRUE, BPPARAM = SerialParam())
 
-phv_fisher(a, b, c, d, alpha = 0.05)
+phv_fisher(a, b, c, d, alpha = 0.05, BPPARAM = SerialParam())
 
 phv_bcpnn_norm(a, b, c, d, alpha = 0.05)
 
-phv_bcpnn_mcmc(a, b, c, d, alpha = 0.05, n_mcmc = 100000L)
+phv_bcpnn_mcmc(
+  a,
+  b,
+  c,
+  d,
+  alpha = 0.05,
+  n_mcmc = 100000L,
+  BPPARAM = SerialParam()
+)
 
 phv_obsexp_shrink(
   a,
@@ -47,7 +56,8 @@ phv_obsexp_shrink(
   alpha = 0.05,
   alpha1 = 0.5,
   alpha2 = 0.5,
-  n_mcmc = 100000L
+  n_mcmc = 100000L,
+  BPPARAM = SerialParam()
 )
 
 phv_ebgm(a, b, c, d, alpha = 0.05, theta_init = NULL, squashing = TRUE)
@@ -88,6 +98,10 @@ ordered as:\verb{ alpha1, beta1, alpha2, beta2, P}. See \link[openEBGM:autoHyper
 
 \item{squashing}{A bool, whether do automated data squashing. If any zeros
 found in \code{a}, will always be \code{TRUE}.}
+
+\item{BPPARAM}{An optional \code{\link[BiocParallel]{BiocParallelParam}} instance
+    defining the parallel back-end to be used during evaluation.
+  }
 }
 \value{
 A \link[data.table:data.table]{data.table} with columns of estimated

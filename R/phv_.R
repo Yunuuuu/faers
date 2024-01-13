@@ -20,6 +20,7 @@
 #' methods will be used.
 #' @param alpha Level of significance, for construction of the confidence
 #'  intervals.
+#' @inheritParams BiocParallel::bpmapply
 #' @details
 #' Note that the `a`, `b`, `c`, `d` inputs can be an atomic vectors of equal
 #' length, for which the function will perform the calculations for each
@@ -83,7 +84,8 @@
 #'   <https://support.sas.com/resources/papers/proceedings19/3361-2019.pdf>
 #' @export
 #' @name phv_signal
-phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5, theta_init = NULL, squashing = TRUE) {
+#' @importFrom BiocParallel SerialParam
+phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE, n_mcmc = 1e5L, alpha1 = 0.5, alpha2 = 0.5, theta_init = NULL, squashing = TRUE, BPPARAM = SerialParam()) {
     allowed_methods <- c(
         "ror", "prr", "chisq", "bcpnn_norm", "bcpnn_mcmc",
         "obsexp_shrink", "fisher", "ebgm"
@@ -94,19 +96,28 @@ phv_signal <- function(a, b, c, d, methods = NULL, alpha = 0.05, correct = TRUE,
     args <- list(a = a, b = b, c = c, d = d, alpha = alpha)
     for (method in methods) {
         phv_fn <- sprintf("phv_%s", method)
+        cli::cli_alert_info("Running {.fn {phv_fn}}")
         signal_out <- switch(method,
-            bcpnn_mcmc = do.call(phv_fn, c(args, list(n_mcmc = n_mcmc))),
+            bcpnn_mcmc = do.call(
+                phv_fn,
+                c(args, list(n_mcmc = n_mcmc, BPPARAM = BPPARAM))
+            ),
             obsexp_shrink = do.call(
                 phv_fn,
-                c(args, list(alpha1 = alpha1, alpha2 = alpha2, n_mcmc = n_mcmc))
+                c(args, list(
+                    alpha1 = alpha1, alpha2 = alpha2, n_mcmc = n_mcmc,
+                    BPPARAM = BPPARAM
+                ))
             ),
             chisq = do.call(phv_fn, c(
-                args[c("a", "b", "c", "d")], list(correct = correct)
+                args[c("a", "b", "c", "d")],
+                list(correct = correct, BPPARAM = BPPARAM)
             )),
             ebgm = do.call(phv_fn, c(
                 args[c("a", "b", "c", "d")],
                 list(theta_init = theta_init, squashing = squashing)
             )),
+            fisher = do.call(phv_fn, c(args, list(BPPARAM = BPPARAM))),
             do.call(phv_fn, args)
         )
         added_names <- names(signal_out)
@@ -167,16 +178,19 @@ phv_prr <- function(a, b, c, d, alpha = 0.05) {
 #' correction when computing the chi-squared statistic.
 #' @export
 #' @rdname phv_signal
-phv_chisq <- function(a, b, c, d, correct = TRUE) {
+phv_chisq <- function(a, b, c, d, correct = TRUE, BPPARAM = SerialParam()) {
     assert_phv_table(a, b, c, d)
-    out <- .mapply(
+    out <- BiocParallel::bpmapply(
         function(n11, n10, n01, n00) {
             out <- stats::chisq.test(
                 matrix(c(n11, n10, n01, n00), nrow = 2L),
                 correct = correct
             )
             c(out$statistic, out$p.value)
-        }, list(n11 = a, n10 = b, n01 = c, n00 = d), NULL
+        },
+        n11 = a, n10 = b, n01 = c, n00 = d,
+        SIMPLIFY = FALSE, USE.NAMES = FALSE,
+        BPPARAM = BPPARAM
     )
     out <- data.table::transpose(out)
     data.table::setDT(out)
@@ -186,16 +200,19 @@ phv_chisq <- function(a, b, c, d, correct = TRUE) {
 
 #' @export
 #' @rdname phv_signal
-phv_fisher <- function(a, b, c, d, alpha = 0.05) {
+phv_fisher <- function(a, b, c, d, alpha = 0.05, BPPARAM = SerialParam()) {
     assert_phv_table(a, b, c, d)
-    out <- .mapply(
+    out <- BiocParallel::bpmapply(
         function(n11, n10, n01, n00) {
             out <- stats::fisher.test(
                 matrix(c(n11, n10, n01, n00), nrow = 2L),
                 conf.int = TRUE, conf.level = 1 - alpha
             )
             c(out$estimate, out$conf.int, out$p.value)
-        }, list(n11 = a, n10 = b, n01 = c, n00 = d), NULL
+        },
+        n11 = a, n10 = b, n01 = c, n00 = d,
+        SIMPLIFY = FALSE, USE.NAMES = FALSE,
+        BPPARAM = BPPARAM
     )
     out <- data.table::as.data.table(do.call("rbind", out))
     data.table::setnames(out, c("odds_ratio", "ci_low", "ci_high", "pvalue"))
@@ -236,7 +253,7 @@ phv_bcpnn_norm <- function(a, b, c, d, alpha = 0.05) {
 #' confidence intervals.
 #' @export
 #' @rdname phv_signal
-phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
+phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L, BPPARAM = SerialParam()) {
     assert_phv_table(a, b, c, d)
     # run bcpnn analysis
     # NOTE: we could speed up the code by combining some of the expressions
@@ -271,7 +288,7 @@ phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
         gamma11 * (gamma11 + gamma10 + gamma01 + gamma00) /
             ((gamma11 + gamma10) * (gamma11 + gamma01))
     )
-    out <- .mapply(
+    out <- BiocParallel::bpmapply(
         function(g11, g10, g01, g00) {
             # sample from the posterior distribution
             p <- MCMCpack::rdirichlet(n_mcmc, c(g11, g10, g01, g00))
@@ -286,7 +303,9 @@ phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
             # (0.025, 0.975) for alpha = 0.05
             stats::quantile(ic_monte, c(alpha / 2, 1 - alpha / 2))
         },
-        list(g11 = gamma11, g10 = gamma10, g01 = gamma01, g00 = gamma00), NULL
+        g11 = gamma11, g10 = gamma10, g01 = gamma01, g00 = gamma00,
+        SIMPLIFY = FALSE, USE.NAMES = FALSE,
+        BPPARAM = BPPARAM
     )
     out <- data.table::as.data.table(do.call("rbind", out))
     data.table::setnames(out, c("ci_low", "ci_high"))
@@ -320,7 +339,7 @@ phv_bcpnn_mcmc <- function(a, b, c, d, alpha = 0.05, n_mcmc = 1e5L) {
 #'   in medical research. 2013 Feb;22(1):57-69.
 #' @export
 #' @rdname phv_signal
-phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5, n_mcmc = 1e5L) {
+phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0.5, n_mcmc = 1e5L, BPPARAM = SerialParam()) {
     # https://github.com/tystan/pharmsignal/blob/master/R/obsexp_shrink_signal.R
     assert_phv_table(a, b, c, d)
     # run bcpnn analysis
@@ -348,7 +367,7 @@ phv_obsexp_shrink <- function(a, b, c, d, alpha = 0.05, alpha1 = 0.5, alpha2 = 0
         c_star <- c[need_exact_lims]
         d_star <- d[need_exact_lims]
         ic <- phv_bcpnn_mcmc(a_star, b_star, c_star, d_star,
-            alpha = alpha, n_mcmc = n_mcmc
+            alpha = alpha, n_mcmc = n_mcmc, BPPARAM = BPPARAM
         )
         # replace the CIs for those with (O + alpha1) < 1
         ci_low[need_exact_lims] <- ic$ci_low

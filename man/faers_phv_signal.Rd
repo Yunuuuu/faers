@@ -16,7 +16,13 @@ faers_phv_table(.object, ..., .full, .object2)
 
 faers_phv_signal(.object, ...)
 
-\S4method{faers_phv_signal}{FAERSascii}(.object, .methods = NULL, ..., .phv_signal_params = list())
+\S4method{faers_phv_signal}{FAERSascii}(
+  .object,
+  .methods = NULL,
+  ...,
+  .phv_signal_params = list(),
+  BPPARAM = SerialParam()
+)
 }
 \arguments{
 \item{.object}{A \link{FAERSascii} object. The value \code{n11} or \code{a} will be
@@ -44,6 +50,10 @@ combination for all columns will define the interested events.}
 \item{.methods}{Just an alias of \code{method} in \link{phv_signal}.}
 
 \item{.phv_signal_params}{Other arguments passed to \link{phv_signal}.}
+
+\item{BPPARAM}{An optional \code{\link[BiocParallel]{BiocParallelParam}} instance
+    defining the parallel back-end to be used during evaluation.
+  }
 }
 \value{
 A \link[data.table:data.table]{data.table} object.

@@ -9,6 +9,7 @@ License: MIT + file LICENSE
 Depends: 
     R (>= 4.4.0)
 Imports: 
+    BiocParallel,
     brio,
     cli,
     curl (>= 5.0.0),

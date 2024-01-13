@@ -1569,8 +1569,8 @@ body {
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>    <span class="kw">grepl</span>(insulin_pattern, ActiveIngredient, <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>]</span>
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a><span class="co">#&gt; → Using Drugs@FDA data from cached</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a><span class="co">#&gt;   &#39;/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2024-01-13.zip&#39;</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a><span class="co">#&gt;   Snapshot date: 2024-01-13</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a><span class="co">#&gt;   &#39;/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2024-01-14.zip&#39;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a><span class="co">#&gt;   Snapshot date: 2024-01-14</span></span>
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a><span class="co">#&gt; Warning: One or more parsing issues, call `problems()` on your data frame for details,</span></span>
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true"></a><span class="co">#&gt; e.g.:</span></span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true"></a><span class="co">#&gt;   dat &lt;- vroom(...)</span></span>
@@ -1589,230 +1589,247 @@ body {
 <span id="cb15-24"><a href="#cb15-24" aria-hidden="true"></a><span class="co">#&gt;   Total unique reports: 3</span></span></code></pre></div>
 <p>Then, signal can be easily obtained with <code>faers_phv_signal()</code> which internally use <code>faers_phv_table()</code> to create a contingency table and use <code>phv_signal()</code> to do signal analysis specified in <code>.methods</code> argument. By default, all supported signal analysis methods will be run, including “ror”, “prr”, “chisq”, “bcpnn_norm”, “bcpnn_mcmc”, “obsexp_shrink”, “fisher”, and “ebgm”.</p>
 <p>The most important argument for this function is <code>.object</code>, which should be a de-duplicated FAERSascii object containing the data for the drugs or traits of interest. Additionally, you must specify either <code>.full</code>, which represents the background distributions data (usually the entire FAERS data), or you can specify <code>.object2</code>, which should be the control data or another drug of interest for comparison.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="kw">set.seed</span>(1L)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>insulin_signals &lt;-<span class="st"> </span><span class="kw">faers_phv_signal</span>(insulin_data, <span class="dt">.full =</span> data)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a>insulin_signals</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="co">#&gt; Key: &lt;soc_name&gt;</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a><span class="co">#&gt;                                                                soc_name     a</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a><span class="co">#&gt;                                                                  &lt;char&gt; &lt;int&gt;</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a><span class="co">#&gt;  1:                                Blood and lymphatic system disorders     0</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a><span class="co">#&gt;  2:                                                   Cardiac disorders     1</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a><span class="co">#&gt;  3:                          Congenital, familial and genetic disorders     0</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a><span class="co">#&gt;  4:                                         Ear and labyrinth disorders     0</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true"></a><span class="co">#&gt;  5:                                                 Endocrine disorders     0</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true"></a><span class="co">#&gt;  6:                                                       Eye disorders     1</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true"></a><span class="co">#&gt;  7:                                          Gastrointestinal disorders     1</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true"></a><span class="co">#&gt;  8:                General disorders and administration site conditions     1</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true"></a><span class="co">#&gt;  9:                                             Hepatobiliary disorders     0</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true"></a><span class="co">#&gt; 10:                                             Immune system disorders     0</span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true"></a><span class="co">#&gt; 11:                                         Infections and infestations     2</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true"></a><span class="co">#&gt; 12:                      Injury, poisoning and procedural complications     1</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true"></a><span class="co">#&gt; 13:                                                      Investigations     2</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true"></a><span class="co">#&gt; 14:                                  Metabolism and nutrition disorders     2</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true"></a><span class="co">#&gt; 15:                     Musculoskeletal and connective tissue disorders     0</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true"></a><span class="co">#&gt;         b     c     d expected        ror ror_ci_low ror_ci_high        prr</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true"></a><span class="co">#&gt;     &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;num&gt;      &lt;num&gt;      &lt;num&gt;       &lt;num&gt;      &lt;num&gt;</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true"></a><span class="co">#&gt;  1:     3    14   183    0.210  0.0000000 0.00000000         NaN  0.0000000</span></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true"></a><span class="co">#&gt;  2:     2     7   190    0.120 13.5714286 1.09612571  168.031524  9.3809524</span></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true"></a><span class="co">#&gt;  3:     3     1   196    0.015  0.0000000 0.00000000         NaN  0.0000000</span></span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true"></a><span class="co">#&gt;  4:     3     4   193    0.060  0.0000000 0.00000000         NaN  0.0000000</span></span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true"></a><span class="co">#&gt;  5:     3     1   196    0.015  0.0000000 0.00000000         NaN  0.0000000</span></span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true"></a><span class="co">#&gt;  6:     2     9   188    0.150 10.4444444 0.86432480  126.209985  7.2962963</span></span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true"></a><span class="co">#&gt;  7:     2    33   164    0.510  2.4848485 0.21888790   28.208376  1.9898990</span></span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true"></a><span class="co">#&gt;  8:     2    79   118    1.200  0.7468354 0.06658895    8.376212  0.8312236</span></span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true"></a><span class="co">#&gt;  9:     3     9   188    0.135  0.0000000 0.00000000         NaN  0.0000000</span></span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true"></a><span class="co">#&gt; 10:     3     4   193    0.060  0.0000000 0.00000000         NaN  0.0000000</span></span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true"></a><span class="co">#&gt; 11:     1    30   167    0.480 11.1333333 0.97846354  126.679335  4.3777778</span></span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true"></a><span class="co">#&gt; 12:     2    30   167    0.465  2.7833333 0.24461589   31.669834  2.1888889</span></span>
-<span id="cb16-36"><a href="#cb16-36" aria-hidden="true"></a><span class="co">#&gt; 13:     1    30   167    0.480 11.1333333 0.97846354  126.679335  4.3777778</span></span>
-<span id="cb16-37"><a href="#cb16-37" aria-hidden="true"></a><span class="co">#&gt; 14:     1    10   187    0.180 37.4000000 3.12161662  448.088336 13.1333333</span></span>
-<span id="cb16-38"><a href="#cb16-38" aria-hidden="true"></a><span class="co">#&gt; 15:     3    19   178    0.285  0.0000000 0.00000000         NaN  0.0000000</span></span>
-<span id="cb16-39"><a href="#cb16-39" aria-hidden="true"></a><span class="co">#&gt;     prr_ci_low prr_ci_high        chisq chisq_pvalue bcpnn_norm_ic</span></span>
-<span id="cb16-40"><a href="#cb16-40" aria-hidden="true"></a><span class="co">#&gt;          &lt;num&gt;       &lt;num&gt;        &lt;num&gt;        &lt;num&gt;         &lt;num&gt;</span></span>
-<span id="cb16-41"><a href="#cb16-41" aria-hidden="true"></a><span class="co">#&gt;  1:  0.0000000         NaN 4.096414e-31  1.000000000   -0.97458175</span></span>
-<span id="cb16-42"><a href="#cb16-42" aria-hidden="true"></a><span class="co">#&gt;  2:  1.6173190   54.412435 1.272561e+00  0.259286856    0.63833534</span></span>
-<span id="cb16-43"><a href="#cb16-43" aria-hidden="true"></a><span class="co">#&gt;  3:  0.0000000         NaN 1.265951e-26  1.000000000   -0.31739140</span></span>
-<span id="cb16-44"><a href="#cb16-44" aria-hidden="true"></a><span class="co">#&gt;  4:  0.0000000         NaN 2.866117e-32  1.000000000   -0.63762418</span></span>
-<span id="cb16-45"><a href="#cb16-45" aria-hidden="true"></a><span class="co">#&gt;  5:  0.0000000         NaN 1.265951e-26  1.000000000   -0.31739140</span></span>
-<span id="cb16-46"><a href="#cb16-46" aria-hidden="true"></a><span class="co">#&gt;  6:  1.3027676   40.863727 8.727402e-01  0.350197814    0.57607008</span></span>
-<span id="cb16-47"><a href="#cb16-47" aria-hidden="true"></a><span class="co">#&gt;  7:  0.3897628   10.159250 6.459270e-31  1.000000000    0.05900067</span></span>
-<span id="cb16-48"><a href="#cb16-48" aria-hidden="true"></a><span class="co">#&gt;  8:  0.1662546    4.155871 1.762340e-31  1.000000000   -0.57013768</span></span>
-<span id="cb16-49"><a href="#cb16-49" aria-hidden="true"></a><span class="co">#&gt;  9:  0.0000000         NaN 6.503567e-28  1.000000000   -0.83645056</span></span>
-<span id="cb16-50"><a href="#cb16-50" aria-hidden="true"></a><span class="co">#&gt; 10:  0.0000000         NaN 2.866117e-32  1.000000000   -0.63762418</span></span>
-<span id="cb16-51"><a href="#cb16-51" aria-hidden="true"></a><span class="co">#&gt; 11:  1.8426662   10.400656 2.619652e+00  0.105547591    0.81550390</span></span>
-<span id="cb16-52"><a href="#cb16-52" aria-hidden="true"></a><span class="co">#&gt; 12:  0.4272128   11.215100 3.165120e-03  0.955135161    0.11209704</span></span>
-<span id="cb16-53"><a href="#cb16-53" aria-hidden="true"></a><span class="co">#&gt; 13:  1.8426662   10.400656 2.619652e+00  0.105547591    0.81550390</span></span>
-<span id="cb16-54"><a href="#cb16-54" aria-hidden="true"></a><span class="co">#&gt; 14:  4.8197010   35.787374 1.045469e+01  0.001223383    1.24133970</span></span>
-<span id="cb16-55"><a href="#cb16-55" aria-hidden="true"></a><span class="co">#&gt; 15:  0.0000000         NaN 4.555566e-29  1.000000000   -1.09198678</span></span>
-<span id="cb16-56"><a href="#cb16-56" aria-hidden="true"></a><span class="co">#&gt;     bcpnn_norm_ic_ci_low bcpnn_norm_ic_ci_high bcpnn_mcmc_ic</span></span>
-<span id="cb16-57"><a href="#cb16-57" aria-hidden="true"></a><span class="co">#&gt;                    &lt;num&gt;                 &lt;num&gt;         &lt;num&gt;</span></span>
-<span id="cb16-58"><a href="#cb16-58" aria-hidden="true"></a><span class="co">#&gt;  1:            -4.960069              3.010906   -0.50449401</span></span>
-<span id="cb16-59"><a href="#cb16-59" aria-hidden="true"></a><span class="co">#&gt;  2:            -2.239177              3.515848    1.27660894</span></span>
-<span id="cb16-60"><a href="#cb16-60" aria-hidden="true"></a><span class="co">#&gt;  3:            -4.844759              4.209977   -0.03947607</span></span>
-<span id="cb16-61"><a href="#cb16-61" aria-hidden="true"></a><span class="co">#&gt;  4:            -4.773808              3.498560   -0.16092798</span></span>
-<span id="cb16-62"><a href="#cb16-62" aria-hidden="true"></a><span class="co">#&gt;  5:            -4.844759              4.209977   -0.03947607</span></span>
-<span id="cb16-63"><a href="#cb16-63" aria-hidden="true"></a><span class="co">#&gt;  6:            -2.270036              3.422176    1.20821022</span></span>
-<span id="cb16-64"><a href="#cb16-64" aria-hidden="true"></a><span class="co">#&gt;  7:            -2.690902              2.808903    0.57112278</span></span>
-<span id="cb16-65"><a href="#cb16-65" aria-hidden="true"></a><span class="co">#&gt;  8:            -3.294337              2.154062   -0.18051848</span></span>
-<span id="cb16-66"><a href="#cb16-66" aria-hidden="true"></a><span class="co">#&gt;  9:            -4.858428              3.185527   -0.34296004</span></span>
-<span id="cb16-67"><a href="#cb16-67" aria-hidden="true"></a><span class="co">#&gt; 10:            -4.773808              3.498560   -0.16092798</span></span>
-<span id="cb16-68"><a href="#cb16-68" aria-hidden="true"></a><span class="co">#&gt; 11:            -1.546257              3.177265    1.35163975</span></span>
-<span id="cb16-69"><a href="#cb16-69" aria-hidden="true"></a><span class="co">#&gt; 12:            -2.641970              2.866165    0.63695385</span></span>
-<span id="cb16-70"><a href="#cb16-70" aria-hidden="true"></a><span class="co">#&gt; 13:            -1.546257              3.177265    1.35163975</span></span>
-<span id="cb16-71"><a href="#cb16-71" aria-hidden="true"></a><span class="co">#&gt; 14:            -1.203821              3.686501    1.87988617</span></span>
-<span id="cb16-72"><a href="#cb16-72" aria-hidden="true"></a><span class="co">#&gt; 15:            -5.059438              2.875465   -0.64969772</span></span>
-<span id="cb16-73"><a href="#cb16-73" aria-hidden="true"></a><span class="co">#&gt;     bcpnn_mcmc_ic_ci_low bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low</span></span>
-<span id="cb16-74"><a href="#cb16-74" aria-hidden="true"></a><span class="co">#&gt;                    &lt;num&gt;                 &lt;num&gt;       &lt;num&gt;           &lt;num&gt;</span></span>
-<span id="cb16-75"><a href="#cb16-75" aria-hidden="true"></a><span class="co">#&gt;  1:          -10.2469847             1.7329970 -0.50589093     -10.3355050</span></span>
-<span id="cb16-76"><a href="#cb16-76" aria-hidden="true"></a><span class="co">#&gt;  2:           -2.3687685             2.7746570  1.27462238      -2.5084784</span></span>
-<span id="cb16-77"><a href="#cb16-77" aria-hidden="true"></a><span class="co">#&gt;  3:          -10.0299469             2.2485350 -0.04264434      -9.8952571</span></span>
-<span id="cb16-78"><a href="#cb16-78" aria-hidden="true"></a><span class="co">#&gt;  4:          -10.0496990             2.1208626 -0.16349873      -9.9729602</span></span>
-<span id="cb16-79"><a href="#cb16-79" aria-hidden="true"></a><span class="co">#&gt;  5:           -9.9443639             2.2546058 -0.04264434     -10.0159789</span></span>
-<span id="cb16-80"><a href="#cb16-80" aria-hidden="true"></a><span class="co">#&gt;  6:           -2.3721307             2.6989335  1.20645088      -2.5766499</span></span>
-<span id="cb16-81"><a href="#cb16-81" aria-hidden="true"></a><span class="co">#&gt;  7:           -2.8497104             1.8982781  0.57060721      -3.2124936</span></span>
-<span id="cb16-82"><a href="#cb16-82" aria-hidden="true"></a><span class="co">#&gt;  8:           -3.4827207             0.9902367 -0.18057225      -3.9636731</span></span>
-<span id="cb16-83"><a href="#cb16-83" aria-hidden="true"></a><span class="co">#&gt;  9:          -10.2104872             1.9009499 -0.34482850     -10.1693395</span></span>
-<span id="cb16-84"><a href="#cb16-84" aria-hidden="true"></a><span class="co">#&gt; 10:          -10.0393748             2.1095254 -0.16349873      -9.9466376</span></span>
-<span id="cb16-85"><a href="#cb16-85" aria-hidden="true"></a><span class="co">#&gt; 11:           -0.7632789             2.3062119  1.35107444      -1.2419932</span></span>
-<span id="cb16-86"><a href="#cb16-86" aria-hidden="true"></a><span class="co">#&gt; 12:           -2.8130859             1.9851334  0.63636165      -3.1467392</span></span>
-<span id="cb16-87"><a href="#cb16-87" aria-hidden="true"></a><span class="co">#&gt; 13:           -0.7832653             2.3098357  1.35107444      -1.2419932</span></span>
-<span id="cb16-88"><a href="#cb16-88" aria-hidden="true"></a><span class="co">#&gt; 14:           -0.4409460             3.0182365  1.87832144      -0.7147462</span></span>
-<span id="cb16-89"><a href="#cb16-89" aria-hidden="true"></a><span class="co">#&gt; 15:          -10.4784638             1.5675396 -0.65076456     -10.5718176</span></span>
-<span id="cb16-90"><a href="#cb16-90" aria-hidden="true"></a><span class="co">#&gt;     oe_ratio_ci_high odds_ratio odds_ratio_ci_low odds_ratio_ci_high</span></span>
-<span id="cb16-91"><a href="#cb16-91" aria-hidden="true"></a><span class="co">#&gt;                &lt;num&gt;      &lt;num&gt;             &lt;num&gt;              &lt;num&gt;</span></span>
-<span id="cb16-92"><a href="#cb16-92" aria-hidden="true"></a><span class="co">#&gt;  1:         1.726128  0.0000000        0.00000000           33.68585</span></span>
-<span id="cb16-93"><a href="#cb16-93" aria-hidden="true"></a><span class="co">#&gt;  2:         2.962049 13.0303800        0.20150028          279.21542</span></span>
-<span id="cb16-94"><a href="#cb16-94" aria-hidden="true"></a><span class="co">#&gt;  3:         2.236123  0.0000000        0.00000000         2462.50000</span></span>
-<span id="cb16-95"><a href="#cb16-95" aria-hidden="true"></a><span class="co">#&gt;  4:         2.129039  0.0000000        0.00000000          145.21133</span></span>
-<span id="cb16-96"><a href="#cb16-96" aria-hidden="true"></a><span class="co">#&gt;  5:         2.268819  0.0000000        0.00000000         2462.50000</span></span>
-<span id="cb16-97"><a href="#cb16-97" aria-hidden="true"></a><span class="co">#&gt;  6:         2.893877 10.1233187        0.15947006          211.87117</span></span>
-<span id="cb16-98"><a href="#cb16-98" aria-hidden="true"></a><span class="co">#&gt;  7:         2.258033  2.4701675        0.04089140           48.73410</span></span>
-<span id="cb16-99"><a href="#cb16-99" aria-hidden="true"></a><span class="co">#&gt;  8:         1.506854  0.7478897        0.01250834           14.59249</span></span>
-<span id="cb16-100"><a href="#cb16-100" aria-hidden="true"></a><span class="co">#&gt;  9:         1.914874  0.0000000        0.00000000           55.53664</span></span>
-<span id="cb16-101"><a href="#cb16-101" aria-hidden="true"></a><span class="co">#&gt; 10:         2.114262  0.0000000        0.00000000          145.21133</span></span>
-<span id="cb16-102"><a href="#cb16-102" aria-hidden="true"></a><span class="co">#&gt; 11:         2.742477 10.9151800        0.55237709          657.45882</span></span>
-<span id="cb16-103"><a href="#cb16-103" aria-hidden="true"></a><span class="co">#&gt; 12:         2.323788  2.7642969        0.04567010           54.61951</span></span>
-<span id="cb16-104"><a href="#cb16-104" aria-hidden="true"></a><span class="co">#&gt; 13:         2.742477 10.9151800        0.55237709          657.45882</span></span>
-<span id="cb16-105"><a href="#cb16-105" aria-hidden="true"></a><span class="co">#&gt; 14:         3.269724 35.2158110        1.70522393         2176.34560</span></span>
-<span id="cb16-106"><a href="#cb16-106" aria-hidden="true"></a><span class="co">#&gt; 15:         1.557832  0.0000000        0.00000000           23.77817</span></span>
-<span id="cb16-107"><a href="#cb16-107" aria-hidden="true"></a><span class="co">#&gt;     fisher_pvalue     ebgm ebgm_ci_low ebgm_ci_high</span></span>
-<span id="cb16-108"><a href="#cb16-108" aria-hidden="true"></a><span class="co">#&gt;             &lt;num&gt;    &lt;num&gt;       &lt;num&gt;        &lt;num&gt;</span></span>
-<span id="cb16-109"><a href="#cb16-109" aria-hidden="true"></a><span class="co">#&gt;  1:    1.00000000 2.421502        2.38         2.46</span></span>
-<span id="cb16-110"><a href="#cb16-110" aria-hidden="true"></a><span class="co">#&gt;  2:    0.11582153 2.421743        2.38         2.46</span></span>
-<span id="cb16-111"><a href="#cb16-111" aria-hidden="true"></a><span class="co">#&gt;  3:    1.00000000 2.421595        2.38         2.46</span></span>
-<span id="cb16-112"><a href="#cb16-112" aria-hidden="true"></a><span class="co">#&gt;  4:    1.00000000 2.421574        2.38         2.46</span></span>
-<span id="cb16-113"><a href="#cb16-113" aria-hidden="true"></a><span class="co">#&gt;  5:    1.00000000 2.421595        2.38         2.46</span></span>
-<span id="cb16-114"><a href="#cb16-114" aria-hidden="true"></a><span class="co">#&gt;  6:    0.14330745 2.421729        2.38         2.46</span></span>
-<span id="cb16-115"><a href="#cb16-115" aria-hidden="true"></a><span class="co">#&gt;  7:    0.42998325 2.421556        2.38         2.46</span></span>
-<span id="cb16-116"><a href="#cb16-116" aria-hidden="true"></a><span class="co">#&gt;  8:    1.00000000 2.421225        2.38         2.46</span></span>
-<span id="cb16-117"><a href="#cb16-117" aria-hidden="true"></a><span class="co">#&gt;  9:    1.00000000 2.421538        2.38         2.46</span></span>
-<span id="cb16-118"><a href="#cb16-118" aria-hidden="true"></a><span class="co">#&gt; 10:    1.00000000 2.421574        2.38         2.46</span></span>
-<span id="cb16-119"><a href="#cb16-119" aria-hidden="true"></a><span class="co">#&gt; 11:    0.06722095 2.421769        2.38         2.46</span></span>
-<span id="cb16-120"><a href="#cb16-120" aria-hidden="true"></a><span class="co">#&gt; 12:    0.39832191 2.421578        2.38         2.46</span></span>
-<span id="cb16-121"><a href="#cb16-121" aria-hidden="true"></a><span class="co">#&gt; 13:    0.06722095 2.421769        2.38         2.46</span></span>
-<span id="cb16-122"><a href="#cb16-122" aria-hidden="true"></a><span class="co">#&gt; 14:    0.00961474 2.421913        2.38         2.46</span></span>
-<span id="cb16-123"><a href="#cb16-123" aria-hidden="true"></a><span class="co">#&gt; 15:    1.00000000 2.421466        2.38         2.46</span></span>
-<span id="cb16-124"><a href="#cb16-124" aria-hidden="true"></a><span class="co">#&gt;  [ reached getOption(&quot;max.print&quot;) -- omitted 12 rows ]</span></span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a>insulin_signals &lt;-<span class="st"> </span><span class="kw">faers_phv_signal</span>(insulin_data,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>    <span class="dt">.full =</span> data,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a>    <span class="dt">BPPARAM =</span> BiocParallel<span class="op">::</span><span class="kw">SerialParam</span>(<span class="dt">RNGseed =</span> 1L)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_ror()`</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_prr()`</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_chisq()`</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_bcpnn_norm()`</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_bcpnn_mcmc()`</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_obsexp_shrink()`</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_fisher()`</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_ebgm()`</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true"></a>insulin_signals</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true"></a><span class="co">#&gt; Key: &lt;soc_name&gt;</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true"></a><span class="co">#&gt;                                                                soc_name     a</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true"></a><span class="co">#&gt;                                                                  &lt;char&gt; &lt;int&gt;</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true"></a><span class="co">#&gt;  1:                                Blood and lymphatic system disorders     0</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true"></a><span class="co">#&gt;  2:                                                   Cardiac disorders     1</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true"></a><span class="co">#&gt;  3:                          Congenital, familial and genetic disorders     0</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true"></a><span class="co">#&gt;  4:                                         Ear and labyrinth disorders     0</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true"></a><span class="co">#&gt;  5:                                                 Endocrine disorders     0</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true"></a><span class="co">#&gt;  6:                                                       Eye disorders     1</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true"></a><span class="co">#&gt;  7:                                          Gastrointestinal disorders     1</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true"></a><span class="co">#&gt;  8:                General disorders and administration site conditions     1</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true"></a><span class="co">#&gt;  9:                                             Hepatobiliary disorders     0</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true"></a><span class="co">#&gt; 10:                                             Immune system disorders     0</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true"></a><span class="co">#&gt; 11:                                         Infections and infestations     2</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true"></a><span class="co">#&gt; 12:                      Injury, poisoning and procedural complications     1</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true"></a><span class="co">#&gt; 13:                                                      Investigations     2</span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true"></a><span class="co">#&gt; 14:                                  Metabolism and nutrition disorders     2</span></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true"></a><span class="co">#&gt; 15:                     Musculoskeletal and connective tissue disorders     0</span></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true"></a><span class="co">#&gt;         b     c     d expected        ror ror_ci_low ror_ci_high        prr</span></span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true"></a><span class="co">#&gt;     &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;num&gt;      &lt;num&gt;      &lt;num&gt;       &lt;num&gt;      &lt;num&gt;</span></span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true"></a><span class="co">#&gt;  1:     3    14   183    0.210  0.0000000 0.00000000         NaN  0.0000000</span></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true"></a><span class="co">#&gt;  2:     2     7   190    0.120 13.5714286 1.09612571  168.031524  9.3809524</span></span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true"></a><span class="co">#&gt;  3:     3     1   196    0.015  0.0000000 0.00000000         NaN  0.0000000</span></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true"></a><span class="co">#&gt;  4:     3     4   193    0.060  0.0000000 0.00000000         NaN  0.0000000</span></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true"></a><span class="co">#&gt;  5:     3     1   196    0.015  0.0000000 0.00000000         NaN  0.0000000</span></span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true"></a><span class="co">#&gt;  6:     2     9   188    0.150 10.4444444 0.86432480  126.209985  7.2962963</span></span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true"></a><span class="co">#&gt;  7:     2    33   164    0.510  2.4848485 0.21888790   28.208376  1.9898990</span></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true"></a><span class="co">#&gt;  8:     2    79   118    1.200  0.7468354 0.06658895    8.376212  0.8312236</span></span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true"></a><span class="co">#&gt;  9:     3     9   188    0.135  0.0000000 0.00000000         NaN  0.0000000</span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true"></a><span class="co">#&gt; 10:     3     4   193    0.060  0.0000000 0.00000000         NaN  0.0000000</span></span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true"></a><span class="co">#&gt; 11:     1    30   167    0.480 11.1333333 0.97846354  126.679335  4.3777778</span></span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true"></a><span class="co">#&gt; 12:     2    30   167    0.465  2.7833333 0.24461589   31.669834  2.1888889</span></span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true"></a><span class="co">#&gt; 13:     1    30   167    0.480 11.1333333 0.97846354  126.679335  4.3777778</span></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true"></a><span class="co">#&gt; 14:     1    10   187    0.180 37.4000000 3.12161662  448.088336 13.1333333</span></span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true"></a><span class="co">#&gt; 15:     3    19   178    0.285  0.0000000 0.00000000         NaN  0.0000000</span></span>
+<span id="cb16-49"><a href="#cb16-49" aria-hidden="true"></a><span class="co">#&gt;     prr_ci_low prr_ci_high        chisq chisq_pvalue bcpnn_norm_ic</span></span>
+<span id="cb16-50"><a href="#cb16-50" aria-hidden="true"></a><span class="co">#&gt;          &lt;num&gt;       &lt;num&gt;        &lt;num&gt;        &lt;num&gt;         &lt;num&gt;</span></span>
+<span id="cb16-51"><a href="#cb16-51" aria-hidden="true"></a><span class="co">#&gt;  1:  0.0000000         NaN 4.096414e-31  1.000000000   -0.97458175</span></span>
+<span id="cb16-52"><a href="#cb16-52" aria-hidden="true"></a><span class="co">#&gt;  2:  1.6173190   54.412435 1.272561e+00  0.259286856    0.63833534</span></span>
+<span id="cb16-53"><a href="#cb16-53" aria-hidden="true"></a><span class="co">#&gt;  3:  0.0000000         NaN 1.265951e-26  1.000000000   -0.31739140</span></span>
+<span id="cb16-54"><a href="#cb16-54" aria-hidden="true"></a><span class="co">#&gt;  4:  0.0000000         NaN 2.866117e-32  1.000000000   -0.63762418</span></span>
+<span id="cb16-55"><a href="#cb16-55" aria-hidden="true"></a><span class="co">#&gt;  5:  0.0000000         NaN 1.265951e-26  1.000000000   -0.31739140</span></span>
+<span id="cb16-56"><a href="#cb16-56" aria-hidden="true"></a><span class="co">#&gt;  6:  1.3027676   40.863727 8.727402e-01  0.350197814    0.57607008</span></span>
+<span id="cb16-57"><a href="#cb16-57" aria-hidden="true"></a><span class="co">#&gt;  7:  0.3897628   10.159250 6.459270e-31  1.000000000    0.05900067</span></span>
+<span id="cb16-58"><a href="#cb16-58" aria-hidden="true"></a><span class="co">#&gt;  8:  0.1662546    4.155871 1.762340e-31  1.000000000   -0.57013768</span></span>
+<span id="cb16-59"><a href="#cb16-59" aria-hidden="true"></a><span class="co">#&gt;  9:  0.0000000         NaN 6.503567e-28  1.000000000   -0.83645056</span></span>
+<span id="cb16-60"><a href="#cb16-60" aria-hidden="true"></a><span class="co">#&gt; 10:  0.0000000         NaN 2.866117e-32  1.000000000   -0.63762418</span></span>
+<span id="cb16-61"><a href="#cb16-61" aria-hidden="true"></a><span class="co">#&gt; 11:  1.8426662   10.400656 2.619652e+00  0.105547591    0.81550390</span></span>
+<span id="cb16-62"><a href="#cb16-62" aria-hidden="true"></a><span class="co">#&gt; 12:  0.4272128   11.215100 3.165120e-03  0.955135161    0.11209704</span></span>
+<span id="cb16-63"><a href="#cb16-63" aria-hidden="true"></a><span class="co">#&gt; 13:  1.8426662   10.400656 2.619652e+00  0.105547591    0.81550390</span></span>
+<span id="cb16-64"><a href="#cb16-64" aria-hidden="true"></a><span class="co">#&gt; 14:  4.8197010   35.787374 1.045469e+01  0.001223383    1.24133970</span></span>
+<span id="cb16-65"><a href="#cb16-65" aria-hidden="true"></a><span class="co">#&gt; 15:  0.0000000         NaN 4.555566e-29  1.000000000   -1.09198678</span></span>
+<span id="cb16-66"><a href="#cb16-66" aria-hidden="true"></a><span class="co">#&gt;     bcpnn_norm_ic_ci_low bcpnn_norm_ic_ci_high bcpnn_mcmc_ic</span></span>
+<span id="cb16-67"><a href="#cb16-67" aria-hidden="true"></a><span class="co">#&gt;                    &lt;num&gt;                 &lt;num&gt;         &lt;num&gt;</span></span>
+<span id="cb16-68"><a href="#cb16-68" aria-hidden="true"></a><span class="co">#&gt;  1:            -4.960069              3.010906   -0.50449401</span></span>
+<span id="cb16-69"><a href="#cb16-69" aria-hidden="true"></a><span class="co">#&gt;  2:            -2.239177              3.515848    1.27660894</span></span>
+<span id="cb16-70"><a href="#cb16-70" aria-hidden="true"></a><span class="co">#&gt;  3:            -4.844759              4.209977   -0.03947607</span></span>
+<span id="cb16-71"><a href="#cb16-71" aria-hidden="true"></a><span class="co">#&gt;  4:            -4.773808              3.498560   -0.16092798</span></span>
+<span id="cb16-72"><a href="#cb16-72" aria-hidden="true"></a><span class="co">#&gt;  5:            -4.844759              4.209977   -0.03947607</span></span>
+<span id="cb16-73"><a href="#cb16-73" aria-hidden="true"></a><span class="co">#&gt;  6:            -2.270036              3.422176    1.20821022</span></span>
+<span id="cb16-74"><a href="#cb16-74" aria-hidden="true"></a><span class="co">#&gt;  7:            -2.690902              2.808903    0.57112278</span></span>
+<span id="cb16-75"><a href="#cb16-75" aria-hidden="true"></a><span class="co">#&gt;  8:            -3.294337              2.154062   -0.18051848</span></span>
+<span id="cb16-76"><a href="#cb16-76" aria-hidden="true"></a><span class="co">#&gt;  9:            -4.858428              3.185527   -0.34296004</span></span>
+<span id="cb16-77"><a href="#cb16-77" aria-hidden="true"></a><span class="co">#&gt; 10:            -4.773808              3.498560   -0.16092798</span></span>
+<span id="cb16-78"><a href="#cb16-78" aria-hidden="true"></a><span class="co">#&gt; 11:            -1.546257              3.177265    1.35163975</span></span>
+<span id="cb16-79"><a href="#cb16-79" aria-hidden="true"></a><span class="co">#&gt; 12:            -2.641970              2.866165    0.63695385</span></span>
+<span id="cb16-80"><a href="#cb16-80" aria-hidden="true"></a><span class="co">#&gt; 13:            -1.546257              3.177265    1.35163975</span></span>
+<span id="cb16-81"><a href="#cb16-81" aria-hidden="true"></a><span class="co">#&gt; 14:            -1.203821              3.686501    1.87988617</span></span>
+<span id="cb16-82"><a href="#cb16-82" aria-hidden="true"></a><span class="co">#&gt; 15:            -5.059438              2.875465   -0.64969772</span></span>
+<span id="cb16-83"><a href="#cb16-83" aria-hidden="true"></a><span class="co">#&gt;     bcpnn_mcmc_ic_ci_low bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low</span></span>
+<span id="cb16-84"><a href="#cb16-84" aria-hidden="true"></a><span class="co">#&gt;                    &lt;num&gt;                 &lt;num&gt;       &lt;num&gt;           &lt;num&gt;</span></span>
+<span id="cb16-85"><a href="#cb16-85" aria-hidden="true"></a><span class="co">#&gt;  1:          -10.3196697             1.7472020 -0.50589093     -10.3196697</span></span>
+<span id="cb16-86"><a href="#cb16-86" aria-hidden="true"></a><span class="co">#&gt;  2:           -2.3407525             2.7739578  1.27462238      -2.5084784</span></span>
+<span id="cb16-87"><a href="#cb16-87" aria-hidden="true"></a><span class="co">#&gt;  3:          -10.0375795             2.2513770 -0.04264434      -9.9161429</span></span>
+<span id="cb16-88"><a href="#cb16-88" aria-hidden="true"></a><span class="co">#&gt;  4:          -10.0323162             2.1241023 -0.16349873     -10.1435381</span></span>
+<span id="cb16-89"><a href="#cb16-89" aria-hidden="true"></a><span class="co">#&gt;  5:           -9.9831122             2.2496459 -0.04264434      -9.9410266</span></span>
+<span id="cb16-90"><a href="#cb16-90" aria-hidden="true"></a><span class="co">#&gt;  6:           -2.4117140             2.6903211  1.20645088      -2.5766499</span></span>
+<span id="cb16-91"><a href="#cb16-91" aria-hidden="true"></a><span class="co">#&gt;  7:           -2.8600902             1.8952952  0.57060721      -3.2124936</span></span>
+<span id="cb16-92"><a href="#cb16-92" aria-hidden="true"></a><span class="co">#&gt;  8:           -3.4910011             0.9970158 -0.18057225      -3.9636731</span></span>
+<span id="cb16-93"><a href="#cb16-93" aria-hidden="true"></a><span class="co">#&gt;  9:          -10.2612343             1.9149076 -0.34482850     -10.2499302</span></span>
+<span id="cb16-94"><a href="#cb16-94" aria-hidden="true"></a><span class="co">#&gt; 10:          -10.0185693             2.1131744 -0.16349873     -10.1629730</span></span>
+<span id="cb16-95"><a href="#cb16-95" aria-hidden="true"></a><span class="co">#&gt; 11:           -0.7503787             2.3050676  1.35107444      -1.2419932</span></span>
+<span id="cb16-96"><a href="#cb16-96" aria-hidden="true"></a><span class="co">#&gt; 12:           -2.8253479             1.9749895  0.63636165      -3.1467392</span></span>
+<span id="cb16-97"><a href="#cb16-97" aria-hidden="true"></a><span class="co">#&gt; 13:           -0.7537848             2.3089207  1.35107444      -1.2419932</span></span>
+<span id="cb16-98"><a href="#cb16-98" aria-hidden="true"></a><span class="co">#&gt; 14:           -0.4187463             3.0192617  1.87832144      -0.7147462</span></span>
+<span id="cb16-99"><a href="#cb16-99" aria-hidden="true"></a><span class="co">#&gt; 15:          -10.4504516             1.5773569 -0.65076456     -10.4211629</span></span>
+<span id="cb16-100"><a href="#cb16-100" aria-hidden="true"></a><span class="co">#&gt;     oe_ratio_ci_high odds_ratio odds_ratio_ci_low odds_ratio_ci_high</span></span>
+<span id="cb16-101"><a href="#cb16-101" aria-hidden="true"></a><span class="co">#&gt;                &lt;num&gt;      &lt;num&gt;             &lt;num&gt;              &lt;num&gt;</span></span>
+<span id="cb16-102"><a href="#cb16-102" aria-hidden="true"></a><span class="co">#&gt;  1:         1.747202  0.0000000        0.00000000           33.68585</span></span>
+<span id="cb16-103"><a href="#cb16-103" aria-hidden="true"></a><span class="co">#&gt;  2:         2.962049 13.0303800        0.20150028          279.21542</span></span>
+<span id="cb16-104"><a href="#cb16-104" aria-hidden="true"></a><span class="co">#&gt;  3:         2.254056  0.0000000        0.00000000         2462.50000</span></span>
+<span id="cb16-105"><a href="#cb16-105" aria-hidden="true"></a><span class="co">#&gt;  4:         2.109325  0.0000000        0.00000000          145.21133</span></span>
+<span id="cb16-106"><a href="#cb16-106" aria-hidden="true"></a><span class="co">#&gt;  5:         2.262299  0.0000000        0.00000000         2462.50000</span></span>
+<span id="cb16-107"><a href="#cb16-107" aria-hidden="true"></a><span class="co">#&gt;  6:         2.893877 10.1233187        0.15947006          211.87117</span></span>
+<span id="cb16-108"><a href="#cb16-108" aria-hidden="true"></a><span class="co">#&gt;  7:         2.258033  2.4701675        0.04089140           48.73410</span></span>
+<span id="cb16-109"><a href="#cb16-109" aria-hidden="true"></a><span class="co">#&gt;  8:         1.506854  0.7478897        0.01250834           14.59249</span></span>
+<span id="cb16-110"><a href="#cb16-110" aria-hidden="true"></a><span class="co">#&gt;  9:         1.904840  0.0000000        0.00000000           55.53664</span></span>
+<span id="cb16-111"><a href="#cb16-111" aria-hidden="true"></a><span class="co">#&gt; 10:         2.113287  0.0000000        0.00000000          145.21133</span></span>
+<span id="cb16-112"><a href="#cb16-112" aria-hidden="true"></a><span class="co">#&gt; 11:         2.742477 10.9151800        0.55237709          657.45882</span></span>
+<span id="cb16-113"><a href="#cb16-113" aria-hidden="true"></a><span class="co">#&gt; 12:         2.323788  2.7642969        0.04567010           54.61951</span></span>
+<span id="cb16-114"><a href="#cb16-114" aria-hidden="true"></a><span class="co">#&gt; 13:         2.742477 10.9151800        0.55237709          657.45882</span></span>
+<span id="cb16-115"><a href="#cb16-115" aria-hidden="true"></a><span class="co">#&gt; 14:         3.269724 35.2158110        1.70522393         2176.34560</span></span>
+<span id="cb16-116"><a href="#cb16-116" aria-hidden="true"></a><span class="co">#&gt; 15:         1.566959  0.0000000        0.00000000           23.77817</span></span>
+<span id="cb16-117"><a href="#cb16-117" aria-hidden="true"></a><span class="co">#&gt;     fisher_pvalue     ebgm ebgm_ci_low ebgm_ci_high</span></span>
+<span id="cb16-118"><a href="#cb16-118" aria-hidden="true"></a><span class="co">#&gt;             &lt;num&gt;    &lt;num&gt;       &lt;num&gt;        &lt;num&gt;</span></span>
+<span id="cb16-119"><a href="#cb16-119" aria-hidden="true"></a><span class="co">#&gt;  1:    1.00000000 2.421502        2.38         2.46</span></span>
+<span id="cb16-120"><a href="#cb16-120" aria-hidden="true"></a><span class="co">#&gt;  2:    0.11582153 2.421743        2.38         2.46</span></span>
+<span id="cb16-121"><a href="#cb16-121" aria-hidden="true"></a><span class="co">#&gt;  3:    1.00000000 2.421595        2.38         2.46</span></span>
+<span id="cb16-122"><a href="#cb16-122" aria-hidden="true"></a><span class="co">#&gt;  4:    1.00000000 2.421574        2.38         2.46</span></span>
+<span id="cb16-123"><a href="#cb16-123" aria-hidden="true"></a><span class="co">#&gt;  5:    1.00000000 2.421595        2.38         2.46</span></span>
+<span id="cb16-124"><a href="#cb16-124" aria-hidden="true"></a><span class="co">#&gt;  6:    0.14330745 2.421729        2.38         2.46</span></span>
+<span id="cb16-125"><a href="#cb16-125" aria-hidden="true"></a><span class="co">#&gt;  7:    0.42998325 2.421556        2.38         2.46</span></span>
+<span id="cb16-126"><a href="#cb16-126" aria-hidden="true"></a><span class="co">#&gt;  8:    1.00000000 2.421225        2.38         2.46</span></span>
+<span id="cb16-127"><a href="#cb16-127" aria-hidden="true"></a><span class="co">#&gt;  9:    1.00000000 2.421538        2.38         2.46</span></span>
+<span id="cb16-128"><a href="#cb16-128" aria-hidden="true"></a><span class="co">#&gt; 10:    1.00000000 2.421574        2.38         2.46</span></span>
+<span id="cb16-129"><a href="#cb16-129" aria-hidden="true"></a><span class="co">#&gt; 11:    0.06722095 2.421769        2.38         2.46</span></span>
+<span id="cb16-130"><a href="#cb16-130" aria-hidden="true"></a><span class="co">#&gt; 12:    0.39832191 2.421578        2.38         2.46</span></span>
+<span id="cb16-131"><a href="#cb16-131" aria-hidden="true"></a><span class="co">#&gt; 13:    0.06722095 2.421769        2.38         2.46</span></span>
+<span id="cb16-132"><a href="#cb16-132" aria-hidden="true"></a><span class="co">#&gt; 14:    0.00961474 2.421913        2.38         2.46</span></span>
+<span id="cb16-133"><a href="#cb16-133" aria-hidden="true"></a><span class="co">#&gt; 15:    1.00000000 2.421466        2.38         2.46</span></span>
+<span id="cb16-134"><a href="#cb16-134" aria-hidden="true"></a><span class="co">#&gt;  [ reached getOption(&quot;max.print&quot;) -- omitted 12 rows ]</span></span></code></pre></div>
 <p>The column containing the events of interest can be specified using an atomic character in the <code>.events</code> (default: “soc_name”) argument. The combination of all specified columns will define the unique event. Additionally, we can control which field data to find the columns in the <code>.field</code> (default: “reac”) argument.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="kw">set.seed</span>(1L)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>insulin_signals_hlgt &lt;-<span class="st"> </span><span class="kw">faers_phv_signal</span>(</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>    insulin_data,</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a>    <span class="dt">.events =</span> <span class="st">&quot;hlgt_name&quot;</span>,</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a>    <span class="dt">.full =</span> data</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a>)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a>insulin_signals_hlgt</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true"></a><span class="co">#&gt; Key: &lt;hlgt_name&gt;</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true"></a><span class="co">#&gt;                                                       hlgt_name     a     b</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true"></a><span class="co">#&gt;                                                          &lt;char&gt; &lt;int&gt; &lt;int&gt;</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true"></a><span class="co">#&gt;   1:                                        Acid-base disorders     0     3</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true"></a><span class="co">#&gt;   2:                              Administration site reactions     0     3</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true"></a><span class="co">#&gt;   3:                                        Allergic conditions     0     3</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true"></a><span class="co">#&gt;   4:               Anaemias nonhaemolytic and marrow depression     0     3</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true"></a><span class="co">#&gt;   5:                                   Angioedema and urticaria     0     3</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                       </span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true"></a><span class="co">#&gt; 138:                                 Viral infectious disorders     0     3</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true"></a><span class="co">#&gt; 139:                                           Vision disorders     1     2</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true"></a><span class="co">#&gt; 140: Vulvovaginal disorders (excl infections and inflammations)     0     3</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true"></a><span class="co">#&gt; 141:              Water, electrolyte and mineral investigations     1     2</span></span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true"></a><span class="co">#&gt; 142:                                 White blood cell disorders     0     3</span></span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true"></a><span class="co">#&gt;          c     d expected   ror ror_ci_low ror_ci_high      prr prr_ci_low</span></span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true"></a><span class="co">#&gt;      &lt;int&gt; &lt;int&gt;    &lt;num&gt; &lt;num&gt;      &lt;num&gt;       &lt;num&gt;    &lt;num&gt;      &lt;num&gt;</span></span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true"></a><span class="co">#&gt;   1:     1   196    0.015  0.00   0.000000         NaN  0.00000   0.000000</span></span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true"></a><span class="co">#&gt;   2:     9   188    0.135  0.00   0.000000         NaN  0.00000   0.000000</span></span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true"></a><span class="co">#&gt;   3:     3   194    0.045  0.00   0.000000         NaN  0.00000   0.000000</span></span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true"></a><span class="co">#&gt;   4:     2   195    0.030  0.00   0.000000         NaN  0.00000   0.000000</span></span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true"></a><span class="co">#&gt;   5:     1   196    0.015  0.00   0.000000         NaN  0.00000   0.000000</span></span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                      </span></span>
-<span id="cb17-30"><a href="#cb17-30" aria-hidden="true"></a><span class="co">#&gt; 138:     6   191    0.090  0.00   0.000000         NaN  0.00000   0.000000</span></span>
-<span id="cb17-31"><a href="#cb17-31" aria-hidden="true"></a><span class="co">#&gt; 139:     2   195    0.045 48.75   3.038446    782.1638 32.83333   3.971134</span></span>
-<span id="cb17-32"><a href="#cb17-32" aria-hidden="true"></a><span class="co">#&gt; 140:     1   196    0.015  0.00   0.000000         NaN  0.00000   0.000000</span></span>
-<span id="cb17-33"><a href="#cb17-33" aria-hidden="true"></a><span class="co">#&gt; 141:     1   196    0.030 98.00   4.405403   2180.0503 65.66667   5.249564</span></span>
-<span id="cb17-34"><a href="#cb17-34" aria-hidden="true"></a><span class="co">#&gt; 142:     6   191    0.090  0.00   0.000000         NaN  0.00000   0.000000</span></span>
-<span id="cb17-35"><a href="#cb17-35" aria-hidden="true"></a><span class="co">#&gt;      prr_ci_high        chisq chisq_pvalue bcpnn_norm_ic bcpnn_norm_ic_ci_low</span></span>
-<span id="cb17-36"><a href="#cb17-36" aria-hidden="true"></a><span class="co">#&gt;            &lt;num&gt;        &lt;num&gt;        &lt;num&gt;         &lt;num&gt;                &lt;num&gt;</span></span>
-<span id="cb17-37"><a href="#cb17-37" aria-hidden="true"></a><span class="co">#&gt;   1:         NaN 1.265951e-26  1.000000000    -0.3173914            -4.844759</span></span>
-<span id="cb17-38"><a href="#cb17-38" aria-hidden="true"></a><span class="co">#&gt;   2:         NaN 6.503567e-28  1.000000000    -0.8364506            -4.858428</span></span>
-<span id="cb17-39"><a href="#cb17-39" aria-hidden="true"></a><span class="co">#&gt;   3:         NaN 3.579029e-27  1.000000000    -0.5729454            -4.769182</span></span>
-<span id="cb17-40"><a href="#cb17-40" aria-hidden="true"></a><span class="co">#&gt;   4:         NaN 1.292402e-30  1.000000000    -0.4806767            -4.781546</span></span>
-<span id="cb17-41"><a href="#cb17-41" aria-hidden="true"></a><span class="co">#&gt;   5:         NaN 1.265951e-26  1.000000000    -0.3173914            -4.844759</span></span>
-<span id="cb17-42"><a href="#cb17-42" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                         </span></span>
-<span id="cb17-43"><a href="#cb17-43" aria-hidden="true"></a><span class="co">#&gt; 138:         NaN 2.800437e-31  1.000000000    -0.7316939            -4.801687</span></span>
-<span id="cb17-44"><a href="#cb17-44" aria-hidden="true"></a><span class="co">#&gt; 139:    271.4660 4.741741e+00  0.029439266     0.8697497            -2.230719</span></span>
-<span id="cb17-45"><a href="#cb17-45" aria-hidden="true"></a><span class="co">#&gt; 140:         NaN 1.265951e-26  1.000000000    -0.3173914            -4.844759</span></span>
-<span id="cb17-46"><a href="#cb17-46" aria-hidden="true"></a><span class="co">#&gt; 141:    821.4227 7.550975e+00  0.005997761     0.9620184            -2.278658</span></span>
-<span id="cb17-47"><a href="#cb17-47" aria-hidden="true"></a><span class="co">#&gt; 142:         NaN 2.800437e-31  1.000000000    -0.7316939            -4.801687</span></span>
-<span id="cb17-48"><a href="#cb17-48" aria-hidden="true"></a><span class="co">#&gt;      bcpnn_norm_ic_ci_high bcpnn_mcmc_ic bcpnn_mcmc_ic_ci_low</span></span>
-<span id="cb17-49"><a href="#cb17-49" aria-hidden="true"></a><span class="co">#&gt;                      &lt;num&gt;         &lt;num&gt;                &lt;num&gt;</span></span>
-<span id="cb17-50"><a href="#cb17-50" aria-hidden="true"></a><span class="co">#&gt;   1:              4.209977   -0.03947607            -9.870668</span></span>
-<span id="cb17-51"><a href="#cb17-51" aria-hidden="true"></a><span class="co">#&gt;   2:              3.185527   -0.34296004           -10.137252</span></span>
-<span id="cb17-52"><a href="#cb17-52" aria-hidden="true"></a><span class="co">#&gt;   3:              3.623291   -0.12157646           -10.072216</span></span>
-<span id="cb17-53"><a href="#cb17-53" aria-hidden="true"></a><span class="co">#&gt;   4:              3.820193   -0.08111417           -10.027072</span></span>
-<span id="cb17-54"><a href="#cb17-54" aria-hidden="true"></a><span class="co">#&gt;   5:              4.209977   -0.03947607            -9.920536</span></span>
-<span id="cb17-55"><a href="#cb17-55" aria-hidden="true"></a><span class="co">#&gt;  ---                                                         </span></span>
-<span id="cb17-56"><a href="#cb17-56" aria-hidden="true"></a><span class="co">#&gt; 138:              3.338300   -0.23653305           -10.119996</span></span>
-<span id="cb17-57"><a href="#cb17-57" aria-hidden="true"></a><span class="co">#&gt; 139:              3.970219    1.46338605            -2.221526</span></span>
-<span id="cb17-58"><a href="#cb17-58" aria-hidden="true"></a><span class="co">#&gt; 140:              4.209977   -0.03947607            -9.976006</span></span>
-<span id="cb17-59"><a href="#cb17-59" aria-hidden="true"></a><span class="co">#&gt; 141:              4.202695    1.50384833            -2.215082</span></span>
-<span id="cb17-60"><a href="#cb17-60" aria-hidden="true"></a><span class="co">#&gt; 142:              3.338300   -0.23653305           -10.139379</span></span>
-<span id="cb17-61"><a href="#cb17-61" aria-hidden="true"></a><span class="co">#&gt;      bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low oe_ratio_ci_high</span></span>
-<span id="cb17-62"><a href="#cb17-62" aria-hidden="true"></a><span class="co">#&gt;                      &lt;num&gt;       &lt;num&gt;           &lt;num&gt;            &lt;num&gt;</span></span>
-<span id="cb17-63"><a href="#cb17-63" aria-hidden="true"></a><span class="co">#&gt;   1:              2.262782 -0.04264434       -9.901054         2.248909</span></span>
-<span id="cb17-64"><a href="#cb17-64" aria-hidden="true"></a><span class="co">#&gt;   2:              1.905408 -0.34482850      -10.194800         1.912105</span></span>
-<span id="cb17-65"><a href="#cb17-65" aria-hidden="true"></a><span class="co">#&gt;   3:              2.155367 -0.12432814       -9.995913         2.168232</span></span>
-<span id="cb17-66"><a href="#cb17-66" aria-hidden="true"></a><span class="co">#&gt;   4:              2.209895 -0.08406426      -10.144027         2.209777</span></span>
-<span id="cb17-67"><a href="#cb17-67" aria-hidden="true"></a><span class="co">#&gt;   5:              2.256206 -0.04264434      -10.092572         2.265663</span></span>
-<span id="cb17-68"><a href="#cb17-68" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                   </span></span>
-<span id="cb17-69"><a href="#cb17-69" aria-hidden="true"></a><span class="co">#&gt; 138:              2.032943 -0.23878686      -10.201472         2.039077</span></span>
-<span id="cb17-70"><a href="#cb17-70" aria-hidden="true"></a><span class="co">#&gt; 139:              3.013392  1.46063437       -2.322466         3.148061</span></span>
-<span id="cb17-71"><a href="#cb17-71" aria-hidden="true"></a><span class="co">#&gt; 140:              2.253660 -0.04264434       -9.954685         2.252572</span></span>
-<span id="cb17-72"><a href="#cb17-72" aria-hidden="true"></a><span class="co">#&gt; 141:              3.064956  1.50089824       -2.282203         3.188325</span></span>
-<span id="cb17-73"><a href="#cb17-73" aria-hidden="true"></a><span class="co">#&gt; 142:              2.052593 -0.23878686      -10.221601         2.044580</span></span>
-<span id="cb17-74"><a href="#cb17-74" aria-hidden="true"></a><span class="co">#&gt;      odds_ratio odds_ratio_ci_low odds_ratio_ci_high fisher_pvalue     ebgm</span></span>
-<span id="cb17-75"><a href="#cb17-75" aria-hidden="true"></a><span class="co">#&gt;           &lt;num&gt;             &lt;num&gt;              &lt;num&gt;         &lt;num&gt;    &lt;num&gt;</span></span>
-<span id="cb17-76"><a href="#cb17-76" aria-hidden="true"></a><span class="co">#&gt;   1:    0.00000         0.0000000         2462.50000    1.00000000 3.670936</span></span>
-<span id="cb17-77"><a href="#cb17-77" aria-hidden="true"></a><span class="co">#&gt;   2:    0.00000         0.0000000           55.53664    1.00000000 3.459110</span></span>
-<span id="cb17-78"><a href="#cb17-78" aria-hidden="true"></a><span class="co">#&gt;   3:    0.00000         0.0000000          213.09160    1.00000000 3.615584</span></span>
-<span id="cb17-79"><a href="#cb17-79" aria-hidden="true"></a><span class="co">#&gt;   4:    0.00000         0.0000000          408.94448    1.00000000 3.643050</span></span>
-<span id="cb17-80"><a href="#cb17-80" aria-hidden="true"></a><span class="co">#&gt;   5:    0.00000         0.0000000         2462.50000    1.00000000 3.670936</span></span>
-<span id="cb17-81"><a href="#cb17-81" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                       </span></span>
-<span id="cb17-82"><a href="#cb17-82" aria-hidden="true"></a><span class="co">#&gt; 138:    0.00000         0.0000000           88.65547    1.00000000 3.535617</span></span>
-<span id="cb17-83"><a href="#cb17-83" aria-hidden="true"></a><span class="co">#&gt; 139:   43.06704         0.5524356         1247.00745    0.04454850 4.117845</span></span>
-<span id="cb17-84"><a href="#cb17-84" aria-hidden="true"></a><span class="co">#&gt; 140:    0.00000         0.0000000         2462.50000    1.00000000 3.670936</span></span>
-<span id="cb17-85"><a href="#cb17-85" aria-hidden="true"></a><span class="co">#&gt; 141:   80.16649         0.8340751         7069.12541    0.02984925 4.149126</span></span>
-<span id="cb17-86"><a href="#cb17-86" aria-hidden="true"></a><span class="co">#&gt; 142:    0.00000         0.0000000           88.65547    1.00000000 3.535617</span></span>
-<span id="cb17-87"><a href="#cb17-87" aria-hidden="true"></a><span class="co">#&gt;      ebgm_ci_low ebgm_ci_high</span></span>
-<span id="cb17-88"><a href="#cb17-88" aria-hidden="true"></a><span class="co">#&gt;            &lt;num&gt;        &lt;num&gt;</span></span>
-<span id="cb17-89"><a href="#cb17-89" aria-hidden="true"></a><span class="co">#&gt;   1:        1.66         7.14</span></span>
-<span id="cb17-90"><a href="#cb17-90" aria-hidden="true"></a><span class="co">#&gt;   2:        1.56         6.73</span></span>
-<span id="cb17-91"><a href="#cb17-91" aria-hidden="true"></a><span class="co">#&gt;   3:        1.63         7.03</span></span>
-<span id="cb17-92"><a href="#cb17-92" aria-hidden="true"></a><span class="co">#&gt;   4:        1.65         7.09</span></span>
-<span id="cb17-93"><a href="#cb17-93" aria-hidden="true"></a><span class="co">#&gt;   5:        1.66         7.14</span></span>
-<span id="cb17-94"><a href="#cb17-94" aria-hidden="true"></a><span class="co">#&gt;  ---                         </span></span>
-<span id="cb17-95"><a href="#cb17-95" aria-hidden="true"></a><span class="co">#&gt; 138:        1.60         6.88</span></span>
-<span id="cb17-96"><a href="#cb17-96" aria-hidden="true"></a><span class="co">#&gt; 139:        1.96         7.71</span></span>
-<span id="cb17-97"><a href="#cb17-97" aria-hidden="true"></a><span class="co">#&gt; 140:        1.66         7.14</span></span>
-<span id="cb17-98"><a href="#cb17-98" aria-hidden="true"></a><span class="co">#&gt; 141:        1.98         7.77</span></span>
-<span id="cb17-99"><a href="#cb17-99" aria-hidden="true"></a><span class="co">#&gt; 142:        1.60         6.88</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>insulin_signals_hlgt &lt;-<span class="st"> </span><span class="kw">faers_phv_signal</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>    insulin_data,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>    <span class="dt">.events =</span> <span class="st">&quot;hlgt_name&quot;</span>, <span class="dt">.full =</span> data,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a>    <span class="dt">BPPARAM =</span> BiocParallel<span class="op">::</span><span class="kw">SerialParam</span>(<span class="dt">RNGseed =</span> 1L)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_ror()`</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_prr()`</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_chisq()`</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_bcpnn_norm()`</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_bcpnn_mcmc()`</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_obsexp_shrink()`</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_fisher()`</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true"></a><span class="co">#&gt; ℹ Running `phv_ebgm()`</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true"></a>insulin_signals_hlgt</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true"></a><span class="co">#&gt; Key: &lt;hlgt_name&gt;</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true"></a><span class="co">#&gt;                                                       hlgt_name     a     b</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true"></a><span class="co">#&gt;                                                          &lt;char&gt; &lt;int&gt; &lt;int&gt;</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true"></a><span class="co">#&gt;   1:                                        Acid-base disorders     0     3</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true"></a><span class="co">#&gt;   2:                              Administration site reactions     0     3</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true"></a><span class="co">#&gt;   3:                                        Allergic conditions     0     3</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true"></a><span class="co">#&gt;   4:               Anaemias nonhaemolytic and marrow depression     0     3</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true"></a><span class="co">#&gt;   5:                                   Angioedema and urticaria     0     3</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                       </span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true"></a><span class="co">#&gt; 138:                                 Viral infectious disorders     0     3</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true"></a><span class="co">#&gt; 139:                                           Vision disorders     1     2</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true"></a><span class="co">#&gt; 140: Vulvovaginal disorders (excl infections and inflammations)     0     3</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true"></a><span class="co">#&gt; 141:              Water, electrolyte and mineral investigations     1     2</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true"></a><span class="co">#&gt; 142:                                 White blood cell disorders     0     3</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true"></a><span class="co">#&gt;          c     d expected   ror ror_ci_low ror_ci_high      prr prr_ci_low</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true"></a><span class="co">#&gt;      &lt;int&gt; &lt;int&gt;    &lt;num&gt; &lt;num&gt;      &lt;num&gt;       &lt;num&gt;    &lt;num&gt;      &lt;num&gt;</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true"></a><span class="co">#&gt;   1:     1   196    0.015  0.00   0.000000         NaN  0.00000   0.000000</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true"></a><span class="co">#&gt;   2:     9   188    0.135  0.00   0.000000         NaN  0.00000   0.000000</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true"></a><span class="co">#&gt;   3:     3   194    0.045  0.00   0.000000         NaN  0.00000   0.000000</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true"></a><span class="co">#&gt;   4:     2   195    0.030  0.00   0.000000         NaN  0.00000   0.000000</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true"></a><span class="co">#&gt;   5:     1   196    0.015  0.00   0.000000         NaN  0.00000   0.000000</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                      </span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true"></a><span class="co">#&gt; 138:     6   191    0.090  0.00   0.000000         NaN  0.00000   0.000000</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true"></a><span class="co">#&gt; 139:     2   195    0.045 48.75   3.038446    782.1638 32.83333   3.971134</span></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true"></a><span class="co">#&gt; 140:     1   196    0.015  0.00   0.000000         NaN  0.00000   0.000000</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true"></a><span class="co">#&gt; 141:     1   196    0.030 98.00   4.405403   2180.0503 65.66667   5.249564</span></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true"></a><span class="co">#&gt; 142:     6   191    0.090  0.00   0.000000         NaN  0.00000   0.000000</span></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true"></a><span class="co">#&gt;      prr_ci_high        chisq chisq_pvalue bcpnn_norm_ic bcpnn_norm_ic_ci_low</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true"></a><span class="co">#&gt;            &lt;num&gt;        &lt;num&gt;        &lt;num&gt;         &lt;num&gt;                &lt;num&gt;</span></span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true"></a><span class="co">#&gt;   1:         NaN 1.265951e-26  1.000000000    -0.3173914            -4.844759</span></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true"></a><span class="co">#&gt;   2:         NaN 6.503567e-28  1.000000000    -0.8364506            -4.858428</span></span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true"></a><span class="co">#&gt;   3:         NaN 3.579029e-27  1.000000000    -0.5729454            -4.769182</span></span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true"></a><span class="co">#&gt;   4:         NaN 1.292402e-30  1.000000000    -0.4806767            -4.781546</span></span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true"></a><span class="co">#&gt;   5:         NaN 1.265951e-26  1.000000000    -0.3173914            -4.844759</span></span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                         </span></span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true"></a><span class="co">#&gt; 138:         NaN 2.800437e-31  1.000000000    -0.7316939            -4.801687</span></span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true"></a><span class="co">#&gt; 139:    271.4660 4.741741e+00  0.029439266     0.8697497            -2.230719</span></span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true"></a><span class="co">#&gt; 140:         NaN 1.265951e-26  1.000000000    -0.3173914            -4.844759</span></span>
+<span id="cb17-53"><a href="#cb17-53" aria-hidden="true"></a><span class="co">#&gt; 141:    821.4227 7.550975e+00  0.005997761     0.9620184            -2.278658</span></span>
+<span id="cb17-54"><a href="#cb17-54" aria-hidden="true"></a><span class="co">#&gt; 142:         NaN 2.800437e-31  1.000000000    -0.7316939            -4.801687</span></span>
+<span id="cb17-55"><a href="#cb17-55" aria-hidden="true"></a><span class="co">#&gt;      bcpnn_norm_ic_ci_high bcpnn_mcmc_ic bcpnn_mcmc_ic_ci_low</span></span>
+<span id="cb17-56"><a href="#cb17-56" aria-hidden="true"></a><span class="co">#&gt;                      &lt;num&gt;         &lt;num&gt;                &lt;num&gt;</span></span>
+<span id="cb17-57"><a href="#cb17-57" aria-hidden="true"></a><span class="co">#&gt;   1:              4.209977   -0.03947607            -9.937782</span></span>
+<span id="cb17-58"><a href="#cb17-58" aria-hidden="true"></a><span class="co">#&gt;   2:              3.185527   -0.34296004           -10.161457</span></span>
+<span id="cb17-59"><a href="#cb17-59" aria-hidden="true"></a><span class="co">#&gt;   3:              3.623291   -0.12157646           -10.114495</span></span>
+<span id="cb17-60"><a href="#cb17-60" aria-hidden="true"></a><span class="co">#&gt;   4:              3.820193   -0.08111417            -9.959860</span></span>
+<span id="cb17-61"><a href="#cb17-61" aria-hidden="true"></a><span class="co">#&gt;   5:              4.209977   -0.03947607            -9.983112</span></span>
+<span id="cb17-62"><a href="#cb17-62" aria-hidden="true"></a><span class="co">#&gt;  ---                                                         </span></span>
+<span id="cb17-63"><a href="#cb17-63" aria-hidden="true"></a><span class="co">#&gt; 138:              3.338300   -0.23653305           -10.224150</span></span>
+<span id="cb17-64"><a href="#cb17-64" aria-hidden="true"></a><span class="co">#&gt; 139:              3.970219    1.46338605            -2.208920</span></span>
+<span id="cb17-65"><a href="#cb17-65" aria-hidden="true"></a><span class="co">#&gt; 140:              4.209977   -0.03947607            -9.942375</span></span>
+<span id="cb17-66"><a href="#cb17-66" aria-hidden="true"></a><span class="co">#&gt; 141:              4.202695    1.50384833            -2.173397</span></span>
+<span id="cb17-67"><a href="#cb17-67" aria-hidden="true"></a><span class="co">#&gt; 142:              3.338300   -0.23653305           -10.112947</span></span>
+<span id="cb17-68"><a href="#cb17-68" aria-hidden="true"></a><span class="co">#&gt;      bcpnn_mcmc_ic_ci_high    oe_ratio oe_ratio_ci_low oe_ratio_ci_high</span></span>
+<span id="cb17-69"><a href="#cb17-69" aria-hidden="true"></a><span class="co">#&gt;                      &lt;num&gt;       &lt;num&gt;           &lt;num&gt;            &lt;num&gt;</span></span>
+<span id="cb17-70"><a href="#cb17-70" aria-hidden="true"></a><span class="co">#&gt;   1:              2.274611 -0.04264434       -9.937782         2.274611</span></span>
+<span id="cb17-71"><a href="#cb17-71" aria-hidden="true"></a><span class="co">#&gt;   2:              1.902619 -0.34482850      -10.161457         1.902619</span></span>
+<span id="cb17-72"><a href="#cb17-72" aria-hidden="true"></a><span class="co">#&gt;   3:              2.156724 -0.12432814      -10.114495         2.156724</span></span>
+<span id="cb17-73"><a href="#cb17-73" aria-hidden="true"></a><span class="co">#&gt;   4:              2.218562 -0.08406426       -9.959860         2.218562</span></span>
+<span id="cb17-74"><a href="#cb17-74" aria-hidden="true"></a><span class="co">#&gt;   5:              2.249646 -0.04264434       -9.983112         2.249646</span></span>
+<span id="cb17-75"><a href="#cb17-75" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                   </span></span>
+<span id="cb17-76"><a href="#cb17-76" aria-hidden="true"></a><span class="co">#&gt; 138:              2.034279 -0.23878686      -10.128830         2.023771</span></span>
+<span id="cb17-77"><a href="#cb17-77" aria-hidden="true"></a><span class="co">#&gt; 139:              3.003724  1.46063437       -2.322466         3.148061</span></span>
+<span id="cb17-78"><a href="#cb17-78" aria-hidden="true"></a><span class="co">#&gt; 140:              2.257494 -0.04264434      -10.025850         2.252671</span></span>
+<span id="cb17-79"><a href="#cb17-79" aria-hidden="true"></a><span class="co">#&gt; 141:              3.063304  1.50089824       -2.282203         3.188325</span></span>
+<span id="cb17-80"><a href="#cb17-80" aria-hidden="true"></a><span class="co">#&gt; 142:              2.022509 -0.23878686      -10.081710         2.036689</span></span>
+<span id="cb17-81"><a href="#cb17-81" aria-hidden="true"></a><span class="co">#&gt;      odds_ratio odds_ratio_ci_low odds_ratio_ci_high fisher_pvalue     ebgm</span></span>
+<span id="cb17-82"><a href="#cb17-82" aria-hidden="true"></a><span class="co">#&gt;           &lt;num&gt;             &lt;num&gt;              &lt;num&gt;         &lt;num&gt;    &lt;num&gt;</span></span>
+<span id="cb17-83"><a href="#cb17-83" aria-hidden="true"></a><span class="co">#&gt;   1:    0.00000         0.0000000         2462.50000    1.00000000 3.670936</span></span>
+<span id="cb17-84"><a href="#cb17-84" aria-hidden="true"></a><span class="co">#&gt;   2:    0.00000         0.0000000           55.53664    1.00000000 3.459110</span></span>
+<span id="cb17-85"><a href="#cb17-85" aria-hidden="true"></a><span class="co">#&gt;   3:    0.00000         0.0000000          213.09160    1.00000000 3.615584</span></span>
+<span id="cb17-86"><a href="#cb17-86" aria-hidden="true"></a><span class="co">#&gt;   4:    0.00000         0.0000000          408.94448    1.00000000 3.643050</span></span>
+<span id="cb17-87"><a href="#cb17-87" aria-hidden="true"></a><span class="co">#&gt;   5:    0.00000         0.0000000         2462.50000    1.00000000 3.670936</span></span>
+<span id="cb17-88"><a href="#cb17-88" aria-hidden="true"></a><span class="co">#&gt;  ---                                                                       </span></span>
+<span id="cb17-89"><a href="#cb17-89" aria-hidden="true"></a><span class="co">#&gt; 138:    0.00000         0.0000000           88.65547    1.00000000 3.535617</span></span>
+<span id="cb17-90"><a href="#cb17-90" aria-hidden="true"></a><span class="co">#&gt; 139:   43.06704         0.5524356         1247.00745    0.04454850 4.117845</span></span>
+<span id="cb17-91"><a href="#cb17-91" aria-hidden="true"></a><span class="co">#&gt; 140:    0.00000         0.0000000         2462.50000    1.00000000 3.670936</span></span>
+<span id="cb17-92"><a href="#cb17-92" aria-hidden="true"></a><span class="co">#&gt; 141:   80.16649         0.8340751         7069.12541    0.02984925 4.149126</span></span>
+<span id="cb17-93"><a href="#cb17-93" aria-hidden="true"></a><span class="co">#&gt; 142:    0.00000         0.0000000           88.65547    1.00000000 3.535617</span></span>
+<span id="cb17-94"><a href="#cb17-94" aria-hidden="true"></a><span class="co">#&gt;      ebgm_ci_low ebgm_ci_high</span></span>
+<span id="cb17-95"><a href="#cb17-95" aria-hidden="true"></a><span class="co">#&gt;            &lt;num&gt;        &lt;num&gt;</span></span>
+<span id="cb17-96"><a href="#cb17-96" aria-hidden="true"></a><span class="co">#&gt;   1:        1.66         7.14</span></span>
+<span id="cb17-97"><a href="#cb17-97" aria-hidden="true"></a><span class="co">#&gt;   2:        1.56         6.73</span></span>
+<span id="cb17-98"><a href="#cb17-98" aria-hidden="true"></a><span class="co">#&gt;   3:        1.63         7.03</span></span>
+<span id="cb17-99"><a href="#cb17-99" aria-hidden="true"></a><span class="co">#&gt;   4:        1.65         7.09</span></span>
+<span id="cb17-100"><a href="#cb17-100" aria-hidden="true"></a><span class="co">#&gt;   5:        1.66         7.14</span></span>
+<span id="cb17-101"><a href="#cb17-101" aria-hidden="true"></a><span class="co">#&gt;  ---                         </span></span>
+<span id="cb17-102"><a href="#cb17-102" aria-hidden="true"></a><span class="co">#&gt; 138:        1.60         6.88</span></span>
+<span id="cb17-103"><a href="#cb17-103" aria-hidden="true"></a><span class="co">#&gt; 139:        1.96         7.71</span></span>
+<span id="cb17-104"><a href="#cb17-104" aria-hidden="true"></a><span class="co">#&gt; 140:        1.66         7.14</span></span>
+<span id="cb17-105"><a href="#cb17-105" aria-hidden="true"></a><span class="co">#&gt; 141:        1.98         7.77</span></span>
+<span id="cb17-106"><a href="#cb17-106" aria-hidden="true"></a><span class="co">#&gt; 142:        1.60         6.88</span></span></code></pre></div>
 <h2 id="sessioninfo">sessionInfo</h2>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="kw">sessionInfo</span>()</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="co">#&gt; R version 4.3.1 (2023-06-16)</span></span>
@@ -1835,24 +1852,30 @@ body {
 <span id="cb18-19"><a href="#cb18-19" aria-hidden="true"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span id="cb18-20"><a href="#cb18-20" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb18-21"><a href="#cb18-21" aria-hidden="true"></a><span class="co">#&gt; other attached packages:</span></span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true"></a><span class="co">#&gt; [1] faers_0.99.3</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true"></a><span class="co">#&gt; [1] faers_0.99.4</span></span>
 <span id="cb18-23"><a href="#cb18-23" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb18-24"><a href="#cb18-24" aria-hidden="true"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true"></a><span class="co">#&gt;  [1] generics_0.1.3     rappdirs_0.3.3     utf8_1.2.4         xml2_1.3.6        </span></span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true"></a><span class="co">#&gt;  [5] stringi_1.8.3      openEBGM_0.9.1     lattice_0.22-5     digest_0.6.33     </span></span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true"></a><span class="co">#&gt;  [9] magrittr_2.0.3     evaluate_0.23      grid_4.3.1         MCMCpack_1.6-3    </span></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true"></a><span class="co">#&gt; [13] fastmap_1.1.1      Matrix_1.6-4       survival_3.5-7     mcmc_0.9-7        </span></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true"></a><span class="co">#&gt; [17] httr_1.4.7         rvest_1.0.3        fansi_1.0.6        selectr_0.4-2     </span></span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true"></a><span class="co">#&gt; [21] scales_1.3.0       cli_3.6.2          rlang_1.1.2        crayon_1.5.2      </span></span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true"></a><span class="co">#&gt; [25] munsell_0.5.0      bit64_4.0.5        splines_4.3.1      yaml_2.3.8        </span></span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true"></a><span class="co">#&gt; [29] tools_4.3.1        parallel_4.3.1     SparseM_1.81       tzdb_0.4.0        </span></span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true"></a><span class="co">#&gt; [33] MatrixModels_0.5-2 coda_0.19-4        dplyr_1.1.4        colorspace_2.1-0  </span></span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true"></a><span class="co">#&gt; [37] ggplot2_3.4.4      curl_5.2.0         vctrs_0.6.5        R6_2.5.1          </span></span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true"></a><span class="co">#&gt; [41] lifecycle_1.0.4    stringr_1.5.1      bit_4.0.5          vroom_1.6.5       </span></span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true"></a><span class="co">#&gt; [45] MASS_7.3-60        pkgconfig_2.0.3    archive_1.1.6      pillar_1.9.0      </span></span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true"></a><span class="co">#&gt; [49] gtable_0.3.4       data.table_1.14.99 glue_1.6.2         xfun_0.41         </span></span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true"></a><span class="co">#&gt; [53] tibble_3.2.1       tidyselect_1.2.0   knitr_1.45         htmltools_0.5.7   </span></span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true"></a><span class="co">#&gt; [57] rmarkdown_2.25     compiler_4.3.1     quantreg_5.96</span></span></code></pre></div>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true"></a><span class="co">#&gt;  [1] generics_0.1.3      rappdirs_0.3.3      utf8_1.2.4         </span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true"></a><span class="co">#&gt;  [4] xml2_1.3.6          openEBGM_0.9.1      stringi_1.8.3      </span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true"></a><span class="co">#&gt;  [7] lattice_0.22-5      digest_0.6.33       magrittr_2.0.3     </span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true"></a><span class="co">#&gt; [10] evaluate_0.23       grid_4.3.1          MCMCpack_1.6-3     </span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true"></a><span class="co">#&gt; [13] fastmap_1.1.1       Matrix_1.6-4        survival_3.5-7     </span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true"></a><span class="co">#&gt; [16] mcmc_0.9-7          httr_1.4.7          rvest_1.0.3        </span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true"></a><span class="co">#&gt; [19] fansi_1.0.6         selectr_0.4-2       scales_1.3.0       </span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true"></a><span class="co">#&gt; [22] codetools_0.2-19    cli_3.6.2           rlang_1.1.2        </span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true"></a><span class="co">#&gt; [25] crayon_1.5.2        munsell_0.5.0       bit64_4.0.5        </span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true"></a><span class="co">#&gt; [28] splines_4.3.1       yaml_2.3.8          tools_4.3.1        </span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true"></a><span class="co">#&gt; [31] parallel_4.3.1      SparseM_1.81        tzdb_0.4.0         </span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true"></a><span class="co">#&gt; [34] BiocParallel_1.34.2 MatrixModels_0.5-2  coda_0.19-4        </span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true"></a><span class="co">#&gt; [37] dplyr_1.1.4         colorspace_2.1-0    ggplot2_3.4.4      </span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true"></a><span class="co">#&gt; [40] curl_5.2.0          vctrs_0.6.5         R6_2.5.1           </span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true"></a><span class="co">#&gt; [43] lifecycle_1.0.4     stringr_1.5.1       bit_4.0.5          </span></span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true"></a><span class="co">#&gt; [46] vroom_1.6.5         MASS_7.3-60         pkgconfig_2.0.3    </span></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true"></a><span class="co">#&gt; [49] archive_1.1.6       gtable_0.3.4        pillar_1.9.0       </span></span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true"></a><span class="co">#&gt; [52] data.table_1.14.99  glue_1.6.2          xfun_0.41          </span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true"></a><span class="co">#&gt; [55] tibble_3.2.1        tidyselect_1.2.0    knitr_1.45         </span></span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true"></a><span class="co">#&gt; [58] htmltools_0.5.7     rmarkdown_2.25      compiler_4.3.1     </span></span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true"></a><span class="co">#&gt; [61] quantreg_5.96</span></span></code></pre></div>
 
 </body>
 </html>

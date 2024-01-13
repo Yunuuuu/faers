@@ -40,17 +40,21 @@ testthat::test_that("`faers_phv_signal()` works well", {
     obj1 <- faers_keep(data_std, interested_ids)
     obj2 <- faers_keep(data_std, interested_ids, invert = TRUE)
     testthat::expect_error(faers_phv_signal(obj1))
-    set.seed(1L)
     testthat::expect_no_error(signal <- suppressWarnings(faers_phv_signal(
         faers_filter(data_std, .fn = function(x) {
             interested_ids
         }),
-        .full = data_std
+        .full = data_std,
+        BPPARAM = BiocParallel::SerialParam(RNGseed = 1L)
     )))
-    set.seed(1L)
-    signal1 <- suppressWarnings(faers_phv_signal(obj1, .full = data_std))
+    signal1 <- suppressWarnings(faers_phv_signal(obj1,
+        .full = data_std,
+        BPPARAM = BiocParallel::SerialParam(RNGseed = 1L)
+    ))
     testthat::expect_true(data.table::fsetequal(signal, signal1))
-    set.seed(1L)
-    signal2 <- suppressWarnings(faers_phv_signal(obj1, .object2 = obj2))
+    signal2 <- suppressWarnings(faers_phv_signal(obj1,
+        .object2 = obj2,
+        BPPARAM = BiocParallel::SerialParam(RNGseed = 1L)
+    ))
     testthat::expect_true(data.table::fsetequal(signal, signal2))
 })
