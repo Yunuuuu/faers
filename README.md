@@ -55,7 +55,7 @@ if (!requireNamespace("pak")) {
         )
     )
 }
-pak::pkg_install("Yunuuuu/faers")
+pak::pkg_install("Yunuuuu/faers@main")
 ```
 
 ## Pharmacovigilance Analysis using FAERS
@@ -73,7 +73,7 @@ library(faers)
 
 This will return a data.table reporting years, period, quarter, and file
 urls and file sizes. By default, this will use the cached file in
-`rappdirs::user_cache_dir("faers")`. If it doesn’t exist, the internal
+`tools::R_user_dir("faers", "cache")`. If it doesn’t exist, the internal
 will parse metadata in
 <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
 
@@ -82,224 +82,224 @@ faers_meta()
 #> → Reading html:
 #>   <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
 #> → Writing FAERS metadata into cache file
-#>   '~/.cache/R/faers/metadata/faers_meta_data.rds'
+#>   '/home/yun/.cache/R/faers/faers/metadata/faers_meta_data.rds'
 #>      year quarter             period
 #>     <int>  <char>             <char>
-#>  1:  2023      q3   July - September
-#>  2:  2023      q2       April - June
-#>  3:  2023      q1    January - March
-#>  4:  2022      q4 October - December
-#>  5:  2022      q3   July - September
-#>  6:  2022      q2       April - June
-#>  7:  2022      q1    January - March
-#>  8:  2021      q4 October - December
-#>  9:  2021      q3   July - September
-#> 10:  2021      q2       April - June
-#> 11:  2021      q1    January - March
-#> 12:  2020      q4 October - December
-#> 13:  2020      q3   July - September
-#> 14:  2020      q2       April - June
-#> 15:  2020      q1    January - March
-#> 16:  2019      q4 October - December
-#> 17:  2019      q3   July - September
-#> 18:  2019      q2       April - June
-#> 19:  2019      q1    January - March
-#> 20:  2018      q4 October - December
-#> 21:  2018      q3   July - September
-#> 22:  2018      q2       April - June
-#> 23:  2018      q1    January - March
-#> 24:  2017      q4 October - December
-#> 25:  2017      q3   July - September
-#> 26:  2017      q2       April - June
-#> 27:  2017      q1    January - March
-#> 28:  2016      q4 October - December
-#> 29:  2016      q3   July - September
-#> 30:  2016      q2       April - June
-#> 31:  2016      q1    January - March
-#> 32:  2015      q4 October - December
-#> 33:  2015      q3   July - September
-#> 34:  2015      q2       April - June
-#> 35:  2015      q1    January - March
-#> 36:  2014      q4 October - December
-#> 37:  2014      q3   July - September
-#> 38:  2014      q2       April - June
-#> 39:  2014      q1    January - March
-#> 40:  2013      q4 October - December
-#> 41:  2013      q3   July - September
-#> 42:  2013      q2       April - June
-#> 43:  2013      q1    January - March
-#> 44:  2012      q4 October - December
-#> 45:  2012      q3   July - September
-#> 46:  2012      q2       April - June
-#> 47:  2012      q1    January - March
-#> 48:  2011      q4 October - December
-#> 49:  2011      q3   July - September
-#> 50:  2011      q2       April - June
-#> 51:  2011      q1    January - March
-#> 52:  2010      q4 October - December
-#> 53:  2010      q3   July - September
-#> 54:  2010      q2       April - June
-#> 55:  2010      q1    January - March
-#> 56:  2009      q4 October - December
-#> 57:  2009      q3   July - September
-#> 58:  2009      q2       April - June
-#> 59:  2009      q1    January - March
-#> 60:  2008      q4 October - December
-#> 61:  2008      q3   July - September
-#> 62:  2008      q2       April - June
-#> 63:  2008      q1    January - March
-#> 64:  2007      q4 October - December
-#> 65:  2007      q3   July - September
-#> 66:  2007      q2       April - June
-#> 67:  2007      q1    January - March
-#> 68:  2006      q4 October - December
-#> 69:  2006      q3   July - September
-#> 70:  2006      q2       April - June
+#>  1:  2023      q4 October - December
+#>  2:  2023      q3   July - September
+#>  3:  2023      q2       April - June
+#>  4:  2023      q1    January - March
+#>  5:  2022      q4 October - December
+#>  6:  2022      q3   July - September
+#>  7:  2022      q2       April - June
+#>  8:  2022      q1    January - March
+#>  9:  2021      q4 October - December
+#> 10:  2021      q3   July - September
+#> 11:  2021      q2       April - June
+#> 12:  2021      q1    January - March
+#> 13:  2020      q4 October - December
+#> 14:  2020      q3   July - September
+#> 15:  2020      q2       April - June
+#> 16:  2020      q1    January - March
+#> 17:  2019      q4 October - December
+#> 18:  2019      q3   July - September
+#> 19:  2019      q2       April - June
+#> 20:  2019      q1    January - March
+#> 21:  2018      q4 October - December
+#> 22:  2018      q3   July - September
+#> 23:  2018      q2       April - June
+#> 24:  2018      q1    January - March
+#> 25:  2017      q4 October - December
+#> 26:  2017      q3   July - September
+#> 27:  2017      q2       April - June
+#> 28:  2017      q1    January - March
+#> 29:  2016      q4 October - December
+#> 30:  2016      q3   July - September
+#> 31:  2016      q2       April - June
+#> 32:  2016      q1    January - March
+#> 33:  2015      q4 October - December
+#> 34:  2015      q3   July - September
+#> 35:  2015      q2       April - June
+#> 36:  2015      q1    January - March
+#> 37:  2014      q4 October - December
+#> 38:  2014      q3   July - September
+#> 39:  2014      q2       April - June
+#> 40:  2014      q1    January - March
+#> 41:  2013      q4 October - December
+#> 42:  2013      q3   July - September
+#> 43:  2013      q2       April - June
+#> 44:  2013      q1    January - March
+#> 45:  2012      q4 October - December
+#> 46:  2012      q3   July - September
+#> 47:  2012      q2       April - June
+#> 48:  2012      q1    January - March
+#> 49:  2011      q4 October - December
+#> 50:  2011      q3   July - September
+#> 51:  2011      q2       April - June
+#> 52:  2011      q1    January - March
+#> 53:  2010      q4 October - December
+#> 54:  2010      q3   July - September
+#> 55:  2010      q2       April - June
+#> 56:  2010      q1    January - March
+#> 57:  2009      q4 October - December
+#> 58:  2009      q3   July - September
+#> 59:  2009      q2       April - June
+#> 60:  2009      q1    January - March
+#> 61:  2008      q4 October - December
+#> 62:  2008      q3   July - September
+#> 63:  2008      q2       April - June
+#> 64:  2008      q1    January - March
+#> 65:  2007      q4 October - December
+#> 66:  2007      q3   July - September
+#> 67:  2007      q2       April - June
+#> 68:  2007      q1    January - March
+#> 69:  2006      q4 October - December
+#> 70:  2006      q3   July - September
 #>                                                     ascii_urls ascii_file_size
 #>                                                         <char>          <char>
-#>  1: https://fis.fda.gov/content/Exports/faers_ascii_2023Q3.zip          60.1MB
-#>  2: https://fis.fda.gov/content/Exports/faers_ascii_2023q2.zip          64.5MB
-#>  3: https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip          64.3MB
-#>  4: https://fis.fda.gov/content/Exports/faers_ascii_2022Q4.zip            69MB
-#>  5: https://fis.fda.gov/content/Exports/faers_ascii_2022Q3.zip          63.2MB
-#>  6: https://fis.fda.gov/content/Exports/faers_ascii_2022q2.zip            63MB
-#>  7: https://fis.fda.gov/content/Exports/faers_ascii_2022q1.zip          64.7MB
-#>  8: https://fis.fda.gov/content/Exports/faers_ascii_2021Q4.zip            59MB
-#>  9: https://fis.fda.gov/content/Exports/faers_ascii_2021Q3.zip            70MB
-#> 10: https://fis.fda.gov/content/Exports/faers_ascii_2021Q2.zip            66MB
-#> 11: https://fis.fda.gov/content/Exports/faers_ascii_2021Q1.zip            69MB
-#> 12: https://fis.fda.gov/content/Exports/faers_ascii_2020Q4.zip            71MB
-#> 13: https://fis.fda.gov/content/Exports/faers_ascii_2020Q3.zip            64MB
-#> 14: https://fis.fda.gov/content/Exports/faers_ascii_2020Q2.zip            66MB
-#> 15: https://fis.fda.gov/content/Exports/faers_ascii_2020Q1.zip            65MB
-#> 16: https://fis.fda.gov/content/Exports/faers_ascii_2019Q4.zip            60MB
-#> 17: https://fis.fda.gov/content/Exports/faers_ascii_2019Q3.zip            62MB
-#> 18: https://fis.fda.gov/content/Exports/faers_ascii_2019Q2.zip            62MB
-#> 19: https://fis.fda.gov/content/Exports/faers_ascii_2019Q1.zip            56MB
-#> 20: https://fis.fda.gov/content/Exports/faers_ascii_2018q4.zip            60MB
-#> 21: https://fis.fda.gov/content/Exports/faers_ascii_2018q3.zip            60MB
-#> 22: https://fis.fda.gov/content/Exports/faers_ascii_2018q2.zip            60MB
-#> 23: https://fis.fda.gov/content/Exports/faers_ascii_2018q1.zip            52MB
-#> 24: https://fis.fda.gov/content/Exports/faers_ascii_2017q4.zip            41MB
-#> 25: https://fis.fda.gov/content/Exports/faers_ascii_2017q3.zip            48MB
-#> 26: https://fis.fda.gov/content/Exports/faers_ascii_2017q2.zip            46MB
-#> 27: https://fis.fda.gov/content/Exports/faers_ascii_2017q1.zip            48MB
-#> 28: https://fis.fda.gov/content/Exports/faers_ascii_2016q4.zip            44MB
-#> 29: https://fis.fda.gov/content/Exports/faers_ascii_2016q3.zip            46MB
-#> 30: https://fis.fda.gov/content/Exports/faers_ascii_2016q2.zip            44MB
-#> 31: https://fis.fda.gov/content/Exports/faers_ascii_2016q1.zip            46MB
-#> 32: https://fis.fda.gov/content/Exports/faers_ascii_2015q4.zip            42MB
-#> 33: https://fis.fda.gov/content/Exports/faers_ascii_2015q3.zip            47MB
-#> 34: https://fis.fda.gov/content/Exports/faers_ascii_2015q2.zip            38MB
-#> 35: https://fis.fda.gov/content/Exports/faers_ascii_2015q1.zip            39MB
-#> 36: https://fis.fda.gov/content/Exports/faers_ascii_2014q4.zip            28MB
-#> 37: https://fis.fda.gov/content/Exports/faers_ascii_2014q3.zip            28MB
-#> 38: https://fis.fda.gov/content/Exports/faers_ascii_2014q2.zip            25MB
-#> 39: https://fis.fda.gov/content/Exports/faers_ascii_2014q1.zip            30MB
-#> 40: https://fis.fda.gov/content/Exports/faers_ascii_2013q4.zip            26MB
-#> 41: https://fis.fda.gov/content/Exports/faers_ascii_2013q3.zip            22MB
-#> 42: https://fis.fda.gov/content/Exports/faers_ascii_2013q2.zip            21MB
-#> 43: https://fis.fda.gov/content/Exports/faers_ascii_2013q1.zip            25MB
-#> 44: https://fis.fda.gov/content/Exports/faers_ascii_2012q4.zip            28MB
-#> 45:  https://fis.fda.gov/content/Exports/aers_ascii_2012q3.zip            16MB
-#> 46:  https://fis.fda.gov/content/Exports/aers_ascii_2012q2.zip            25MB
-#> 47:  https://fis.fda.gov/content/Exports/aers_ascii_2012q1.zip            26MB
-#> 48:  https://fis.fda.gov/content/Exports/aers_ascii_2011q4.zip            23MB
-#> 49:  https://fis.fda.gov/content/Exports/aers_ascii_2011q3.zip            23MB
-#> 50:  https://fis.fda.gov/content/Exports/aers_ascii_2011q2.zip            23MB
-#> 51:  https://fis.fda.gov/content/Exports/aers_ascii_2011q1.zip            21MB
-#> 52:  https://fis.fda.gov/content/Exports/aers_ascii_2010q4.zip            20MB
-#> 53:  https://fis.fda.gov/content/Exports/aers_ascii_2010q3.zip            22MB
-#> 54:  https://fis.fda.gov/content/Exports/aers_ascii_2010q2.zip            17MB
-#> 55:  https://fis.fda.gov/content/Exports/aers_ascii_2010q1.zip            16MB
-#> 56:  https://fis.fda.gov/content/Exports/aers_ascii_2009q4.zip            16MB
-#> 57:  https://fis.fda.gov/content/Exports/aers_ascii_2009q3.zip            16MB
-#> 58:  https://fis.fda.gov/content/Exports/aers_ascii_2009q2.zip            14MB
-#> 59:  https://fis.fda.gov/content/Exports/aers_ascii_2009q1.zip            13MB
-#> 60:  https://fis.fda.gov/content/Exports/aers_ascii_2008q4.zip            13MB
-#> 61:  https://fis.fda.gov/content/Exports/aers_ascii_2008q3.zip            13MB
-#> 62:  https://fis.fda.gov/content/Exports/aers_ascii_2008q2.zip            12MB
-#> 63:  https://fis.fda.gov/content/Exports/aers_ascii_2008q1.zip            12MB
-#> 64:  https://fis.fda.gov/content/Exports/aers_ascii_2007q4.zip            12MB
-#> 65:  https://fis.fda.gov/content/Exports/aers_ascii_2007q3.zip           9.9MB
-#> 66:  https://fis.fda.gov/content/Exports/aers_ascii_2007q2.zip           9.5MB
-#> 67:  https://fis.fda.gov/content/Exports/aers_ascii_2007q1.zip           9.6MB
-#> 68:  https://fis.fda.gov/content/Exports/aers_ascii_2006q4.zip           9.1MB
-#> 69:  https://fis.fda.gov/content/Exports/aers_ascii_2006q3.zip           8.5MB
-#> 70:  https://fis.fda.gov/content/Exports/aers_ascii_2006q2.zip           9.7MB
+#>  1: https://fis.fda.gov/content/Exports/faers_ascii_2023Q4.zip          69.1MB
+#>  2: https://fis.fda.gov/content/Exports/faers_ascii_2023Q3.zip          60.1MB
+#>  3: https://fis.fda.gov/content/Exports/faers_ascii_2023q2.zip          64.5MB
+#>  4: https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip          64.3MB
+#>  5: https://fis.fda.gov/content/Exports/faers_ascii_2022Q4.zip            69MB
+#>  6: https://fis.fda.gov/content/Exports/faers_ascii_2022Q3.zip          63.2MB
+#>  7: https://fis.fda.gov/content/Exports/faers_ascii_2022q2.zip            63MB
+#>  8: https://fis.fda.gov/content/Exports/faers_ascii_2022q1.zip          64.7MB
+#>  9: https://fis.fda.gov/content/Exports/faers_ascii_2021Q4.zip            59MB
+#> 10: https://fis.fda.gov/content/Exports/faers_ascii_2021Q3.zip            70MB
+#> 11: https://fis.fda.gov/content/Exports/faers_ascii_2021Q2.zip            66MB
+#> 12: https://fis.fda.gov/content/Exports/faers_ascii_2021Q1.zip            69MB
+#> 13: https://fis.fda.gov/content/Exports/faers_ascii_2020Q4.zip            71MB
+#> 14: https://fis.fda.gov/content/Exports/faers_ascii_2020Q3.zip            64MB
+#> 15: https://fis.fda.gov/content/Exports/faers_ascii_2020Q2.zip            66MB
+#> 16: https://fis.fda.gov/content/Exports/faers_ascii_2020Q1.zip            65MB
+#> 17: https://fis.fda.gov/content/Exports/faers_ascii_2019Q4.zip            60MB
+#> 18: https://fis.fda.gov/content/Exports/faers_ascii_2019Q3.zip            62MB
+#> 19: https://fis.fda.gov/content/Exports/faers_ascii_2019Q2.zip            62MB
+#> 20: https://fis.fda.gov/content/Exports/faers_ascii_2019Q1.zip            56MB
+#> 21: https://fis.fda.gov/content/Exports/faers_ascii_2018q4.zip            60MB
+#> 22: https://fis.fda.gov/content/Exports/faers_ascii_2018q3.zip            60MB
+#> 23: https://fis.fda.gov/content/Exports/faers_ascii_2018q2.zip            60MB
+#> 24: https://fis.fda.gov/content/Exports/faers_ascii_2018q1.zip            52MB
+#> 25: https://fis.fda.gov/content/Exports/faers_ascii_2017q4.zip            41MB
+#> 26: https://fis.fda.gov/content/Exports/faers_ascii_2017q3.zip            48MB
+#> 27: https://fis.fda.gov/content/Exports/faers_ascii_2017q2.zip            46MB
+#> 28: https://fis.fda.gov/content/Exports/faers_ascii_2017q1.zip            48MB
+#> 29: https://fis.fda.gov/content/Exports/faers_ascii_2016q4.zip            44MB
+#> 30: https://fis.fda.gov/content/Exports/faers_ascii_2016q3.zip            46MB
+#> 31: https://fis.fda.gov/content/Exports/faers_ascii_2016q2.zip            44MB
+#> 32: https://fis.fda.gov/content/Exports/faers_ascii_2016q1.zip            46MB
+#> 33: https://fis.fda.gov/content/Exports/faers_ascii_2015q4.zip            42MB
+#> 34: https://fis.fda.gov/content/Exports/faers_ascii_2015q3.zip            47MB
+#> 35: https://fis.fda.gov/content/Exports/faers_ascii_2015q2.zip            38MB
+#> 36: https://fis.fda.gov/content/Exports/faers_ascii_2015q1.zip            39MB
+#> 37: https://fis.fda.gov/content/Exports/faers_ascii_2014q4.zip            28MB
+#> 38: https://fis.fda.gov/content/Exports/faers_ascii_2014q3.zip            28MB
+#> 39: https://fis.fda.gov/content/Exports/faers_ascii_2014q2.zip            25MB
+#> 40: https://fis.fda.gov/content/Exports/faers_ascii_2014q1.zip            30MB
+#> 41: https://fis.fda.gov/content/Exports/faers_ascii_2013q4.zip            26MB
+#> 42: https://fis.fda.gov/content/Exports/faers_ascii_2013q3.zip            22MB
+#> 43: https://fis.fda.gov/content/Exports/faers_ascii_2013q2.zip            21MB
+#> 44: https://fis.fda.gov/content/Exports/faers_ascii_2013q1.zip            25MB
+#> 45: https://fis.fda.gov/content/Exports/faers_ascii_2012q4.zip            28MB
+#> 46:  https://fis.fda.gov/content/Exports/aers_ascii_2012q3.zip            16MB
+#> 47:  https://fis.fda.gov/content/Exports/aers_ascii_2012q2.zip            25MB
+#> 48:  https://fis.fda.gov/content/Exports/aers_ascii_2012q1.zip            26MB
+#> 49:  https://fis.fda.gov/content/Exports/aers_ascii_2011q4.zip            23MB
+#> 50:  https://fis.fda.gov/content/Exports/aers_ascii_2011q3.zip            23MB
+#> 51:  https://fis.fda.gov/content/Exports/aers_ascii_2011q2.zip            23MB
+#> 52:  https://fis.fda.gov/content/Exports/aers_ascii_2011q1.zip            21MB
+#> 53:  https://fis.fda.gov/content/Exports/aers_ascii_2010q4.zip            20MB
+#> 54:  https://fis.fda.gov/content/Exports/aers_ascii_2010q3.zip            22MB
+#> 55:  https://fis.fda.gov/content/Exports/aers_ascii_2010q2.zip            17MB
+#> 56:  https://fis.fda.gov/content/Exports/aers_ascii_2010q1.zip            16MB
+#> 57:  https://fis.fda.gov/content/Exports/aers_ascii_2009q4.zip            16MB
+#> 58:  https://fis.fda.gov/content/Exports/aers_ascii_2009q3.zip            16MB
+#> 59:  https://fis.fda.gov/content/Exports/aers_ascii_2009q2.zip            14MB
+#> 60:  https://fis.fda.gov/content/Exports/aers_ascii_2009q1.zip            13MB
+#> 61:  https://fis.fda.gov/content/Exports/aers_ascii_2008q4.zip            13MB
+#> 62:  https://fis.fda.gov/content/Exports/aers_ascii_2008q3.zip            13MB
+#> 63:  https://fis.fda.gov/content/Exports/aers_ascii_2008q2.zip            12MB
+#> 64:  https://fis.fda.gov/content/Exports/aers_ascii_2008q1.zip            12MB
+#> 65:  https://fis.fda.gov/content/Exports/aers_ascii_2007q4.zip            12MB
+#> 66:  https://fis.fda.gov/content/Exports/aers_ascii_2007q3.zip           9.9MB
+#> 67:  https://fis.fda.gov/content/Exports/aers_ascii_2007q2.zip           9.5MB
+#> 68:  https://fis.fda.gov/content/Exports/aers_ascii_2007q1.zip           9.6MB
+#> 69:  https://fis.fda.gov/content/Exports/aers_ascii_2006q4.zip           9.1MB
+#> 70:  https://fis.fda.gov/content/Exports/aers_ascii_2006q3.zip           8.5MB
 #>                                                     xml_urls xml_file_size
 #>                                                       <char>        <char>
-#>  1: https://fis.fda.gov/content/Exports/faers_xml_2023Q3.zip         123MB
-#>  2: https://fis.fda.gov/content/Exports/faers_xml_2023q2.zip         130MB
-#>  3: https://fis.fda.gov/content/Exports/faers_xml_2023q1.zip         133MB
-#>  4: https://fis.fda.gov/content/Exports/faers_xml_2022Q4.zip         144MB
-#>  5: https://fis.fda.gov/content/Exports/faers_xml_2022Q3.zip         132MB
-#>  6: https://fis.fda.gov/content/Exports/faers_xml_2022q2.zip         140MB
-#>  7: https://fis.fda.gov/content/Exports/faers_xml_2022q1.zip         136MB
-#>  8: https://fis.fda.gov/content/Exports/faers_xml_2021Q4.zip         123MB
-#>  9: https://fis.fda.gov/content/Exports/faers_xml_2021Q3.zip         132MB
-#> 10: https://fis.fda.gov/content/Exports/faers_xml_2021Q2.zip         123MB
-#> 11: https://fis.fda.gov/content/Exports/faers_xml_2021Q1.zip         130MB
-#> 12: https://fis.fda.gov/content/Exports/faers_xml_2020Q4.zip         131MB
-#> 13: https://fis.fda.gov/content/Exports/faers_xml_2020Q3.zip         121MB
-#> 14: https://fis.fda.gov/content/Exports/faers_xml_2020Q2.zip         123MB
-#> 15: https://fis.fda.gov/content/Exports/faers_xml_2020Q1.zip         125MB
-#> 16: https://fis.fda.gov/content/Exports/faers_xml_2019Q4.zip         113MB
-#> 17: https://fis.fda.gov/content/Exports/faers_xml_2019Q3.zip         118MB
-#> 18: https://fis.fda.gov/content/Exports/faers_xml_2019Q2.zip         118MB
-#> 19: https://fis.fda.gov/content/Exports/faers_xml_2019Q1.zip         103MB
-#> 20: https://fis.fda.gov/content/Exports/faers_xml_2018q4.zip         112MB
-#> 21: https://fis.fda.gov/content/Exports/faers_xml_2018q3.zip         112MB
-#> 22: https://fis.fda.gov/content/Exports/faers_xml_2018q2.zip         112MB
-#> 23: https://fis.fda.gov/content/Exports/faers_xml_2018q1.zip          94MB
-#> 24: https://fis.fda.gov/content/Exports/faers_xml_2017q4.zip          76MB
-#> 25: https://fis.fda.gov/content/Exports/faers_xml_2017q3.zip          91MB
-#> 26: https://fis.fda.gov/content/Exports/faers_xml_2017q2.zip          86MB
-#> 27: https://fis.fda.gov/content/Exports/faers_xml_2017q1.zip          91MB
-#> 28: https://fis.fda.gov/content/Exports/faers_xml_2016q4.zip          82MB
-#> 29: https://fis.fda.gov/content/Exports/faers_xml_2016q3.zip          87MB
-#> 30: https://fis.fda.gov/content/Exports/faers_xml_2016q2.zip          81MB
-#> 31: https://fis.fda.gov/content/Exports/faers_xml_2016q1.zip          84MB
-#> 32: https://fis.fda.gov/content/Exports/faers_xml_2015q4.zip          77MB
-#> 33: https://fis.fda.gov/content/Exports/faers_xml_2015q3.zip          88MB
-#> 34: https://fis.fda.gov/content/Exports/faers_xml_2015q2.zip          70MB
-#> 35: https://fis.fda.gov/content/Exports/faers_xml_2015q1.zip          72MB
-#> 36: https://fis.fda.gov/content/Exports/faers_xml_2014q4.zip          53MB
-#> 37: https://fis.fda.gov/content/Exports/faers_xml_2014q3.zip          54MB
-#> 38: https://fis.fda.gov/content/Exports/faers_xml_2014q2.zip          44MB
-#> 39: https://fis.fda.gov/content/Exports/faers_xml_2014q1.zip          52MB
-#> 40: https://fis.fda.gov/content/Exports/faers_xml_2013q4.zip          46MB
-#> 41: https://fis.fda.gov/content/Exports/faers_xml_2013q3.zip          40MB
-#> 42: https://fis.fda.gov/content/Exports/faers_xml_2013q2.zip          38MB
-#> 43: https://fis.fda.gov/content/Exports/faers_xml_2013q1.zip          44MB
-#> 44: https://fis.fda.gov/content/Exports/faers_xml_2012q4.zip          50MB
-#> 45: https://fis.fda.gov/content/Exports/aers_sgml_2012q3.zip          21MB
-#> 46: https://fis.fda.gov/content/Exports/aers_sgml_2012q2.zip          32MB
-#> 47: https://fis.fda.gov/content/Exports/aers_sgml_2012q1.zip          33MB
-#> 48: https://fis.fda.gov/content/Exports/aers_sgml_2011q4.zip          29MB
-#> 49: https://fis.fda.gov/content/Exports/aers_sgml_2011q3.zip          29MB
-#> 50: https://fis.fda.gov/content/Exports/aers_sgml_2011q2.zip          29MB
-#> 51: https://fis.fda.gov/content/Exports/aers_sgml_2011q1.zip          26MB
-#> 52: https://fis.fda.gov/content/Exports/aers_sgml_2010q4.zip          25MB
-#> 53: https://fis.fda.gov/content/Exports/aers_sgml_2010q3.zip          28MB
-#> 54: https://fis.fda.gov/content/Exports/aers_sgml_2010q2.zip          22MB
-#> 55: https://fis.fda.gov/content/Exports/aers_sgml_2010q1.zip          20MB
-#> 56: https://fis.fda.gov/content/Exports/aers_sgml_2009q4.zip          20MB
-#> 57: https://fis.fda.gov/content/Exports/aers_sgml_2009q3.zip          19MB
-#> 58: https://fis.fda.gov/content/Exports/aers_sgml_2009q2.zip          18MB
-#> 59: https://fis.fda.gov/content/Exports/aers_sgml_2009q1.zip          16MB
-#> 60: https://fis.fda.gov/content/Exports/aers_sgml_2008q4.zip          16MB
-#> 61: https://fis.fda.gov/content/Exports/aers_sgml_2008q3.zip          16MB
-#> 62: https://fis.fda.gov/content/Exports/aers_sgml_2008q2.zip          16MB
-#> 63: https://fis.fda.gov/content/Exports/aers_sgml_2008q1.zip          15MB
-#> 64: https://fis.fda.gov/content/Exports/aers_sgml_2007q4.zip          14MB
-#> 65: https://fis.fda.gov/content/Exports/aers_sgml_2007q3.zip          13MB
-#> 66: https://fis.fda.gov/content/Exports/aers_sgml_2007q2.zip          12MB
-#> 67: https://fis.fda.gov/content/Exports/aers_sgml_2007q1.zip          12MB
-#> 68: https://fis.fda.gov/content/Exports/aers_sgml_2006q4.zip          12MB
-#> 69: https://fis.fda.gov/content/Exports/aers_sgml_2006q3.zip          11MB
-#> 70: https://fis.fda.gov/content/Exports/aers_sgml_2006q2.zip          13MB
-#>  [ reached getOption("max.print") -- omitted 10 rows ]
+#>  1: https://fis.fda.gov/content/Exports/faers_xml_2023Q4.zip         140MB
+#>  2: https://fis.fda.gov/content/Exports/faers_xml_2023Q3.zip         123MB
+#>  3: https://fis.fda.gov/content/Exports/faers_xml_2023q2.zip         130MB
+#>  4: https://fis.fda.gov/content/Exports/faers_xml_2023q1.zip         133MB
+#>  5: https://fis.fda.gov/content/Exports/faers_xml_2022Q4.zip         144MB
+#>  6: https://fis.fda.gov/content/Exports/faers_xml_2022Q3.zip         132MB
+#>  7: https://fis.fda.gov/content/Exports/faers_xml_2022q2.zip         140MB
+#>  8: https://fis.fda.gov/content/Exports/faers_xml_2022q1.zip         136MB
+#>  9: https://fis.fda.gov/content/Exports/faers_xml_2021Q4.zip         123MB
+#> 10: https://fis.fda.gov/content/Exports/faers_xml_2021Q3.zip         132MB
+#> 11: https://fis.fda.gov/content/Exports/faers_xml_2021Q2.zip         123MB
+#> 12: https://fis.fda.gov/content/Exports/faers_xml_2021Q1.zip         130MB
+#> 13: https://fis.fda.gov/content/Exports/faers_xml_2020Q4.zip         131MB
+#> 14: https://fis.fda.gov/content/Exports/faers_xml_2020Q3.zip         121MB
+#> 15: https://fis.fda.gov/content/Exports/faers_xml_2020Q2.zip         123MB
+#> 16: https://fis.fda.gov/content/Exports/faers_xml_2020Q1.zip         125MB
+#> 17: https://fis.fda.gov/content/Exports/faers_xml_2019Q4.zip         113MB
+#> 18: https://fis.fda.gov/content/Exports/faers_xml_2019Q3.zip         118MB
+#> 19: https://fis.fda.gov/content/Exports/faers_xml_2019Q2.zip         118MB
+#> 20: https://fis.fda.gov/content/Exports/faers_xml_2019Q1.zip         103MB
+#> 21: https://fis.fda.gov/content/Exports/faers_xml_2018q4.zip         112MB
+#> 22: https://fis.fda.gov/content/Exports/faers_xml_2018q3.zip         112MB
+#> 23: https://fis.fda.gov/content/Exports/faers_xml_2018q2.zip         112MB
+#> 24: https://fis.fda.gov/content/Exports/faers_xml_2018q1.zip          94MB
+#> 25: https://fis.fda.gov/content/Exports/faers_xml_2017q4.zip          76MB
+#> 26: https://fis.fda.gov/content/Exports/faers_xml_2017q3.zip          91MB
+#> 27: https://fis.fda.gov/content/Exports/faers_xml_2017q2.zip          86MB
+#> 28: https://fis.fda.gov/content/Exports/faers_xml_2017q1.zip          91MB
+#> 29: https://fis.fda.gov/content/Exports/faers_xml_2016q4.zip          82MB
+#> 30: https://fis.fda.gov/content/Exports/faers_xml_2016q3.zip          87MB
+#> 31: https://fis.fda.gov/content/Exports/faers_xml_2016q2.zip          81MB
+#> 32: https://fis.fda.gov/content/Exports/faers_xml_2016q1.zip          84MB
+#> 33: https://fis.fda.gov/content/Exports/faers_xml_2015q4.zip          77MB
+#> 34: https://fis.fda.gov/content/Exports/faers_xml_2015q3.zip          88MB
+#> 35: https://fis.fda.gov/content/Exports/faers_xml_2015q2.zip          70MB
+#> 36: https://fis.fda.gov/content/Exports/faers_xml_2015q1.zip          72MB
+#> 37: https://fis.fda.gov/content/Exports/faers_xml_2014q4.zip          53MB
+#> 38: https://fis.fda.gov/content/Exports/faers_xml_2014q3.zip          54MB
+#> 39: https://fis.fda.gov/content/Exports/faers_xml_2014q2.zip          44MB
+#> 40: https://fis.fda.gov/content/Exports/faers_xml_2014q1.zip          52MB
+#> 41: https://fis.fda.gov/content/Exports/faers_xml_2013q4.zip          46MB
+#> 42: https://fis.fda.gov/content/Exports/faers_xml_2013q3.zip          40MB
+#> 43: https://fis.fda.gov/content/Exports/faers_xml_2013q2.zip          38MB
+#> 44: https://fis.fda.gov/content/Exports/faers_xml_2013q1.zip          44MB
+#> 45: https://fis.fda.gov/content/Exports/faers_xml_2012q4.zip          50MB
+#> 46: https://fis.fda.gov/content/Exports/aers_sgml_2012q3.zip          21MB
+#> 47: https://fis.fda.gov/content/Exports/aers_sgml_2012q2.zip          32MB
+#> 48: https://fis.fda.gov/content/Exports/aers_sgml_2012q1.zip          33MB
+#> 49: https://fis.fda.gov/content/Exports/aers_sgml_2011q4.zip          29MB
+#> 50: https://fis.fda.gov/content/Exports/aers_sgml_2011q3.zip          29MB
+#> 51: https://fis.fda.gov/content/Exports/aers_sgml_2011q2.zip          29MB
+#> 52: https://fis.fda.gov/content/Exports/aers_sgml_2011q1.zip          26MB
+#> 53: https://fis.fda.gov/content/Exports/aers_sgml_2010q4.zip          25MB
+#> 54: https://fis.fda.gov/content/Exports/aers_sgml_2010q3.zip          28MB
+#> 55: https://fis.fda.gov/content/Exports/aers_sgml_2010q2.zip          22MB
+#> 56: https://fis.fda.gov/content/Exports/aers_sgml_2010q1.zip          20MB
+#> 57: https://fis.fda.gov/content/Exports/aers_sgml_2009q4.zip          20MB
+#> 58: https://fis.fda.gov/content/Exports/aers_sgml_2009q3.zip          19MB
+#> 59: https://fis.fda.gov/content/Exports/aers_sgml_2009q2.zip          18MB
+#> 60: https://fis.fda.gov/content/Exports/aers_sgml_2009q1.zip          16MB
+#> 61: https://fis.fda.gov/content/Exports/aers_sgml_2008q4.zip          16MB
+#> 62: https://fis.fda.gov/content/Exports/aers_sgml_2008q3.zip          16MB
+#> 63: https://fis.fda.gov/content/Exports/aers_sgml_2008q2.zip          16MB
+#> 64: https://fis.fda.gov/content/Exports/aers_sgml_2008q1.zip          15MB
+#> 65: https://fis.fda.gov/content/Exports/aers_sgml_2007q4.zip          14MB
+#> 66: https://fis.fda.gov/content/Exports/aers_sgml_2007q3.zip          13MB
+#> 67: https://fis.fda.gov/content/Exports/aers_sgml_2007q2.zip          12MB
+#> 68: https://fis.fda.gov/content/Exports/aers_sgml_2007q1.zip          12MB
+#> 69: https://fis.fda.gov/content/Exports/aers_sgml_2006q4.zip          12MB
+#> 70: https://fis.fda.gov/content/Exports/aers_sgml_2006q3.zip          11MB
+#>  [ reached getOption("max.print") -- omitted 11 rows ]
 ```
 
 An metadata copy was associated with the package, just set `internal =
@@ -309,7 +309,7 @@ more up-to-date than this metadata copy.
 
 ``` r
 faers_clearcache("metadata")
-#> ✔ Removing '~/.cache/R/faers/metadata' successfully
+#> ✔ Removing '/home/yun/.cache/R/faers/faers/metadata' successfully
 faers_meta(internal = TRUE)
 #> → Using internal FAERS metadata
 #>   Snapshot time: 2023-11-08 13:06:35.726011
@@ -1106,20 +1106,20 @@ Furthermore, we extract the brand names of insulin from the
 dataset, which can be easily obtained using the `fda_drugs()` function.
 
 ``` r
-insulin_pattern <- "insulin"
-insulin_pattern <- paste(insulin_pattern, collapse = "|")
+insulin_names <- "insulin"
+insulin_pattern <- paste(insulin_names, collapse = "|")
 fda_insulin <- fda_drugs()[
     grepl(insulin_pattern, ActiveIngredient, ignore.case = TRUE)
 ]
 #> → Using Drugs@FDA data from cached
-#>   '/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2024-01-14.zip'
-#>   Snapshot date: 2024-01-14
+#>   '/home/yun/.cache/R/faers/faers/fdadrugs/fda_drugs_data_2024-03-14.zip'
+#>   Snapshot date: 2024-03-14
 #> Warning: One or more parsing issues, call `problems()` on your data frame for details,
 #> e.g.:
 #>   dat <- vroom(...)
 #>   problems(dat)
 insulin_pattern <- paste0(
-    unique(tolower(c(insulin_pattern, fda_insulin$DrugName))),
+    unique(tolower(c(insulin_names, fda_insulin$DrugName))),
     collapse = "|"
 )
 insulin_data <- faers_filter(data, .fn = function(x) {
@@ -1422,28 +1422,27 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] faers_0.99.4
+#> [1] faers_0.99.5
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] generics_0.1.3      rappdirs_0.3.3      utf8_1.2.4         
-#>  [4] xml2_1.3.6          openEBGM_0.9.1      stringi_1.8.3      
-#>  [7] lattice_0.22-5      digest_0.6.33       magrittr_2.0.3     
-#> [10] evaluate_0.23       grid_4.3.1          MCMCpack_1.6-3     
-#> [13] fastmap_1.1.1       Matrix_1.6-4        survival_3.5-7     
-#> [16] mcmc_0.9-7          httr_1.4.7          rvest_1.0.3        
-#> [19] fansi_1.0.6         selectr_0.4-2       scales_1.3.0       
-#> [22] codetools_0.2-19    cli_3.6.2           rlang_1.1.2        
-#> [25] crayon_1.5.2        munsell_0.5.0       bit64_4.0.5        
-#> [28] splines_4.3.1       yaml_2.3.8          tools_4.3.1        
-#> [31] parallel_4.3.1      SparseM_1.81        tzdb_0.4.0         
-#> [34] BiocParallel_1.34.2 MatrixModels_0.5-2  coda_0.19-4        
-#> [37] dplyr_1.1.4         colorspace_2.1-0    ggplot2_3.4.4      
-#> [40] curl_5.2.0          vctrs_0.6.5         R6_2.5.1           
-#> [43] lifecycle_1.0.4     stringr_1.5.1       bit_4.0.5          
-#> [46] vroom_1.6.5         MASS_7.3-60         pkgconfig_2.0.3    
-#> [49] archive_1.1.6       gtable_0.3.4        pillar_1.9.0       
-#> [52] data.table_1.14.99  glue_1.6.2          xfun_0.41          
-#> [55] tibble_3.2.1        tidyselect_1.2.0    knitr_1.45         
-#> [58] htmltools_0.5.7     rmarkdown_2.25      compiler_4.3.1     
-#> [61] quantreg_5.96
+#>  [1] generics_0.1.3      utf8_1.2.4          xml2_1.3.6         
+#>  [4] openEBGM_0.9.1      stringi_1.8.3       lattice_0.22-5     
+#>  [7] digest_0.6.33       magrittr_2.0.3      evaluate_0.23      
+#> [10] grid_4.3.1          MCMCpack_1.6-3      fastmap_1.1.1      
+#> [13] Matrix_1.6-4        survival_3.5-7      mcmc_0.9-7         
+#> [16] httr_1.4.7          rvest_1.0.3         fansi_1.0.6        
+#> [19] selectr_0.4-2       scales_1.3.0        codetools_0.2-19   
+#> [22] cli_3.6.2           rlang_1.1.2         crayon_1.5.2       
+#> [25] munsell_0.5.0       bit64_4.0.5         splines_4.3.1      
+#> [28] yaml_2.3.8          tools_4.3.1         parallel_4.3.1     
+#> [31] SparseM_1.81        tzdb_0.4.0          BiocParallel_1.34.2
+#> [34] MatrixModels_0.5-2  coda_0.19-4         dplyr_1.1.4        
+#> [37] colorspace_2.1-0    ggplot2_3.4.4       curl_5.2.0         
+#> [40] vctrs_0.6.5         R6_2.5.1            lifecycle_1.0.4    
+#> [43] stringr_1.5.1       bit_4.0.5           vroom_1.6.5        
+#> [46] MASS_7.3-60         pkgconfig_2.0.3     archive_1.1.6      
+#> [49] gtable_0.3.4        pillar_1.9.0        data.table_1.14.99 
+#> [52] glue_1.6.2          xfun_0.41           tibble_3.2.1       
+#> [55] tidyselect_1.2.0    knitr_1.45          htmltools_0.5.7    
+#> [58] rmarkdown_2.25      compiler_4.3.1      quantreg_5.96
 ```

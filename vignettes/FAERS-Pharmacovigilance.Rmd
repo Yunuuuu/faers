@@ -65,7 +65,7 @@ if (!requireNamespace("pak")) {
         )
     )
 }
-pak::pkg_install("Yunuuuu/faers")
+pak::pkg_install("Yunuuuu/faers@main")
 ```
 
 ## Pharmacovigilance Analysis using FAERS
@@ -81,7 +81,7 @@ library(faers)
 ### Check metadata of FAERS
 This will return a data.table reporting years, period, quarter, and file urls
 and file sizes. By default, this will use the cached file in
-`rappdirs::user_cache_dir("faers")`.  If it doesn't exist, the internal will
+`tools::R_user_dir("faers", "cache")`.  If it doesn't exist, the internal will
 parse metadata in <`r sprintf("%s/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html",
 faers:::fda_host("fis"))`> 
 ```{r}
@@ -216,13 +216,13 @@ return the `primaryid` that you want to keep.
 
 To enhance our analysis, it would be advantageous to include all drug synonym names for `insulin`. These synonyms can be obtained by querying sources such as https://go.drugbank.com/ or alternative databases. Furthermore, we extract the brand names of insulin from the [Drugs@FDA](https://www.fda.gov/drugs/drug-approvals-and-databases/drugsfda-data-files) dataset, which can be easily obtained using the `fda_drugs()` function. 
 ```{r}
-insulin_pattern <- "insulin"
-insulin_pattern <- paste(insulin_pattern, collapse = "|")
+insulin_names <- "insulin"
+insulin_pattern <- paste(insulin_names, collapse = "|")
 fda_insulin <- fda_drugs()[
     grepl(insulin_pattern, ActiveIngredient, ignore.case = TRUE)
 ]
 insulin_pattern <- paste0(
-    unique(tolower(c(insulin_pattern, fda_insulin$DrugName))),
+    unique(tolower(c(insulin_names, fda_insulin$DrugName))),
     collapse = "|"
 )
 insulin_data <- faers_filter(data, .fn = function(x) {

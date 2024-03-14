@@ -631,237 +631,237 @@ body {
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>        )</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>    )</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>}</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>pak<span class="op">::</span><span class="kw">pkg_install</span>(<span class="st">&quot;Yunuuuu/faers&quot;</span>)</span></code></pre></div>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>pak<span class="op">::</span><span class="kw">pkg_install</span>(<span class="st">&quot;Yunuuuu/faers@main&quot;</span>)</span></code></pre></div>
 <h2 id="pharmacovigilance-analysis-using-faers">Pharmacovigilance Analysis using FAERS</h2>
 <p>FAERS is a database for the spontaneous reporting of adverse events and medication errors involving human drugs and therapeutic biological products. This package accelarate the process of Pharmacovigilance Analysis using FAERS.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">library</span>(faers)</span></code></pre></div>
 <h3 id="check-metadata-of-faers">Check metadata of FAERS</h3>
-<p>This will return a data.table reporting years, period, quarter, and file urls and file sizes. By default, this will use the cached file in <code>rappdirs::user_cache_dir(&quot;faers&quot;)</code>. If it doesn’t exist, the internal will parse metadata in <a href="https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html">https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html</a></p>
+<p>This will return a data.table reporting years, period, quarter, and file urls and file sizes. By default, this will use the cached file in <code>tools::R_user_dir(&quot;faers&quot;, &quot;cache&quot;)</code>. If it doesn’t exist, the internal will parse metadata in <a href="https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html">https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html</a></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">faers_meta</span>()</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">#&gt; → Reading html:</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co">#&gt;   &lt;https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html&gt;</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co">#&gt; → Writing FAERS metadata into cache file</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co">#&gt;   &#39;~/.cache/R/faers/metadata/faers_meta_data.rds&#39;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co">#&gt;   &#39;/home/yun/.cache/R/faers/faers/metadata/faers_meta_data.rds&#39;</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co">#&gt;      year quarter             period</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="co">#&gt;     &lt;int&gt;  &lt;char&gt;             &lt;char&gt;</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co">#&gt;  1:  2023      q3   July - September</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="co">#&gt;  2:  2023      q2       April - June</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="co">#&gt;  3:  2023      q1    January - March</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="co">#&gt;  4:  2022      q4 October - December</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co">#&gt;  5:  2022      q3   July - September</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="co">#&gt;  6:  2022      q2       April - June</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="co">#&gt;  7:  2022      q1    January - March</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="co">#&gt;  8:  2021      q4 October - December</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="co">#&gt;  9:  2021      q3   July - September</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a><span class="co">#&gt; 10:  2021      q2       April - June</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a><span class="co">#&gt; 11:  2021      q1    January - March</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a><span class="co">#&gt; 12:  2020      q4 October - December</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a><span class="co">#&gt; 13:  2020      q3   July - September</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a><span class="co">#&gt; 14:  2020      q2       April - June</span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a><span class="co">#&gt; 15:  2020      q1    January - March</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a><span class="co">#&gt; 16:  2019      q4 October - December</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a><span class="co">#&gt; 17:  2019      q3   July - September</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a><span class="co">#&gt; 18:  2019      q2       April - June</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a><span class="co">#&gt; 19:  2019      q1    January - March</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a><span class="co">#&gt; 20:  2018      q4 October - December</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a><span class="co">#&gt; 21:  2018      q3   July - September</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a><span class="co">#&gt; 22:  2018      q2       April - June</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a><span class="co">#&gt; 23:  2018      q1    January - March</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="co">#&gt; 24:  2017      q4 October - December</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a><span class="co">#&gt; 25:  2017      q3   July - September</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a><span class="co">#&gt; 26:  2017      q2       April - June</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a><span class="co">#&gt; 27:  2017      q1    January - March</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a><span class="co">#&gt; 28:  2016      q4 October - December</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a><span class="co">#&gt; 29:  2016      q3   July - September</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a><span class="co">#&gt; 30:  2016      q2       April - June</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a><span class="co">#&gt; 31:  2016      q1    January - March</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a><span class="co">#&gt; 32:  2015      q4 October - December</span></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true"></a><span class="co">#&gt; 33:  2015      q3   July - September</span></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true"></a><span class="co">#&gt; 34:  2015      q2       April - June</span></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true"></a><span class="co">#&gt; 35:  2015      q1    January - March</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true"></a><span class="co">#&gt; 36:  2014      q4 October - December</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true"></a><span class="co">#&gt; 37:  2014      q3   July - September</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true"></a><span class="co">#&gt; 38:  2014      q2       April - June</span></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true"></a><span class="co">#&gt; 39:  2014      q1    January - March</span></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true"></a><span class="co">#&gt; 40:  2013      q4 October - December</span></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true"></a><span class="co">#&gt; 41:  2013      q3   July - September</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true"></a><span class="co">#&gt; 42:  2013      q2       April - June</span></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true"></a><span class="co">#&gt; 43:  2013      q1    January - March</span></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true"></a><span class="co">#&gt; 44:  2012      q4 October - December</span></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true"></a><span class="co">#&gt; 45:  2012      q3   July - September</span></span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true"></a><span class="co">#&gt; 46:  2012      q2       April - June</span></span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true"></a><span class="co">#&gt; 47:  2012      q1    January - March</span></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true"></a><span class="co">#&gt; 48:  2011      q4 October - December</span></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true"></a><span class="co">#&gt; 49:  2011      q3   July - September</span></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true"></a><span class="co">#&gt; 50:  2011      q2       April - June</span></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true"></a><span class="co">#&gt; 51:  2011      q1    January - March</span></span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true"></a><span class="co">#&gt; 52:  2010      q4 October - December</span></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true"></a><span class="co">#&gt; 53:  2010      q3   July - September</span></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true"></a><span class="co">#&gt; 54:  2010      q2       April - June</span></span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true"></a><span class="co">#&gt; 55:  2010      q1    January - March</span></span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true"></a><span class="co">#&gt; 56:  2009      q4 October - December</span></span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true"></a><span class="co">#&gt; 57:  2009      q3   July - September</span></span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true"></a><span class="co">#&gt; 58:  2009      q2       April - June</span></span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true"></a><span class="co">#&gt; 59:  2009      q1    January - March</span></span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true"></a><span class="co">#&gt; 60:  2008      q4 October - December</span></span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true"></a><span class="co">#&gt; 61:  2008      q3   July - September</span></span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true"></a><span class="co">#&gt; 62:  2008      q2       April - June</span></span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true"></a><span class="co">#&gt; 63:  2008      q1    January - March</span></span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true"></a><span class="co">#&gt; 64:  2007      q4 October - December</span></span>
-<span id="cb4-72"><a href="#cb4-72" aria-hidden="true"></a><span class="co">#&gt; 65:  2007      q3   July - September</span></span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true"></a><span class="co">#&gt; 66:  2007      q2       April - June</span></span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true"></a><span class="co">#&gt; 67:  2007      q1    January - March</span></span>
-<span id="cb4-75"><a href="#cb4-75" aria-hidden="true"></a><span class="co">#&gt; 68:  2006      q4 October - December</span></span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true"></a><span class="co">#&gt; 69:  2006      q3   July - September</span></span>
-<span id="cb4-77"><a href="#cb4-77" aria-hidden="true"></a><span class="co">#&gt; 70:  2006      q2       April - June</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co">#&gt;  1:  2023      q4 October - December</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="co">#&gt;  2:  2023      q3   July - September</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="co">#&gt;  3:  2023      q2       April - June</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="co">#&gt;  4:  2023      q1    January - March</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co">#&gt;  5:  2022      q4 October - December</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="co">#&gt;  6:  2022      q3   July - September</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="co">#&gt;  7:  2022      q2       April - June</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="co">#&gt;  8:  2022      q1    January - March</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="co">#&gt;  9:  2021      q4 October - December</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a><span class="co">#&gt; 10:  2021      q3   July - September</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a><span class="co">#&gt; 11:  2021      q2       April - June</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a><span class="co">#&gt; 12:  2021      q1    January - March</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a><span class="co">#&gt; 13:  2020      q4 October - December</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a><span class="co">#&gt; 14:  2020      q3   July - September</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a><span class="co">#&gt; 15:  2020      q2       April - June</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a><span class="co">#&gt; 16:  2020      q1    January - March</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a><span class="co">#&gt; 17:  2019      q4 October - December</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a><span class="co">#&gt; 18:  2019      q3   July - September</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a><span class="co">#&gt; 19:  2019      q2       April - June</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a><span class="co">#&gt; 20:  2019      q1    January - March</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a><span class="co">#&gt; 21:  2018      q4 October - December</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a><span class="co">#&gt; 22:  2018      q3   July - September</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a><span class="co">#&gt; 23:  2018      q2       April - June</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="co">#&gt; 24:  2018      q1    January - March</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a><span class="co">#&gt; 25:  2017      q4 October - December</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a><span class="co">#&gt; 26:  2017      q3   July - September</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a><span class="co">#&gt; 27:  2017      q2       April - June</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a><span class="co">#&gt; 28:  2017      q1    January - March</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a><span class="co">#&gt; 29:  2016      q4 October - December</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a><span class="co">#&gt; 30:  2016      q3   July - September</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a><span class="co">#&gt; 31:  2016      q2       April - June</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a><span class="co">#&gt; 32:  2016      q1    January - March</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true"></a><span class="co">#&gt; 33:  2015      q4 October - December</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true"></a><span class="co">#&gt; 34:  2015      q3   July - September</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true"></a><span class="co">#&gt; 35:  2015      q2       April - June</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true"></a><span class="co">#&gt; 36:  2015      q1    January - March</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true"></a><span class="co">#&gt; 37:  2014      q4 October - December</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true"></a><span class="co">#&gt; 38:  2014      q3   July - September</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true"></a><span class="co">#&gt; 39:  2014      q2       April - June</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true"></a><span class="co">#&gt; 40:  2014      q1    January - March</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true"></a><span class="co">#&gt; 41:  2013      q4 October - December</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true"></a><span class="co">#&gt; 42:  2013      q3   July - September</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true"></a><span class="co">#&gt; 43:  2013      q2       April - June</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true"></a><span class="co">#&gt; 44:  2013      q1    January - March</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true"></a><span class="co">#&gt; 45:  2012      q4 October - December</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true"></a><span class="co">#&gt; 46:  2012      q3   July - September</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true"></a><span class="co">#&gt; 47:  2012      q2       April - June</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true"></a><span class="co">#&gt; 48:  2012      q1    January - March</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true"></a><span class="co">#&gt; 49:  2011      q4 October - December</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true"></a><span class="co">#&gt; 50:  2011      q3   July - September</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true"></a><span class="co">#&gt; 51:  2011      q2       April - June</span></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true"></a><span class="co">#&gt; 52:  2011      q1    January - March</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true"></a><span class="co">#&gt; 53:  2010      q4 October - December</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true"></a><span class="co">#&gt; 54:  2010      q3   July - September</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true"></a><span class="co">#&gt; 55:  2010      q2       April - June</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true"></a><span class="co">#&gt; 56:  2010      q1    January - March</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true"></a><span class="co">#&gt; 57:  2009      q4 October - December</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true"></a><span class="co">#&gt; 58:  2009      q3   July - September</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true"></a><span class="co">#&gt; 59:  2009      q2       April - June</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true"></a><span class="co">#&gt; 60:  2009      q1    January - March</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true"></a><span class="co">#&gt; 61:  2008      q4 October - December</span></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true"></a><span class="co">#&gt; 62:  2008      q3   July - September</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true"></a><span class="co">#&gt; 63:  2008      q2       April - June</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true"></a><span class="co">#&gt; 64:  2008      q1    January - March</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true"></a><span class="co">#&gt; 65:  2007      q4 October - December</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true"></a><span class="co">#&gt; 66:  2007      q3   July - September</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true"></a><span class="co">#&gt; 67:  2007      q2       April - June</span></span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true"></a><span class="co">#&gt; 68:  2007      q1    January - March</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true"></a><span class="co">#&gt; 69:  2006      q4 October - December</span></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true"></a><span class="co">#&gt; 70:  2006      q3   July - September</span></span>
 <span id="cb4-78"><a href="#cb4-78" aria-hidden="true"></a><span class="co">#&gt;                                                     ascii_urls ascii_file_size</span></span>
 <span id="cb4-79"><a href="#cb4-79" aria-hidden="true"></a><span class="co">#&gt;                                                         &lt;char&gt;          &lt;char&gt;</span></span>
-<span id="cb4-80"><a href="#cb4-80" aria-hidden="true"></a><span class="co">#&gt;  1: https://fis.fda.gov/content/Exports/faers_ascii_2023Q3.zip          60.1MB</span></span>
-<span id="cb4-81"><a href="#cb4-81" aria-hidden="true"></a><span class="co">#&gt;  2: https://fis.fda.gov/content/Exports/faers_ascii_2023q2.zip          64.5MB</span></span>
-<span id="cb4-82"><a href="#cb4-82" aria-hidden="true"></a><span class="co">#&gt;  3: https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip          64.3MB</span></span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true"></a><span class="co">#&gt;  4: https://fis.fda.gov/content/Exports/faers_ascii_2022Q4.zip            69MB</span></span>
-<span id="cb4-84"><a href="#cb4-84" aria-hidden="true"></a><span class="co">#&gt;  5: https://fis.fda.gov/content/Exports/faers_ascii_2022Q3.zip          63.2MB</span></span>
-<span id="cb4-85"><a href="#cb4-85" aria-hidden="true"></a><span class="co">#&gt;  6: https://fis.fda.gov/content/Exports/faers_ascii_2022q2.zip            63MB</span></span>
-<span id="cb4-86"><a href="#cb4-86" aria-hidden="true"></a><span class="co">#&gt;  7: https://fis.fda.gov/content/Exports/faers_ascii_2022q1.zip          64.7MB</span></span>
-<span id="cb4-87"><a href="#cb4-87" aria-hidden="true"></a><span class="co">#&gt;  8: https://fis.fda.gov/content/Exports/faers_ascii_2021Q4.zip            59MB</span></span>
-<span id="cb4-88"><a href="#cb4-88" aria-hidden="true"></a><span class="co">#&gt;  9: https://fis.fda.gov/content/Exports/faers_ascii_2021Q3.zip            70MB</span></span>
-<span id="cb4-89"><a href="#cb4-89" aria-hidden="true"></a><span class="co">#&gt; 10: https://fis.fda.gov/content/Exports/faers_ascii_2021Q2.zip            66MB</span></span>
-<span id="cb4-90"><a href="#cb4-90" aria-hidden="true"></a><span class="co">#&gt; 11: https://fis.fda.gov/content/Exports/faers_ascii_2021Q1.zip            69MB</span></span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true"></a><span class="co">#&gt; 12: https://fis.fda.gov/content/Exports/faers_ascii_2020Q4.zip            71MB</span></span>
-<span id="cb4-92"><a href="#cb4-92" aria-hidden="true"></a><span class="co">#&gt; 13: https://fis.fda.gov/content/Exports/faers_ascii_2020Q3.zip            64MB</span></span>
-<span id="cb4-93"><a href="#cb4-93" aria-hidden="true"></a><span class="co">#&gt; 14: https://fis.fda.gov/content/Exports/faers_ascii_2020Q2.zip            66MB</span></span>
-<span id="cb4-94"><a href="#cb4-94" aria-hidden="true"></a><span class="co">#&gt; 15: https://fis.fda.gov/content/Exports/faers_ascii_2020Q1.zip            65MB</span></span>
-<span id="cb4-95"><a href="#cb4-95" aria-hidden="true"></a><span class="co">#&gt; 16: https://fis.fda.gov/content/Exports/faers_ascii_2019Q4.zip            60MB</span></span>
-<span id="cb4-96"><a href="#cb4-96" aria-hidden="true"></a><span class="co">#&gt; 17: https://fis.fda.gov/content/Exports/faers_ascii_2019Q3.zip            62MB</span></span>
-<span id="cb4-97"><a href="#cb4-97" aria-hidden="true"></a><span class="co">#&gt; 18: https://fis.fda.gov/content/Exports/faers_ascii_2019Q2.zip            62MB</span></span>
-<span id="cb4-98"><a href="#cb4-98" aria-hidden="true"></a><span class="co">#&gt; 19: https://fis.fda.gov/content/Exports/faers_ascii_2019Q1.zip            56MB</span></span>
-<span id="cb4-99"><a href="#cb4-99" aria-hidden="true"></a><span class="co">#&gt; 20: https://fis.fda.gov/content/Exports/faers_ascii_2018q4.zip            60MB</span></span>
-<span id="cb4-100"><a href="#cb4-100" aria-hidden="true"></a><span class="co">#&gt; 21: https://fis.fda.gov/content/Exports/faers_ascii_2018q3.zip            60MB</span></span>
-<span id="cb4-101"><a href="#cb4-101" aria-hidden="true"></a><span class="co">#&gt; 22: https://fis.fda.gov/content/Exports/faers_ascii_2018q2.zip            60MB</span></span>
-<span id="cb4-102"><a href="#cb4-102" aria-hidden="true"></a><span class="co">#&gt; 23: https://fis.fda.gov/content/Exports/faers_ascii_2018q1.zip            52MB</span></span>
-<span id="cb4-103"><a href="#cb4-103" aria-hidden="true"></a><span class="co">#&gt; 24: https://fis.fda.gov/content/Exports/faers_ascii_2017q4.zip            41MB</span></span>
-<span id="cb4-104"><a href="#cb4-104" aria-hidden="true"></a><span class="co">#&gt; 25: https://fis.fda.gov/content/Exports/faers_ascii_2017q3.zip            48MB</span></span>
-<span id="cb4-105"><a href="#cb4-105" aria-hidden="true"></a><span class="co">#&gt; 26: https://fis.fda.gov/content/Exports/faers_ascii_2017q2.zip            46MB</span></span>
-<span id="cb4-106"><a href="#cb4-106" aria-hidden="true"></a><span class="co">#&gt; 27: https://fis.fda.gov/content/Exports/faers_ascii_2017q1.zip            48MB</span></span>
-<span id="cb4-107"><a href="#cb4-107" aria-hidden="true"></a><span class="co">#&gt; 28: https://fis.fda.gov/content/Exports/faers_ascii_2016q4.zip            44MB</span></span>
-<span id="cb4-108"><a href="#cb4-108" aria-hidden="true"></a><span class="co">#&gt; 29: https://fis.fda.gov/content/Exports/faers_ascii_2016q3.zip            46MB</span></span>
-<span id="cb4-109"><a href="#cb4-109" aria-hidden="true"></a><span class="co">#&gt; 30: https://fis.fda.gov/content/Exports/faers_ascii_2016q2.zip            44MB</span></span>
-<span id="cb4-110"><a href="#cb4-110" aria-hidden="true"></a><span class="co">#&gt; 31: https://fis.fda.gov/content/Exports/faers_ascii_2016q1.zip            46MB</span></span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true"></a><span class="co">#&gt; 32: https://fis.fda.gov/content/Exports/faers_ascii_2015q4.zip            42MB</span></span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true"></a><span class="co">#&gt; 33: https://fis.fda.gov/content/Exports/faers_ascii_2015q3.zip            47MB</span></span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true"></a><span class="co">#&gt; 34: https://fis.fda.gov/content/Exports/faers_ascii_2015q2.zip            38MB</span></span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true"></a><span class="co">#&gt; 35: https://fis.fda.gov/content/Exports/faers_ascii_2015q1.zip            39MB</span></span>
-<span id="cb4-115"><a href="#cb4-115" aria-hidden="true"></a><span class="co">#&gt; 36: https://fis.fda.gov/content/Exports/faers_ascii_2014q4.zip            28MB</span></span>
-<span id="cb4-116"><a href="#cb4-116" aria-hidden="true"></a><span class="co">#&gt; 37: https://fis.fda.gov/content/Exports/faers_ascii_2014q3.zip            28MB</span></span>
-<span id="cb4-117"><a href="#cb4-117" aria-hidden="true"></a><span class="co">#&gt; 38: https://fis.fda.gov/content/Exports/faers_ascii_2014q2.zip            25MB</span></span>
-<span id="cb4-118"><a href="#cb4-118" aria-hidden="true"></a><span class="co">#&gt; 39: https://fis.fda.gov/content/Exports/faers_ascii_2014q1.zip            30MB</span></span>
-<span id="cb4-119"><a href="#cb4-119" aria-hidden="true"></a><span class="co">#&gt; 40: https://fis.fda.gov/content/Exports/faers_ascii_2013q4.zip            26MB</span></span>
-<span id="cb4-120"><a href="#cb4-120" aria-hidden="true"></a><span class="co">#&gt; 41: https://fis.fda.gov/content/Exports/faers_ascii_2013q3.zip            22MB</span></span>
-<span id="cb4-121"><a href="#cb4-121" aria-hidden="true"></a><span class="co">#&gt; 42: https://fis.fda.gov/content/Exports/faers_ascii_2013q2.zip            21MB</span></span>
-<span id="cb4-122"><a href="#cb4-122" aria-hidden="true"></a><span class="co">#&gt; 43: https://fis.fda.gov/content/Exports/faers_ascii_2013q1.zip            25MB</span></span>
-<span id="cb4-123"><a href="#cb4-123" aria-hidden="true"></a><span class="co">#&gt; 44: https://fis.fda.gov/content/Exports/faers_ascii_2012q4.zip            28MB</span></span>
-<span id="cb4-124"><a href="#cb4-124" aria-hidden="true"></a><span class="co">#&gt; 45:  https://fis.fda.gov/content/Exports/aers_ascii_2012q3.zip            16MB</span></span>
-<span id="cb4-125"><a href="#cb4-125" aria-hidden="true"></a><span class="co">#&gt; 46:  https://fis.fda.gov/content/Exports/aers_ascii_2012q2.zip            25MB</span></span>
-<span id="cb4-126"><a href="#cb4-126" aria-hidden="true"></a><span class="co">#&gt; 47:  https://fis.fda.gov/content/Exports/aers_ascii_2012q1.zip            26MB</span></span>
-<span id="cb4-127"><a href="#cb4-127" aria-hidden="true"></a><span class="co">#&gt; 48:  https://fis.fda.gov/content/Exports/aers_ascii_2011q4.zip            23MB</span></span>
-<span id="cb4-128"><a href="#cb4-128" aria-hidden="true"></a><span class="co">#&gt; 49:  https://fis.fda.gov/content/Exports/aers_ascii_2011q3.zip            23MB</span></span>
-<span id="cb4-129"><a href="#cb4-129" aria-hidden="true"></a><span class="co">#&gt; 50:  https://fis.fda.gov/content/Exports/aers_ascii_2011q2.zip            23MB</span></span>
-<span id="cb4-130"><a href="#cb4-130" aria-hidden="true"></a><span class="co">#&gt; 51:  https://fis.fda.gov/content/Exports/aers_ascii_2011q1.zip            21MB</span></span>
-<span id="cb4-131"><a href="#cb4-131" aria-hidden="true"></a><span class="co">#&gt; 52:  https://fis.fda.gov/content/Exports/aers_ascii_2010q4.zip            20MB</span></span>
-<span id="cb4-132"><a href="#cb4-132" aria-hidden="true"></a><span class="co">#&gt; 53:  https://fis.fda.gov/content/Exports/aers_ascii_2010q3.zip            22MB</span></span>
-<span id="cb4-133"><a href="#cb4-133" aria-hidden="true"></a><span class="co">#&gt; 54:  https://fis.fda.gov/content/Exports/aers_ascii_2010q2.zip            17MB</span></span>
-<span id="cb4-134"><a href="#cb4-134" aria-hidden="true"></a><span class="co">#&gt; 55:  https://fis.fda.gov/content/Exports/aers_ascii_2010q1.zip            16MB</span></span>
-<span id="cb4-135"><a href="#cb4-135" aria-hidden="true"></a><span class="co">#&gt; 56:  https://fis.fda.gov/content/Exports/aers_ascii_2009q4.zip            16MB</span></span>
-<span id="cb4-136"><a href="#cb4-136" aria-hidden="true"></a><span class="co">#&gt; 57:  https://fis.fda.gov/content/Exports/aers_ascii_2009q3.zip            16MB</span></span>
-<span id="cb4-137"><a href="#cb4-137" aria-hidden="true"></a><span class="co">#&gt; 58:  https://fis.fda.gov/content/Exports/aers_ascii_2009q2.zip            14MB</span></span>
-<span id="cb4-138"><a href="#cb4-138" aria-hidden="true"></a><span class="co">#&gt; 59:  https://fis.fda.gov/content/Exports/aers_ascii_2009q1.zip            13MB</span></span>
-<span id="cb4-139"><a href="#cb4-139" aria-hidden="true"></a><span class="co">#&gt; 60:  https://fis.fda.gov/content/Exports/aers_ascii_2008q4.zip            13MB</span></span>
-<span id="cb4-140"><a href="#cb4-140" aria-hidden="true"></a><span class="co">#&gt; 61:  https://fis.fda.gov/content/Exports/aers_ascii_2008q3.zip            13MB</span></span>
-<span id="cb4-141"><a href="#cb4-141" aria-hidden="true"></a><span class="co">#&gt; 62:  https://fis.fda.gov/content/Exports/aers_ascii_2008q2.zip            12MB</span></span>
-<span id="cb4-142"><a href="#cb4-142" aria-hidden="true"></a><span class="co">#&gt; 63:  https://fis.fda.gov/content/Exports/aers_ascii_2008q1.zip            12MB</span></span>
-<span id="cb4-143"><a href="#cb4-143" aria-hidden="true"></a><span class="co">#&gt; 64:  https://fis.fda.gov/content/Exports/aers_ascii_2007q4.zip            12MB</span></span>
-<span id="cb4-144"><a href="#cb4-144" aria-hidden="true"></a><span class="co">#&gt; 65:  https://fis.fda.gov/content/Exports/aers_ascii_2007q3.zip           9.9MB</span></span>
-<span id="cb4-145"><a href="#cb4-145" aria-hidden="true"></a><span class="co">#&gt; 66:  https://fis.fda.gov/content/Exports/aers_ascii_2007q2.zip           9.5MB</span></span>
-<span id="cb4-146"><a href="#cb4-146" aria-hidden="true"></a><span class="co">#&gt; 67:  https://fis.fda.gov/content/Exports/aers_ascii_2007q1.zip           9.6MB</span></span>
-<span id="cb4-147"><a href="#cb4-147" aria-hidden="true"></a><span class="co">#&gt; 68:  https://fis.fda.gov/content/Exports/aers_ascii_2006q4.zip           9.1MB</span></span>
-<span id="cb4-148"><a href="#cb4-148" aria-hidden="true"></a><span class="co">#&gt; 69:  https://fis.fda.gov/content/Exports/aers_ascii_2006q3.zip           8.5MB</span></span>
-<span id="cb4-149"><a href="#cb4-149" aria-hidden="true"></a><span class="co">#&gt; 70:  https://fis.fda.gov/content/Exports/aers_ascii_2006q2.zip           9.7MB</span></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true"></a><span class="co">#&gt;  1: https://fis.fda.gov/content/Exports/faers_ascii_2023Q4.zip          69.1MB</span></span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true"></a><span class="co">#&gt;  2: https://fis.fda.gov/content/Exports/faers_ascii_2023Q3.zip          60.1MB</span></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true"></a><span class="co">#&gt;  3: https://fis.fda.gov/content/Exports/faers_ascii_2023q2.zip          64.5MB</span></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true"></a><span class="co">#&gt;  4: https://fis.fda.gov/content/Exports/faers_ascii_2023q1.zip          64.3MB</span></span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true"></a><span class="co">#&gt;  5: https://fis.fda.gov/content/Exports/faers_ascii_2022Q4.zip            69MB</span></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true"></a><span class="co">#&gt;  6: https://fis.fda.gov/content/Exports/faers_ascii_2022Q3.zip          63.2MB</span></span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true"></a><span class="co">#&gt;  7: https://fis.fda.gov/content/Exports/faers_ascii_2022q2.zip            63MB</span></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true"></a><span class="co">#&gt;  8: https://fis.fda.gov/content/Exports/faers_ascii_2022q1.zip          64.7MB</span></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true"></a><span class="co">#&gt;  9: https://fis.fda.gov/content/Exports/faers_ascii_2021Q4.zip            59MB</span></span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true"></a><span class="co">#&gt; 10: https://fis.fda.gov/content/Exports/faers_ascii_2021Q3.zip            70MB</span></span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true"></a><span class="co">#&gt; 11: https://fis.fda.gov/content/Exports/faers_ascii_2021Q2.zip            66MB</span></span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true"></a><span class="co">#&gt; 12: https://fis.fda.gov/content/Exports/faers_ascii_2021Q1.zip            69MB</span></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true"></a><span class="co">#&gt; 13: https://fis.fda.gov/content/Exports/faers_ascii_2020Q4.zip            71MB</span></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true"></a><span class="co">#&gt; 14: https://fis.fda.gov/content/Exports/faers_ascii_2020Q3.zip            64MB</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true"></a><span class="co">#&gt; 15: https://fis.fda.gov/content/Exports/faers_ascii_2020Q2.zip            66MB</span></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true"></a><span class="co">#&gt; 16: https://fis.fda.gov/content/Exports/faers_ascii_2020Q1.zip            65MB</span></span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true"></a><span class="co">#&gt; 17: https://fis.fda.gov/content/Exports/faers_ascii_2019Q4.zip            60MB</span></span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true"></a><span class="co">#&gt; 18: https://fis.fda.gov/content/Exports/faers_ascii_2019Q3.zip            62MB</span></span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true"></a><span class="co">#&gt; 19: https://fis.fda.gov/content/Exports/faers_ascii_2019Q2.zip            62MB</span></span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true"></a><span class="co">#&gt; 20: https://fis.fda.gov/content/Exports/faers_ascii_2019Q1.zip            56MB</span></span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true"></a><span class="co">#&gt; 21: https://fis.fda.gov/content/Exports/faers_ascii_2018q4.zip            60MB</span></span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true"></a><span class="co">#&gt; 22: https://fis.fda.gov/content/Exports/faers_ascii_2018q3.zip            60MB</span></span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true"></a><span class="co">#&gt; 23: https://fis.fda.gov/content/Exports/faers_ascii_2018q2.zip            60MB</span></span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true"></a><span class="co">#&gt; 24: https://fis.fda.gov/content/Exports/faers_ascii_2018q1.zip            52MB</span></span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true"></a><span class="co">#&gt; 25: https://fis.fda.gov/content/Exports/faers_ascii_2017q4.zip            41MB</span></span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true"></a><span class="co">#&gt; 26: https://fis.fda.gov/content/Exports/faers_ascii_2017q3.zip            48MB</span></span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true"></a><span class="co">#&gt; 27: https://fis.fda.gov/content/Exports/faers_ascii_2017q2.zip            46MB</span></span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true"></a><span class="co">#&gt; 28: https://fis.fda.gov/content/Exports/faers_ascii_2017q1.zip            48MB</span></span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true"></a><span class="co">#&gt; 29: https://fis.fda.gov/content/Exports/faers_ascii_2016q4.zip            44MB</span></span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true"></a><span class="co">#&gt; 30: https://fis.fda.gov/content/Exports/faers_ascii_2016q3.zip            46MB</span></span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true"></a><span class="co">#&gt; 31: https://fis.fda.gov/content/Exports/faers_ascii_2016q2.zip            44MB</span></span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true"></a><span class="co">#&gt; 32: https://fis.fda.gov/content/Exports/faers_ascii_2016q1.zip            46MB</span></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true"></a><span class="co">#&gt; 33: https://fis.fda.gov/content/Exports/faers_ascii_2015q4.zip            42MB</span></span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true"></a><span class="co">#&gt; 34: https://fis.fda.gov/content/Exports/faers_ascii_2015q3.zip            47MB</span></span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true"></a><span class="co">#&gt; 35: https://fis.fda.gov/content/Exports/faers_ascii_2015q2.zip            38MB</span></span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true"></a><span class="co">#&gt; 36: https://fis.fda.gov/content/Exports/faers_ascii_2015q1.zip            39MB</span></span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true"></a><span class="co">#&gt; 37: https://fis.fda.gov/content/Exports/faers_ascii_2014q4.zip            28MB</span></span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true"></a><span class="co">#&gt; 38: https://fis.fda.gov/content/Exports/faers_ascii_2014q3.zip            28MB</span></span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true"></a><span class="co">#&gt; 39: https://fis.fda.gov/content/Exports/faers_ascii_2014q2.zip            25MB</span></span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true"></a><span class="co">#&gt; 40: https://fis.fda.gov/content/Exports/faers_ascii_2014q1.zip            30MB</span></span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true"></a><span class="co">#&gt; 41: https://fis.fda.gov/content/Exports/faers_ascii_2013q4.zip            26MB</span></span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true"></a><span class="co">#&gt; 42: https://fis.fda.gov/content/Exports/faers_ascii_2013q3.zip            22MB</span></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true"></a><span class="co">#&gt; 43: https://fis.fda.gov/content/Exports/faers_ascii_2013q2.zip            21MB</span></span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true"></a><span class="co">#&gt; 44: https://fis.fda.gov/content/Exports/faers_ascii_2013q1.zip            25MB</span></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true"></a><span class="co">#&gt; 45: https://fis.fda.gov/content/Exports/faers_ascii_2012q4.zip            28MB</span></span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true"></a><span class="co">#&gt; 46:  https://fis.fda.gov/content/Exports/aers_ascii_2012q3.zip            16MB</span></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true"></a><span class="co">#&gt; 47:  https://fis.fda.gov/content/Exports/aers_ascii_2012q2.zip            25MB</span></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true"></a><span class="co">#&gt; 48:  https://fis.fda.gov/content/Exports/aers_ascii_2012q1.zip            26MB</span></span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true"></a><span class="co">#&gt; 49:  https://fis.fda.gov/content/Exports/aers_ascii_2011q4.zip            23MB</span></span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true"></a><span class="co">#&gt; 50:  https://fis.fda.gov/content/Exports/aers_ascii_2011q3.zip            23MB</span></span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true"></a><span class="co">#&gt; 51:  https://fis.fda.gov/content/Exports/aers_ascii_2011q2.zip            23MB</span></span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true"></a><span class="co">#&gt; 52:  https://fis.fda.gov/content/Exports/aers_ascii_2011q1.zip            21MB</span></span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true"></a><span class="co">#&gt; 53:  https://fis.fda.gov/content/Exports/aers_ascii_2010q4.zip            20MB</span></span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true"></a><span class="co">#&gt; 54:  https://fis.fda.gov/content/Exports/aers_ascii_2010q3.zip            22MB</span></span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true"></a><span class="co">#&gt; 55:  https://fis.fda.gov/content/Exports/aers_ascii_2010q2.zip            17MB</span></span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true"></a><span class="co">#&gt; 56:  https://fis.fda.gov/content/Exports/aers_ascii_2010q1.zip            16MB</span></span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true"></a><span class="co">#&gt; 57:  https://fis.fda.gov/content/Exports/aers_ascii_2009q4.zip            16MB</span></span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true"></a><span class="co">#&gt; 58:  https://fis.fda.gov/content/Exports/aers_ascii_2009q3.zip            16MB</span></span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true"></a><span class="co">#&gt; 59:  https://fis.fda.gov/content/Exports/aers_ascii_2009q2.zip            14MB</span></span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true"></a><span class="co">#&gt; 60:  https://fis.fda.gov/content/Exports/aers_ascii_2009q1.zip            13MB</span></span>
+<span id="cb4-140"><a href="#cb4-140" aria-hidden="true"></a><span class="co">#&gt; 61:  https://fis.fda.gov/content/Exports/aers_ascii_2008q4.zip            13MB</span></span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true"></a><span class="co">#&gt; 62:  https://fis.fda.gov/content/Exports/aers_ascii_2008q3.zip            13MB</span></span>
+<span id="cb4-142"><a href="#cb4-142" aria-hidden="true"></a><span class="co">#&gt; 63:  https://fis.fda.gov/content/Exports/aers_ascii_2008q2.zip            12MB</span></span>
+<span id="cb4-143"><a href="#cb4-143" aria-hidden="true"></a><span class="co">#&gt; 64:  https://fis.fda.gov/content/Exports/aers_ascii_2008q1.zip            12MB</span></span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true"></a><span class="co">#&gt; 65:  https://fis.fda.gov/content/Exports/aers_ascii_2007q4.zip            12MB</span></span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true"></a><span class="co">#&gt; 66:  https://fis.fda.gov/content/Exports/aers_ascii_2007q3.zip           9.9MB</span></span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true"></a><span class="co">#&gt; 67:  https://fis.fda.gov/content/Exports/aers_ascii_2007q2.zip           9.5MB</span></span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true"></a><span class="co">#&gt; 68:  https://fis.fda.gov/content/Exports/aers_ascii_2007q1.zip           9.6MB</span></span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true"></a><span class="co">#&gt; 69:  https://fis.fda.gov/content/Exports/aers_ascii_2006q4.zip           9.1MB</span></span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true"></a><span class="co">#&gt; 70:  https://fis.fda.gov/content/Exports/aers_ascii_2006q3.zip           8.5MB</span></span>
 <span id="cb4-150"><a href="#cb4-150" aria-hidden="true"></a><span class="co">#&gt;                                                     xml_urls xml_file_size</span></span>
 <span id="cb4-151"><a href="#cb4-151" aria-hidden="true"></a><span class="co">#&gt;                                                       &lt;char&gt;        &lt;char&gt;</span></span>
-<span id="cb4-152"><a href="#cb4-152" aria-hidden="true"></a><span class="co">#&gt;  1: https://fis.fda.gov/content/Exports/faers_xml_2023Q3.zip         123MB</span></span>
-<span id="cb4-153"><a href="#cb4-153" aria-hidden="true"></a><span class="co">#&gt;  2: https://fis.fda.gov/content/Exports/faers_xml_2023q2.zip         130MB</span></span>
-<span id="cb4-154"><a href="#cb4-154" aria-hidden="true"></a><span class="co">#&gt;  3: https://fis.fda.gov/content/Exports/faers_xml_2023q1.zip         133MB</span></span>
-<span id="cb4-155"><a href="#cb4-155" aria-hidden="true"></a><span class="co">#&gt;  4: https://fis.fda.gov/content/Exports/faers_xml_2022Q4.zip         144MB</span></span>
-<span id="cb4-156"><a href="#cb4-156" aria-hidden="true"></a><span class="co">#&gt;  5: https://fis.fda.gov/content/Exports/faers_xml_2022Q3.zip         132MB</span></span>
-<span id="cb4-157"><a href="#cb4-157" aria-hidden="true"></a><span class="co">#&gt;  6: https://fis.fda.gov/content/Exports/faers_xml_2022q2.zip         140MB</span></span>
-<span id="cb4-158"><a href="#cb4-158" aria-hidden="true"></a><span class="co">#&gt;  7: https://fis.fda.gov/content/Exports/faers_xml_2022q1.zip         136MB</span></span>
-<span id="cb4-159"><a href="#cb4-159" aria-hidden="true"></a><span class="co">#&gt;  8: https://fis.fda.gov/content/Exports/faers_xml_2021Q4.zip         123MB</span></span>
-<span id="cb4-160"><a href="#cb4-160" aria-hidden="true"></a><span class="co">#&gt;  9: https://fis.fda.gov/content/Exports/faers_xml_2021Q3.zip         132MB</span></span>
-<span id="cb4-161"><a href="#cb4-161" aria-hidden="true"></a><span class="co">#&gt; 10: https://fis.fda.gov/content/Exports/faers_xml_2021Q2.zip         123MB</span></span>
-<span id="cb4-162"><a href="#cb4-162" aria-hidden="true"></a><span class="co">#&gt; 11: https://fis.fda.gov/content/Exports/faers_xml_2021Q1.zip         130MB</span></span>
-<span id="cb4-163"><a href="#cb4-163" aria-hidden="true"></a><span class="co">#&gt; 12: https://fis.fda.gov/content/Exports/faers_xml_2020Q4.zip         131MB</span></span>
-<span id="cb4-164"><a href="#cb4-164" aria-hidden="true"></a><span class="co">#&gt; 13: https://fis.fda.gov/content/Exports/faers_xml_2020Q3.zip         121MB</span></span>
-<span id="cb4-165"><a href="#cb4-165" aria-hidden="true"></a><span class="co">#&gt; 14: https://fis.fda.gov/content/Exports/faers_xml_2020Q2.zip         123MB</span></span>
-<span id="cb4-166"><a href="#cb4-166" aria-hidden="true"></a><span class="co">#&gt; 15: https://fis.fda.gov/content/Exports/faers_xml_2020Q1.zip         125MB</span></span>
-<span id="cb4-167"><a href="#cb4-167" aria-hidden="true"></a><span class="co">#&gt; 16: https://fis.fda.gov/content/Exports/faers_xml_2019Q4.zip         113MB</span></span>
-<span id="cb4-168"><a href="#cb4-168" aria-hidden="true"></a><span class="co">#&gt; 17: https://fis.fda.gov/content/Exports/faers_xml_2019Q3.zip         118MB</span></span>
-<span id="cb4-169"><a href="#cb4-169" aria-hidden="true"></a><span class="co">#&gt; 18: https://fis.fda.gov/content/Exports/faers_xml_2019Q2.zip         118MB</span></span>
-<span id="cb4-170"><a href="#cb4-170" aria-hidden="true"></a><span class="co">#&gt; 19: https://fis.fda.gov/content/Exports/faers_xml_2019Q1.zip         103MB</span></span>
-<span id="cb4-171"><a href="#cb4-171" aria-hidden="true"></a><span class="co">#&gt; 20: https://fis.fda.gov/content/Exports/faers_xml_2018q4.zip         112MB</span></span>
-<span id="cb4-172"><a href="#cb4-172" aria-hidden="true"></a><span class="co">#&gt; 21: https://fis.fda.gov/content/Exports/faers_xml_2018q3.zip         112MB</span></span>
-<span id="cb4-173"><a href="#cb4-173" aria-hidden="true"></a><span class="co">#&gt; 22: https://fis.fda.gov/content/Exports/faers_xml_2018q2.zip         112MB</span></span>
-<span id="cb4-174"><a href="#cb4-174" aria-hidden="true"></a><span class="co">#&gt; 23: https://fis.fda.gov/content/Exports/faers_xml_2018q1.zip          94MB</span></span>
-<span id="cb4-175"><a href="#cb4-175" aria-hidden="true"></a><span class="co">#&gt; 24: https://fis.fda.gov/content/Exports/faers_xml_2017q4.zip          76MB</span></span>
-<span id="cb4-176"><a href="#cb4-176" aria-hidden="true"></a><span class="co">#&gt; 25: https://fis.fda.gov/content/Exports/faers_xml_2017q3.zip          91MB</span></span>
-<span id="cb4-177"><a href="#cb4-177" aria-hidden="true"></a><span class="co">#&gt; 26: https://fis.fda.gov/content/Exports/faers_xml_2017q2.zip          86MB</span></span>
-<span id="cb4-178"><a href="#cb4-178" aria-hidden="true"></a><span class="co">#&gt; 27: https://fis.fda.gov/content/Exports/faers_xml_2017q1.zip          91MB</span></span>
-<span id="cb4-179"><a href="#cb4-179" aria-hidden="true"></a><span class="co">#&gt; 28: https://fis.fda.gov/content/Exports/faers_xml_2016q4.zip          82MB</span></span>
-<span id="cb4-180"><a href="#cb4-180" aria-hidden="true"></a><span class="co">#&gt; 29: https://fis.fda.gov/content/Exports/faers_xml_2016q3.zip          87MB</span></span>
-<span id="cb4-181"><a href="#cb4-181" aria-hidden="true"></a><span class="co">#&gt; 30: https://fis.fda.gov/content/Exports/faers_xml_2016q2.zip          81MB</span></span>
-<span id="cb4-182"><a href="#cb4-182" aria-hidden="true"></a><span class="co">#&gt; 31: https://fis.fda.gov/content/Exports/faers_xml_2016q1.zip          84MB</span></span>
-<span id="cb4-183"><a href="#cb4-183" aria-hidden="true"></a><span class="co">#&gt; 32: https://fis.fda.gov/content/Exports/faers_xml_2015q4.zip          77MB</span></span>
-<span id="cb4-184"><a href="#cb4-184" aria-hidden="true"></a><span class="co">#&gt; 33: https://fis.fda.gov/content/Exports/faers_xml_2015q3.zip          88MB</span></span>
-<span id="cb4-185"><a href="#cb4-185" aria-hidden="true"></a><span class="co">#&gt; 34: https://fis.fda.gov/content/Exports/faers_xml_2015q2.zip          70MB</span></span>
-<span id="cb4-186"><a href="#cb4-186" aria-hidden="true"></a><span class="co">#&gt; 35: https://fis.fda.gov/content/Exports/faers_xml_2015q1.zip          72MB</span></span>
-<span id="cb4-187"><a href="#cb4-187" aria-hidden="true"></a><span class="co">#&gt; 36: https://fis.fda.gov/content/Exports/faers_xml_2014q4.zip          53MB</span></span>
-<span id="cb4-188"><a href="#cb4-188" aria-hidden="true"></a><span class="co">#&gt; 37: https://fis.fda.gov/content/Exports/faers_xml_2014q3.zip          54MB</span></span>
-<span id="cb4-189"><a href="#cb4-189" aria-hidden="true"></a><span class="co">#&gt; 38: https://fis.fda.gov/content/Exports/faers_xml_2014q2.zip          44MB</span></span>
-<span id="cb4-190"><a href="#cb4-190" aria-hidden="true"></a><span class="co">#&gt; 39: https://fis.fda.gov/content/Exports/faers_xml_2014q1.zip          52MB</span></span>
-<span id="cb4-191"><a href="#cb4-191" aria-hidden="true"></a><span class="co">#&gt; 40: https://fis.fda.gov/content/Exports/faers_xml_2013q4.zip          46MB</span></span>
-<span id="cb4-192"><a href="#cb4-192" aria-hidden="true"></a><span class="co">#&gt; 41: https://fis.fda.gov/content/Exports/faers_xml_2013q3.zip          40MB</span></span>
-<span id="cb4-193"><a href="#cb4-193" aria-hidden="true"></a><span class="co">#&gt; 42: https://fis.fda.gov/content/Exports/faers_xml_2013q2.zip          38MB</span></span>
-<span id="cb4-194"><a href="#cb4-194" aria-hidden="true"></a><span class="co">#&gt; 43: https://fis.fda.gov/content/Exports/faers_xml_2013q1.zip          44MB</span></span>
-<span id="cb4-195"><a href="#cb4-195" aria-hidden="true"></a><span class="co">#&gt; 44: https://fis.fda.gov/content/Exports/faers_xml_2012q4.zip          50MB</span></span>
-<span id="cb4-196"><a href="#cb4-196" aria-hidden="true"></a><span class="co">#&gt; 45: https://fis.fda.gov/content/Exports/aers_sgml_2012q3.zip          21MB</span></span>
-<span id="cb4-197"><a href="#cb4-197" aria-hidden="true"></a><span class="co">#&gt; 46: https://fis.fda.gov/content/Exports/aers_sgml_2012q2.zip          32MB</span></span>
-<span id="cb4-198"><a href="#cb4-198" aria-hidden="true"></a><span class="co">#&gt; 47: https://fis.fda.gov/content/Exports/aers_sgml_2012q1.zip          33MB</span></span>
-<span id="cb4-199"><a href="#cb4-199" aria-hidden="true"></a><span class="co">#&gt; 48: https://fis.fda.gov/content/Exports/aers_sgml_2011q4.zip          29MB</span></span>
-<span id="cb4-200"><a href="#cb4-200" aria-hidden="true"></a><span class="co">#&gt; 49: https://fis.fda.gov/content/Exports/aers_sgml_2011q3.zip          29MB</span></span>
-<span id="cb4-201"><a href="#cb4-201" aria-hidden="true"></a><span class="co">#&gt; 50: https://fis.fda.gov/content/Exports/aers_sgml_2011q2.zip          29MB</span></span>
-<span id="cb4-202"><a href="#cb4-202" aria-hidden="true"></a><span class="co">#&gt; 51: https://fis.fda.gov/content/Exports/aers_sgml_2011q1.zip          26MB</span></span>
-<span id="cb4-203"><a href="#cb4-203" aria-hidden="true"></a><span class="co">#&gt; 52: https://fis.fda.gov/content/Exports/aers_sgml_2010q4.zip          25MB</span></span>
-<span id="cb4-204"><a href="#cb4-204" aria-hidden="true"></a><span class="co">#&gt; 53: https://fis.fda.gov/content/Exports/aers_sgml_2010q3.zip          28MB</span></span>
-<span id="cb4-205"><a href="#cb4-205" aria-hidden="true"></a><span class="co">#&gt; 54: https://fis.fda.gov/content/Exports/aers_sgml_2010q2.zip          22MB</span></span>
-<span id="cb4-206"><a href="#cb4-206" aria-hidden="true"></a><span class="co">#&gt; 55: https://fis.fda.gov/content/Exports/aers_sgml_2010q1.zip          20MB</span></span>
-<span id="cb4-207"><a href="#cb4-207" aria-hidden="true"></a><span class="co">#&gt; 56: https://fis.fda.gov/content/Exports/aers_sgml_2009q4.zip          20MB</span></span>
-<span id="cb4-208"><a href="#cb4-208" aria-hidden="true"></a><span class="co">#&gt; 57: https://fis.fda.gov/content/Exports/aers_sgml_2009q3.zip          19MB</span></span>
-<span id="cb4-209"><a href="#cb4-209" aria-hidden="true"></a><span class="co">#&gt; 58: https://fis.fda.gov/content/Exports/aers_sgml_2009q2.zip          18MB</span></span>
-<span id="cb4-210"><a href="#cb4-210" aria-hidden="true"></a><span class="co">#&gt; 59: https://fis.fda.gov/content/Exports/aers_sgml_2009q1.zip          16MB</span></span>
-<span id="cb4-211"><a href="#cb4-211" aria-hidden="true"></a><span class="co">#&gt; 60: https://fis.fda.gov/content/Exports/aers_sgml_2008q4.zip          16MB</span></span>
-<span id="cb4-212"><a href="#cb4-212" aria-hidden="true"></a><span class="co">#&gt; 61: https://fis.fda.gov/content/Exports/aers_sgml_2008q3.zip          16MB</span></span>
-<span id="cb4-213"><a href="#cb4-213" aria-hidden="true"></a><span class="co">#&gt; 62: https://fis.fda.gov/content/Exports/aers_sgml_2008q2.zip          16MB</span></span>
-<span id="cb4-214"><a href="#cb4-214" aria-hidden="true"></a><span class="co">#&gt; 63: https://fis.fda.gov/content/Exports/aers_sgml_2008q1.zip          15MB</span></span>
-<span id="cb4-215"><a href="#cb4-215" aria-hidden="true"></a><span class="co">#&gt; 64: https://fis.fda.gov/content/Exports/aers_sgml_2007q4.zip          14MB</span></span>
-<span id="cb4-216"><a href="#cb4-216" aria-hidden="true"></a><span class="co">#&gt; 65: https://fis.fda.gov/content/Exports/aers_sgml_2007q3.zip          13MB</span></span>
-<span id="cb4-217"><a href="#cb4-217" aria-hidden="true"></a><span class="co">#&gt; 66: https://fis.fda.gov/content/Exports/aers_sgml_2007q2.zip          12MB</span></span>
-<span id="cb4-218"><a href="#cb4-218" aria-hidden="true"></a><span class="co">#&gt; 67: https://fis.fda.gov/content/Exports/aers_sgml_2007q1.zip          12MB</span></span>
-<span id="cb4-219"><a href="#cb4-219" aria-hidden="true"></a><span class="co">#&gt; 68: https://fis.fda.gov/content/Exports/aers_sgml_2006q4.zip          12MB</span></span>
-<span id="cb4-220"><a href="#cb4-220" aria-hidden="true"></a><span class="co">#&gt; 69: https://fis.fda.gov/content/Exports/aers_sgml_2006q3.zip          11MB</span></span>
-<span id="cb4-221"><a href="#cb4-221" aria-hidden="true"></a><span class="co">#&gt; 70: https://fis.fda.gov/content/Exports/aers_sgml_2006q2.zip          13MB</span></span>
-<span id="cb4-222"><a href="#cb4-222" aria-hidden="true"></a><span class="co">#&gt;  [ reached getOption(&quot;max.print&quot;) -- omitted 10 rows ]</span></span></code></pre></div>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true"></a><span class="co">#&gt;  1: https://fis.fda.gov/content/Exports/faers_xml_2023Q4.zip         140MB</span></span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true"></a><span class="co">#&gt;  2: https://fis.fda.gov/content/Exports/faers_xml_2023Q3.zip         123MB</span></span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true"></a><span class="co">#&gt;  3: https://fis.fda.gov/content/Exports/faers_xml_2023q2.zip         130MB</span></span>
+<span id="cb4-155"><a href="#cb4-155" aria-hidden="true"></a><span class="co">#&gt;  4: https://fis.fda.gov/content/Exports/faers_xml_2023q1.zip         133MB</span></span>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true"></a><span class="co">#&gt;  5: https://fis.fda.gov/content/Exports/faers_xml_2022Q4.zip         144MB</span></span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true"></a><span class="co">#&gt;  6: https://fis.fda.gov/content/Exports/faers_xml_2022Q3.zip         132MB</span></span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true"></a><span class="co">#&gt;  7: https://fis.fda.gov/content/Exports/faers_xml_2022q2.zip         140MB</span></span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true"></a><span class="co">#&gt;  8: https://fis.fda.gov/content/Exports/faers_xml_2022q1.zip         136MB</span></span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true"></a><span class="co">#&gt;  9: https://fis.fda.gov/content/Exports/faers_xml_2021Q4.zip         123MB</span></span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true"></a><span class="co">#&gt; 10: https://fis.fda.gov/content/Exports/faers_xml_2021Q3.zip         132MB</span></span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true"></a><span class="co">#&gt; 11: https://fis.fda.gov/content/Exports/faers_xml_2021Q2.zip         123MB</span></span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true"></a><span class="co">#&gt; 12: https://fis.fda.gov/content/Exports/faers_xml_2021Q1.zip         130MB</span></span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true"></a><span class="co">#&gt; 13: https://fis.fda.gov/content/Exports/faers_xml_2020Q4.zip         131MB</span></span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true"></a><span class="co">#&gt; 14: https://fis.fda.gov/content/Exports/faers_xml_2020Q3.zip         121MB</span></span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true"></a><span class="co">#&gt; 15: https://fis.fda.gov/content/Exports/faers_xml_2020Q2.zip         123MB</span></span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true"></a><span class="co">#&gt; 16: https://fis.fda.gov/content/Exports/faers_xml_2020Q1.zip         125MB</span></span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true"></a><span class="co">#&gt; 17: https://fis.fda.gov/content/Exports/faers_xml_2019Q4.zip         113MB</span></span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true"></a><span class="co">#&gt; 18: https://fis.fda.gov/content/Exports/faers_xml_2019Q3.zip         118MB</span></span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true"></a><span class="co">#&gt; 19: https://fis.fda.gov/content/Exports/faers_xml_2019Q2.zip         118MB</span></span>
+<span id="cb4-171"><a href="#cb4-171" aria-hidden="true"></a><span class="co">#&gt; 20: https://fis.fda.gov/content/Exports/faers_xml_2019Q1.zip         103MB</span></span>
+<span id="cb4-172"><a href="#cb4-172" aria-hidden="true"></a><span class="co">#&gt; 21: https://fis.fda.gov/content/Exports/faers_xml_2018q4.zip         112MB</span></span>
+<span id="cb4-173"><a href="#cb4-173" aria-hidden="true"></a><span class="co">#&gt; 22: https://fis.fda.gov/content/Exports/faers_xml_2018q3.zip         112MB</span></span>
+<span id="cb4-174"><a href="#cb4-174" aria-hidden="true"></a><span class="co">#&gt; 23: https://fis.fda.gov/content/Exports/faers_xml_2018q2.zip         112MB</span></span>
+<span id="cb4-175"><a href="#cb4-175" aria-hidden="true"></a><span class="co">#&gt; 24: https://fis.fda.gov/content/Exports/faers_xml_2018q1.zip          94MB</span></span>
+<span id="cb4-176"><a href="#cb4-176" aria-hidden="true"></a><span class="co">#&gt; 25: https://fis.fda.gov/content/Exports/faers_xml_2017q4.zip          76MB</span></span>
+<span id="cb4-177"><a href="#cb4-177" aria-hidden="true"></a><span class="co">#&gt; 26: https://fis.fda.gov/content/Exports/faers_xml_2017q3.zip          91MB</span></span>
+<span id="cb4-178"><a href="#cb4-178" aria-hidden="true"></a><span class="co">#&gt; 27: https://fis.fda.gov/content/Exports/faers_xml_2017q2.zip          86MB</span></span>
+<span id="cb4-179"><a href="#cb4-179" aria-hidden="true"></a><span class="co">#&gt; 28: https://fis.fda.gov/content/Exports/faers_xml_2017q1.zip          91MB</span></span>
+<span id="cb4-180"><a href="#cb4-180" aria-hidden="true"></a><span class="co">#&gt; 29: https://fis.fda.gov/content/Exports/faers_xml_2016q4.zip          82MB</span></span>
+<span id="cb4-181"><a href="#cb4-181" aria-hidden="true"></a><span class="co">#&gt; 30: https://fis.fda.gov/content/Exports/faers_xml_2016q3.zip          87MB</span></span>
+<span id="cb4-182"><a href="#cb4-182" aria-hidden="true"></a><span class="co">#&gt; 31: https://fis.fda.gov/content/Exports/faers_xml_2016q2.zip          81MB</span></span>
+<span id="cb4-183"><a href="#cb4-183" aria-hidden="true"></a><span class="co">#&gt; 32: https://fis.fda.gov/content/Exports/faers_xml_2016q1.zip          84MB</span></span>
+<span id="cb4-184"><a href="#cb4-184" aria-hidden="true"></a><span class="co">#&gt; 33: https://fis.fda.gov/content/Exports/faers_xml_2015q4.zip          77MB</span></span>
+<span id="cb4-185"><a href="#cb4-185" aria-hidden="true"></a><span class="co">#&gt; 34: https://fis.fda.gov/content/Exports/faers_xml_2015q3.zip          88MB</span></span>
+<span id="cb4-186"><a href="#cb4-186" aria-hidden="true"></a><span class="co">#&gt; 35: https://fis.fda.gov/content/Exports/faers_xml_2015q2.zip          70MB</span></span>
+<span id="cb4-187"><a href="#cb4-187" aria-hidden="true"></a><span class="co">#&gt; 36: https://fis.fda.gov/content/Exports/faers_xml_2015q1.zip          72MB</span></span>
+<span id="cb4-188"><a href="#cb4-188" aria-hidden="true"></a><span class="co">#&gt; 37: https://fis.fda.gov/content/Exports/faers_xml_2014q4.zip          53MB</span></span>
+<span id="cb4-189"><a href="#cb4-189" aria-hidden="true"></a><span class="co">#&gt; 38: https://fis.fda.gov/content/Exports/faers_xml_2014q3.zip          54MB</span></span>
+<span id="cb4-190"><a href="#cb4-190" aria-hidden="true"></a><span class="co">#&gt; 39: https://fis.fda.gov/content/Exports/faers_xml_2014q2.zip          44MB</span></span>
+<span id="cb4-191"><a href="#cb4-191" aria-hidden="true"></a><span class="co">#&gt; 40: https://fis.fda.gov/content/Exports/faers_xml_2014q1.zip          52MB</span></span>
+<span id="cb4-192"><a href="#cb4-192" aria-hidden="true"></a><span class="co">#&gt; 41: https://fis.fda.gov/content/Exports/faers_xml_2013q4.zip          46MB</span></span>
+<span id="cb4-193"><a href="#cb4-193" aria-hidden="true"></a><span class="co">#&gt; 42: https://fis.fda.gov/content/Exports/faers_xml_2013q3.zip          40MB</span></span>
+<span id="cb4-194"><a href="#cb4-194" aria-hidden="true"></a><span class="co">#&gt; 43: https://fis.fda.gov/content/Exports/faers_xml_2013q2.zip          38MB</span></span>
+<span id="cb4-195"><a href="#cb4-195" aria-hidden="true"></a><span class="co">#&gt; 44: https://fis.fda.gov/content/Exports/faers_xml_2013q1.zip          44MB</span></span>
+<span id="cb4-196"><a href="#cb4-196" aria-hidden="true"></a><span class="co">#&gt; 45: https://fis.fda.gov/content/Exports/faers_xml_2012q4.zip          50MB</span></span>
+<span id="cb4-197"><a href="#cb4-197" aria-hidden="true"></a><span class="co">#&gt; 46: https://fis.fda.gov/content/Exports/aers_sgml_2012q3.zip          21MB</span></span>
+<span id="cb4-198"><a href="#cb4-198" aria-hidden="true"></a><span class="co">#&gt; 47: https://fis.fda.gov/content/Exports/aers_sgml_2012q2.zip          32MB</span></span>
+<span id="cb4-199"><a href="#cb4-199" aria-hidden="true"></a><span class="co">#&gt; 48: https://fis.fda.gov/content/Exports/aers_sgml_2012q1.zip          33MB</span></span>
+<span id="cb4-200"><a href="#cb4-200" aria-hidden="true"></a><span class="co">#&gt; 49: https://fis.fda.gov/content/Exports/aers_sgml_2011q4.zip          29MB</span></span>
+<span id="cb4-201"><a href="#cb4-201" aria-hidden="true"></a><span class="co">#&gt; 50: https://fis.fda.gov/content/Exports/aers_sgml_2011q3.zip          29MB</span></span>
+<span id="cb4-202"><a href="#cb4-202" aria-hidden="true"></a><span class="co">#&gt; 51: https://fis.fda.gov/content/Exports/aers_sgml_2011q2.zip          29MB</span></span>
+<span id="cb4-203"><a href="#cb4-203" aria-hidden="true"></a><span class="co">#&gt; 52: https://fis.fda.gov/content/Exports/aers_sgml_2011q1.zip          26MB</span></span>
+<span id="cb4-204"><a href="#cb4-204" aria-hidden="true"></a><span class="co">#&gt; 53: https://fis.fda.gov/content/Exports/aers_sgml_2010q4.zip          25MB</span></span>
+<span id="cb4-205"><a href="#cb4-205" aria-hidden="true"></a><span class="co">#&gt; 54: https://fis.fda.gov/content/Exports/aers_sgml_2010q3.zip          28MB</span></span>
+<span id="cb4-206"><a href="#cb4-206" aria-hidden="true"></a><span class="co">#&gt; 55: https://fis.fda.gov/content/Exports/aers_sgml_2010q2.zip          22MB</span></span>
+<span id="cb4-207"><a href="#cb4-207" aria-hidden="true"></a><span class="co">#&gt; 56: https://fis.fda.gov/content/Exports/aers_sgml_2010q1.zip          20MB</span></span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true"></a><span class="co">#&gt; 57: https://fis.fda.gov/content/Exports/aers_sgml_2009q4.zip          20MB</span></span>
+<span id="cb4-209"><a href="#cb4-209" aria-hidden="true"></a><span class="co">#&gt; 58: https://fis.fda.gov/content/Exports/aers_sgml_2009q3.zip          19MB</span></span>
+<span id="cb4-210"><a href="#cb4-210" aria-hidden="true"></a><span class="co">#&gt; 59: https://fis.fda.gov/content/Exports/aers_sgml_2009q2.zip          18MB</span></span>
+<span id="cb4-211"><a href="#cb4-211" aria-hidden="true"></a><span class="co">#&gt; 60: https://fis.fda.gov/content/Exports/aers_sgml_2009q1.zip          16MB</span></span>
+<span id="cb4-212"><a href="#cb4-212" aria-hidden="true"></a><span class="co">#&gt; 61: https://fis.fda.gov/content/Exports/aers_sgml_2008q4.zip          16MB</span></span>
+<span id="cb4-213"><a href="#cb4-213" aria-hidden="true"></a><span class="co">#&gt; 62: https://fis.fda.gov/content/Exports/aers_sgml_2008q3.zip          16MB</span></span>
+<span id="cb4-214"><a href="#cb4-214" aria-hidden="true"></a><span class="co">#&gt; 63: https://fis.fda.gov/content/Exports/aers_sgml_2008q2.zip          16MB</span></span>
+<span id="cb4-215"><a href="#cb4-215" aria-hidden="true"></a><span class="co">#&gt; 64: https://fis.fda.gov/content/Exports/aers_sgml_2008q1.zip          15MB</span></span>
+<span id="cb4-216"><a href="#cb4-216" aria-hidden="true"></a><span class="co">#&gt; 65: https://fis.fda.gov/content/Exports/aers_sgml_2007q4.zip          14MB</span></span>
+<span id="cb4-217"><a href="#cb4-217" aria-hidden="true"></a><span class="co">#&gt; 66: https://fis.fda.gov/content/Exports/aers_sgml_2007q3.zip          13MB</span></span>
+<span id="cb4-218"><a href="#cb4-218" aria-hidden="true"></a><span class="co">#&gt; 67: https://fis.fda.gov/content/Exports/aers_sgml_2007q2.zip          12MB</span></span>
+<span id="cb4-219"><a href="#cb4-219" aria-hidden="true"></a><span class="co">#&gt; 68: https://fis.fda.gov/content/Exports/aers_sgml_2007q1.zip          12MB</span></span>
+<span id="cb4-220"><a href="#cb4-220" aria-hidden="true"></a><span class="co">#&gt; 69: https://fis.fda.gov/content/Exports/aers_sgml_2006q4.zip          12MB</span></span>
+<span id="cb4-221"><a href="#cb4-221" aria-hidden="true"></a><span class="co">#&gt; 70: https://fis.fda.gov/content/Exports/aers_sgml_2006q3.zip          11MB</span></span>
+<span id="cb4-222"><a href="#cb4-222" aria-hidden="true"></a><span class="co">#&gt;  [ reached getOption(&quot;max.print&quot;) -- omitted 11 rows ]</span></span></code></pre></div>
 <p>An metadata copy was associated with the package, just set <code>internal = TRUE</code>. However, this copy will only be used if the cached file on your computer cannot be found as the cached file on your computer should be more up-to-date than this metadata copy.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">faers_clearcache</span>(<span class="st">&quot;metadata&quot;</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">#&gt; ✔ Removing &#39;~/.cache/R/faers/metadata&#39; successfully</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co">#&gt; ✔ Removing &#39;/home/yun/.cache/R/faers/faers/metadata&#39; successfully</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="kw">faers_meta</span>(<span class="dt">internal =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co">#&gt; → Using internal FAERS metadata</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="co">#&gt;   Snapshot time: 2023-11-08 13:06:35.726011</span></span>
@@ -1563,20 +1563,20 @@ body {
 <p>Pharmacovigilance is the science and activities relating to the detection, assessment, understanding and prevention of adverse effects or any other medicine/vaccine related problem.</p>
 <p>To mine the signals of “insulin”, we start by using the <code>faers_filter()</code> function. In this function, the <code>.fn</code> argument should be a function that accepts data specified in <code>.field</code>. It is important to note that <code>.fn</code> should always return the <code>primaryid</code> that you want to keep.</p>
 <p>To enhance our analysis, it would be advantageous to include all drug synonym names for <code>insulin</code>. These synonyms can be obtained by querying sources such as <a href="https://go.drugbank.com/">https://go.drugbank.com/</a> or alternative databases. Furthermore, we extract the brand names of insulin from the <a href="https://www.fda.gov/drugs/drug-approvals-and-databases/drugsfda-data-files">Drugs@FDA</a> dataset, which can be easily obtained using the <code>fda_drugs()</code> function.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a>insulin_pattern &lt;-<span class="st"> &quot;insulin&quot;</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>insulin_pattern &lt;-<span class="st"> </span><span class="kw">paste</span>(insulin_pattern, <span class="dt">collapse =</span> <span class="st">&quot;|&quot;</span>)</span>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a>insulin_names &lt;-<span class="st"> &quot;insulin&quot;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>insulin_pattern &lt;-<span class="st"> </span><span class="kw">paste</span>(insulin_names, <span class="dt">collapse =</span> <span class="st">&quot;|&quot;</span>)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>fda_insulin &lt;-<span class="st"> </span><span class="kw">fda_drugs</span>()[</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>    <span class="kw">grepl</span>(insulin_pattern, ActiveIngredient, <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>]</span>
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a><span class="co">#&gt; → Using Drugs@FDA data from cached</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a><span class="co">#&gt;   &#39;/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2024-01-14.zip&#39;</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a><span class="co">#&gt;   Snapshot date: 2024-01-14</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a><span class="co">#&gt;   &#39;/home/yun/.cache/R/faers/faers/fdadrugs/fda_drugs_data_2024-03-14.zip&#39;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true"></a><span class="co">#&gt;   Snapshot date: 2024-03-14</span></span>
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true"></a><span class="co">#&gt; Warning: One or more parsing issues, call `problems()` on your data frame for details,</span></span>
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true"></a><span class="co">#&gt; e.g.:</span></span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true"></a><span class="co">#&gt;   dat &lt;- vroom(...)</span></span>
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true"></a><span class="co">#&gt;   problems(dat)</span></span>
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true"></a>insulin_pattern &lt;-<span class="st"> </span><span class="kw">paste0</span>(</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true"></a>    <span class="kw">unique</span>(<span class="kw">tolower</span>(<span class="kw">c</span>(insulin_pattern, fda_insulin<span class="op">$</span>DrugName))),</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true"></a>    <span class="kw">unique</span>(<span class="kw">tolower</span>(<span class="kw">c</span>(insulin_names, fda_insulin<span class="op">$</span>DrugName))),</span>
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true"></a>    <span class="dt">collapse =</span> <span class="st">&quot;|&quot;</span></span>
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true"></a>)</span>
 <span id="cb15-17"><a href="#cb15-17" aria-hidden="true"></a>insulin_data &lt;-<span class="st"> </span><span class="kw">faers_filter</span>(data, <span class="dt">.fn =</span> <span class="cf">function</span>(x) {</span>
@@ -1852,30 +1852,29 @@ body {
 <span id="cb18-19"><a href="#cb18-19" aria-hidden="true"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span id="cb18-20"><a href="#cb18-20" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb18-21"><a href="#cb18-21" aria-hidden="true"></a><span class="co">#&gt; other attached packages:</span></span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true"></a><span class="co">#&gt; [1] faers_0.99.4</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true"></a><span class="co">#&gt; [1] faers_0.99.5</span></span>
 <span id="cb18-23"><a href="#cb18-23" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb18-24"><a href="#cb18-24" aria-hidden="true"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true"></a><span class="co">#&gt;  [1] generics_0.1.3      rappdirs_0.3.3      utf8_1.2.4         </span></span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true"></a><span class="co">#&gt;  [4] xml2_1.3.6          openEBGM_0.9.1      stringi_1.8.3      </span></span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true"></a><span class="co">#&gt;  [7] lattice_0.22-5      digest_0.6.33       magrittr_2.0.3     </span></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true"></a><span class="co">#&gt; [10] evaluate_0.23       grid_4.3.1          MCMCpack_1.6-3     </span></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true"></a><span class="co">#&gt; [13] fastmap_1.1.1       Matrix_1.6-4        survival_3.5-7     </span></span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true"></a><span class="co">#&gt; [16] mcmc_0.9-7          httr_1.4.7          rvest_1.0.3        </span></span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true"></a><span class="co">#&gt; [19] fansi_1.0.6         selectr_0.4-2       scales_1.3.0       </span></span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true"></a><span class="co">#&gt; [22] codetools_0.2-19    cli_3.6.2           rlang_1.1.2        </span></span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true"></a><span class="co">#&gt; [25] crayon_1.5.2        munsell_0.5.0       bit64_4.0.5        </span></span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true"></a><span class="co">#&gt; [28] splines_4.3.1       yaml_2.3.8          tools_4.3.1        </span></span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true"></a><span class="co">#&gt; [31] parallel_4.3.1      SparseM_1.81        tzdb_0.4.0         </span></span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true"></a><span class="co">#&gt; [34] BiocParallel_1.34.2 MatrixModels_0.5-2  coda_0.19-4        </span></span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true"></a><span class="co">#&gt; [37] dplyr_1.1.4         colorspace_2.1-0    ggplot2_3.4.4      </span></span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true"></a><span class="co">#&gt; [40] curl_5.2.0          vctrs_0.6.5         R6_2.5.1           </span></span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true"></a><span class="co">#&gt; [43] lifecycle_1.0.4     stringr_1.5.1       bit_4.0.5          </span></span>
-<span id="cb18-40"><a href="#cb18-40" aria-hidden="true"></a><span class="co">#&gt; [46] vroom_1.6.5         MASS_7.3-60         pkgconfig_2.0.3    </span></span>
-<span id="cb18-41"><a href="#cb18-41" aria-hidden="true"></a><span class="co">#&gt; [49] archive_1.1.6       gtable_0.3.4        pillar_1.9.0       </span></span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true"></a><span class="co">#&gt; [52] data.table_1.14.99  glue_1.6.2          xfun_0.41          </span></span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true"></a><span class="co">#&gt; [55] tibble_3.2.1        tidyselect_1.2.0    knitr_1.45         </span></span>
-<span id="cb18-44"><a href="#cb18-44" aria-hidden="true"></a><span class="co">#&gt; [58] htmltools_0.5.7     rmarkdown_2.25      compiler_4.3.1     </span></span>
-<span id="cb18-45"><a href="#cb18-45" aria-hidden="true"></a><span class="co">#&gt; [61] quantreg_5.96</span></span></code></pre></div>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true"></a><span class="co">#&gt;  [1] generics_0.1.3      utf8_1.2.4          xml2_1.3.6         </span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true"></a><span class="co">#&gt;  [4] openEBGM_0.9.1      stringi_1.8.3       lattice_0.22-5     </span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true"></a><span class="co">#&gt;  [7] digest_0.6.33       magrittr_2.0.3      evaluate_0.23      </span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true"></a><span class="co">#&gt; [10] grid_4.3.1          MCMCpack_1.6-3      fastmap_1.1.1      </span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true"></a><span class="co">#&gt; [13] Matrix_1.6-4        survival_3.5-7      mcmc_0.9-7         </span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true"></a><span class="co">#&gt; [16] httr_1.4.7          rvest_1.0.3         fansi_1.0.6        </span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true"></a><span class="co">#&gt; [19] selectr_0.4-2       scales_1.3.0        codetools_0.2-19   </span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true"></a><span class="co">#&gt; [22] cli_3.6.2           rlang_1.1.2         crayon_1.5.2       </span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true"></a><span class="co">#&gt; [25] munsell_0.5.0       bit64_4.0.5         splines_4.3.1      </span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true"></a><span class="co">#&gt; [28] yaml_2.3.8          tools_4.3.1         parallel_4.3.1     </span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true"></a><span class="co">#&gt; [31] SparseM_1.81        tzdb_0.4.0          BiocParallel_1.34.2</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true"></a><span class="co">#&gt; [34] MatrixModels_0.5-2  coda_0.19-4         dplyr_1.1.4        </span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true"></a><span class="co">#&gt; [37] colorspace_2.1-0    ggplot2_3.4.4       curl_5.2.0         </span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true"></a><span class="co">#&gt; [40] vctrs_0.6.5         R6_2.5.1            lifecycle_1.0.4    </span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true"></a><span class="co">#&gt; [43] stringr_1.5.1       bit_4.0.5           vroom_1.6.5        </span></span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true"></a><span class="co">#&gt; [46] MASS_7.3-60         pkgconfig_2.0.3     archive_1.1.6      </span></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true"></a><span class="co">#&gt; [49] gtable_0.3.4        pillar_1.9.0        data.table_1.14.99 </span></span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true"></a><span class="co">#&gt; [52] glue_1.6.2          xfun_0.41           tibble_3.2.1       </span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true"></a><span class="co">#&gt; [55] tidyselect_1.2.0    knitr_1.45          htmltools_0.5.7    </span></span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true"></a><span class="co">#&gt; [58] rmarkdown_2.25      compiler_4.3.1      quantreg_5.96</span></span></code></pre></div>
 
 </body>
 </html>

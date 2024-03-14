@@ -102,7 +102,7 @@ faers_cache_dir <- function(name, create = TRUE) {
 }
 
 faers_user_cache_dir <- function(create = TRUE) {
-    path <- file.path(rappdirs::user_cache_dir("R"), pkg_nm())
+    path <- file.path(tools::R_user_dir(pkg_nm(), "cache"), pkg_nm())
     if (create) {
         dir_create2(path, recursive = TRUE)
     } else {
