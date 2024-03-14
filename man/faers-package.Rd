@@ -3,7 +3,6 @@
 \docType{package}
 \name{faers-package}
 \alias{faers-package}
-\alias{_PACKAGE}
 \title{faers: R interface for FDA Adverse Event Reporting System}
 \description{
 The FDA Adverse Event Reporting System (FAERS) is a database used for the spontaneous reporting of adverse events and medication errors related to human drugs and therapeutic biological products. faers pacakge serves as the interface between the FAERS database and R. Furthermore, faers pacakge offers a standardized approach for performing pharmacovigilance analysis.

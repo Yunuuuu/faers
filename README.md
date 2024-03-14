@@ -55,7 +55,7 @@ if (!requireNamespace("pak")) {
         )
     )
 }
-pak::pkg_install("Yunuuuu/faers")
+pak::pkg_install("Yunuuuu/faers@main")
 ```
 
 ## Pharmacovigilance Analysis using FAERS
@@ -73,7 +73,7 @@ library(faers)
 
 This will return a data.table reporting years, period, quarter, and file
 urls and file sizes. By default, this will use the cached file in
-`rappdirs::user_cache_dir("faers")`. If it doesn’t exist, the internal
+`tools::R_user_dir("faers", "cache")`. If it doesn’t exist, the internal
 will parse metadata in
 <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
 
@@ -82,7 +82,7 @@ faers_meta()
 #> → Reading html:
 #>   <https://fis.fda.gov/extensions/FPD-QDE-FAERS/FPD-QDE-FAERS.html>
 #> → Writing FAERS metadata into cache file
-#>   '~/.cache/R/faers/metadata/faers_meta_data.rds'
+#>   '/home/yun/.cache/R/faers/faers/metadata/faers_meta_data.rds'
 #>      year quarter             period
 #>     <int>  <char>             <char>
 #>  1:  2023      q4 October - December
@@ -309,7 +309,7 @@ more up-to-date than this metadata copy.
 
 ``` r
 faers_clearcache("metadata")
-#> ✔ Removing '~/.cache/R/faers/metadata' successfully
+#> ✔ Removing '/home/yun/.cache/R/faers/faers/metadata' successfully
 faers_meta(internal = TRUE)
 #> → Using internal FAERS metadata
 #>   Snapshot time: 2023-11-08 13:06:35.726011
@@ -1112,8 +1112,8 @@ fda_insulin <- fda_drugs()[
     grepl(insulin_pattern, ActiveIngredient, ignore.case = TRUE)
 ]
 #> → Using Drugs@FDA data from cached
-#>   '/home/yun/.cache/R/faers/fdadrugs/fda_drugs_data_2024-01-14.zip'
-#>   Snapshot date: 2024-01-14
+#>   '/home/yun/.cache/R/faers/faers/fdadrugs/fda_drugs_data_2024-03-14.zip'
+#>   Snapshot date: 2024-03-14
 #> Warning: One or more parsing issues, call `problems()` on your data frame for details,
 #> e.g.:
 #>   dat <- vroom(...)
@@ -1422,28 +1422,27 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] faers_0.99.4
+#> [1] faers_0.99.5
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] generics_0.1.3      rappdirs_0.3.3      utf8_1.2.4         
-#>  [4] xml2_1.3.6          openEBGM_0.9.1      stringi_1.8.3      
-#>  [7] lattice_0.22-5      digest_0.6.33       magrittr_2.0.3     
-#> [10] evaluate_0.23       grid_4.3.1          MCMCpack_1.6-3     
-#> [13] fastmap_1.1.1       Matrix_1.6-4        survival_3.5-7     
-#> [16] mcmc_0.9-7          httr_1.4.7          rvest_1.0.3        
-#> [19] fansi_1.0.6         selectr_0.4-2       scales_1.3.0       
-#> [22] codetools_0.2-19    cli_3.6.2           rlang_1.1.2        
-#> [25] crayon_1.5.2        munsell_0.5.0       bit64_4.0.5        
-#> [28] splines_4.3.1       yaml_2.3.8          tools_4.3.1        
-#> [31] parallel_4.3.1      SparseM_1.81        tzdb_0.4.0         
-#> [34] BiocParallel_1.34.2 MatrixModels_0.5-2  coda_0.19-4        
-#> [37] dplyr_1.1.4         colorspace_2.1-0    ggplot2_3.4.4      
-#> [40] curl_5.2.0          vctrs_0.6.5         R6_2.5.1           
-#> [43] lifecycle_1.0.4     stringr_1.5.1       bit_4.0.5          
-#> [46] vroom_1.6.5         MASS_7.3-60         pkgconfig_2.0.3    
-#> [49] archive_1.1.6       gtable_0.3.4        pillar_1.9.0       
-#> [52] data.table_1.14.99  glue_1.6.2          xfun_0.41          
-#> [55] tibble_3.2.1        tidyselect_1.2.0    knitr_1.45         
-#> [58] htmltools_0.5.7     rmarkdown_2.25      compiler_4.3.1     
-#> [61] quantreg_5.96
+#>  [1] generics_0.1.3      utf8_1.2.4          xml2_1.3.6         
+#>  [4] openEBGM_0.9.1      stringi_1.8.3       lattice_0.22-5     
+#>  [7] digest_0.6.33       magrittr_2.0.3      evaluate_0.23      
+#> [10] grid_4.3.1          MCMCpack_1.6-3      fastmap_1.1.1      
+#> [13] Matrix_1.6-4        survival_3.5-7      mcmc_0.9-7         
+#> [16] httr_1.4.7          rvest_1.0.3         fansi_1.0.6        
+#> [19] selectr_0.4-2       scales_1.3.0        codetools_0.2-19   
+#> [22] cli_3.6.2           rlang_1.1.2         crayon_1.5.2       
+#> [25] munsell_0.5.0       bit64_4.0.5         splines_4.3.1      
+#> [28] yaml_2.3.8          tools_4.3.1         parallel_4.3.1     
+#> [31] SparseM_1.81        tzdb_0.4.0          BiocParallel_1.34.2
+#> [34] MatrixModels_0.5-2  coda_0.19-4         dplyr_1.1.4        
+#> [37] colorspace_2.1-0    ggplot2_3.4.4       curl_5.2.0         
+#> [40] vctrs_0.6.5         R6_2.5.1            lifecycle_1.0.4    
+#> [43] stringr_1.5.1       bit_4.0.5           vroom_1.6.5        
+#> [46] MASS_7.3-60         pkgconfig_2.0.3     archive_1.1.6      
+#> [49] gtable_0.3.4        pillar_1.9.0        data.table_1.14.99 
+#> [52] glue_1.6.2          xfun_0.41           tibble_3.2.1       
+#> [55] tidyselect_1.2.0    knitr_1.45          htmltools_0.5.7    
+#> [58] rmarkdown_2.25      compiler_4.3.1      quantreg_5.96
 ```

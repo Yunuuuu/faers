@@ -18,9 +18,9 @@ Imports:
     MCMCpack,
     methods,
     openEBGM,
-    rappdirs,
     rlang (>= 1.1.0),
     rvest,
+    tools,
     utils,
     vroom,
     xml2
@@ -34,7 +34,7 @@ biocViews: Software, DataImport, BiomedicalInformatics, Pharmacogenomics, Pharma
 Encoding: UTF-8
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 VignetteBuilder: knitr
