@@ -1,8 +1,13 @@
 Package: faers
 Title: R interface for FDA Adverse Event Reporting System
-Version: 0.99.6
+Version: 0.99.7
 Authors@R: 
-    person("Yun", "Peng", , "yunyunp96@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-2801-3332"))
+    c(
+        person("Yun", "Peng", , "yunyunp96@163.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-2801-3332")),
+        person("YuXuan", "Song", , "yuxuan_song2021@163.com", role = "aut"),
+        person("Caipeng", "Qin", , "qincaipeng@pkuph.edu.cn", role = "aut"),
+        person("JiaXing", "Lin", , "1570851599@qq.com", role = "aut")
+    )
 BugReports: https://github.com/Yunuuuu/faers
 Description: The FDA Adverse Event Reporting System (FAERS) is a database used for the spontaneous reporting of adverse events and medication errors related to human drugs and therapeutic biological products. faers pacakge serves as the interface between the FAERS database and R. Furthermore, faers pacakge offers a standardized approach for performing pharmacovigilance analysis.
 License: MIT + file LICENSE
