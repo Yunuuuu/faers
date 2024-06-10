@@ -65,6 +65,8 @@ methods::setMethod(
         full_counts <- faers_counts(.full, .events = .events, ...)
         interested_counts <- faers_counts(.object, .events = .events, ...)
         # It's not necessary to call unique for de-duplicated data
+        # Don't use `sum(full_counts$N)` or `sum(interested_counts$N)`, since
+        # they will include duplicated primaryids (patients)
         n <- length(unique(full_primaryids))
         n1. <- length(unique(interested_primaryids))
         data.table::setnames(full_counts, "N", "n.1")
