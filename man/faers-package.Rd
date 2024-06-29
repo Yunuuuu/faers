@@ -15,13 +15,13 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Yun Peng \email{yunyunp96@gmail.com} (\href{https://orcid.org/0000-0003-2801-3332}{ORCID})
+\strong{Maintainer}: Yun Peng \email{yunyunp96@163.com} (\href{https://orcid.org/0000-0003-2801-3332}{ORCID})
 
 Authors:
 \itemize{
   \item YuXuan Song \email{yuxuan_song2021@163.com}
-  \item Jiaxing Song \email{1570851599@qq.com}
   \item Caipeng Qin \email{qincaipeng@pkuph.edu.cn}
+  \item JiaXing Lin \email{1570851599@qq.com}
 }
 
 }

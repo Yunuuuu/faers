@@ -5,9 +5,8 @@
 #'  - `faers_phv_signal`: Pharmacovigilance Analysis used contingency table
 #'    constructed with `faers_phv_table`. You must pass `.full` or `.object2`
 #'    into `faers_phv_table`.
-#' @param .object A [FAERSascii] object. The value `n11` or `a` will be
-#' calculated from `.object`. The unique number of primaryids will be regarded
-#' as `n1.`.
+#' @param .object A [FAERSascii] object. The unique number of `primaryids` from
+#' `.object` will be regarded as `n1.`.
 #' @param ... Other arguments passed to specific methods.
 #'  - `faers_phv_table`: other arguments passed to [faers_counts].
 #'  - `faers_phv_signal`: other arguments passed to `faers_phv_table`.
@@ -42,8 +41,8 @@ methods::setGeneric(
 )
 
 #' @param .full A [FAERSascii] object with data from full data. In this way,
-#' `.object` must be a subset of `.full`. The unique number of primaryids will
-#' be regarded as `n`.
+#' `.object` must be a subset of `.full`. The unique number of `primaryids` from
+#' `.full` will be regarded as `n`.
 #' @inheritParams faers_counts
 #' @export
 #' @rdname faers_phv_signal
@@ -84,8 +83,8 @@ methods::setMethod(
 )
 
 #' @param .object2 A [FAERSascii] object with data from another interested drug,
-#' In this way, `.object` and `.object2` should be not overlapped. The unique
-#' number of primaryids will be regarded as `n0.`.
+#' In this way, `.object` and `.object2` should not be overlapped. The unique
+#' number of `primaryids` from `object2` will be regarded as `n0.`.
 #' @rdname faers_phv_signal
 #' @export
 methods::setMethod(
