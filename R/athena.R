@@ -72,7 +72,7 @@ athena_read <- function(file) {
 athena_file <- function(
     url, force, dir = faers_cache_dir("athena"),
     arg = rlang::caller_arg(url)) {
-    cache_file(
+    cache_use_or_download(
         force = force,
         url = url,
         prefix = "athena_vocabularies",

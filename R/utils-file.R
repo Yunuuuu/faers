@@ -40,11 +40,10 @@ delete_cache <- function(path, ..., name = NULL) {
     }
 }
 
-cache_file <- function(
-    force, url, prefix,
-    ext = NULL, name, dir,
-    arg = rlang::caller_arg(url),
-    call = rlang::caller_env()) {
+cache_use_or_download <- function(force, url, prefix,
+                                  ext = NULL, name, dir, ...,
+                                  arg = rlang::caller_arg(url),
+                                  call = rlang::caller_env()) {
     if (!force) {
         pattern <- sprintf("^%s_\\d+-\\d+-\\d+", prefix)
         if (!is.null(ext)) {
@@ -54,41 +53,56 @@ cache_file <- function(
         }
         file <- tryCatch(
             locate_files(dir, pattern, ignore.case = FALSE),
-            no_file = function(cnd) {
-                force <<- TRUE
-            }
+            no_file = function(cnd) force <<- TRUE
         )
     }
     if (force) {
-        if (is.null(url)) {
-            cli::cli_abort("You must provide {.arg {arg}}", call = call)
-        }
-        file <- cache_download(url, prefix = prefix, ext = ext, dir = dir)
-    } else {
-        date <- as.Date(
-            str_extract(basename(file), "\\d+-\\d+-\\d+"),
-            format = "%Y-%m-%d"
+        cache_download(
+            url = url,
+            prefix = prefix, ext = ext, dir = dir,
+            ...,
+            arg = arg, call = call
         )
-        if (length(file) > 1L) {
-            i <- order(date, decreasing = TRUE)[1L]
-            file <- file[i]
-            date <- date[i]
-        }
-        cli::cli_inform(c(
-            ">" = "Using {name} from cached {.file {file}}",
-            " " = "Snapshot date: {date}"
-        ))
+    } else {
+        cache_use(file, name = name)
     }
+}
+
+cache_use <- function(file, name) {
+    date <- as.Date(
+        str_extract(basename(file), "\\d+-\\d+-\\d+"),
+        format = "%Y-%m-%d"
+    )
+    if (length(file) > 1L) {
+        i <- order(date, decreasing = TRUE)[1L]
+        file <- file[i]
+        date <- date[i]
+    }
+    cli::cli_inform(c(
+        ">" = "Using {name} from cached {.file {file}}",
+        " " = "Snapshot date: {date}"
+    ))
     file
 }
 
-cache_download <- function(url, prefix, ext, dir, call = rlang::caller_env()) {
+cache_download <- function(url, prefix, ext, dir, method = NULL,
+                           ...,
+                           arg = rlang::caller_arg(url),
+                           call = rlang::caller_env()) {
+    if (is.null(url)) {
+        cli::cli_abort("You must provide {.arg {arg}}", call = call)
+    }
     assert_internet(call = call)
+    method <- match.arg(method, c("base", "curl"))
     file <- file.path(dir, paste(prefix, Sys.Date(), sep = "_"))
     if (!is.null(ext)) {
         file <- paste(file, ext, sep = ".")
     }
-    download_inform(url, file)
+    if (identical(method, "base")) {
+        base_download_inform(url, file)
+    } else {
+        download_inform(url, file, ...)
+    }
 }
 
 # name used: metadata, fdadrugs, rxnorm, athena
@@ -111,7 +125,8 @@ faers_user_cache_dir <- function(create = TRUE) {
 }
 
 # file or path utils function --------------
-dir_or_unzip <- function(path, compress_dir, pattern, none_msg, ignore.case = TRUE) {
+dir_or_unzip <- function(path, compress_dir, pattern, none_msg,
+                         ignore.case = TRUE) {
     if (dir.exists(path)) {
         return(path)
     } else if (file.exists(path)) {
@@ -138,14 +153,15 @@ zip2 <- function(zipfile, files, ..., root = getwd()) {
 #' Will always add the basename into the compress_dir
 #' @noRd
 unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
-    compress_dir <- file.path(dir_create2(compress_dir), str_remove(
-        basename(path), "\\.zip$",
-        ignore.case = ignore.case
-    ))
-    if (is.null(utils::unzip(path, exdir = dir_create2(compress_dir), overwrite = TRUE))) {
+    compress_dir <- file.path(
+        dir_create2(compress_dir),
+        str_remove(basename(path), "\\.zip$", ignore.case = ignore.case)
+    )
+    exdir <- dir_create2(compress_dir)
+    if (is.null(utils::unzip(path, exdir = exdir, overwrite = TRUE))) {
         cli::cli_abort("Cannot uncompress {.file {path}}")
     }
-    compress_dir
+    exdir
 }
 
 locate_dir <- function(path, pattern = NULL, ignore.case = TRUE) {

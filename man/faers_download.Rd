@@ -19,7 +19,7 @@ Default: "ascii".}
 current working dir.}
 
 \item{...}{Extra handle options passed to each request
-\link[curl:handle]{new_handle}.}
+\link[curl:multi_download]{multi_download}.}
 }
 \value{
 An atomic character for the path of downloaded files.

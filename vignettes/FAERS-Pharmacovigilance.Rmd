@@ -65,7 +65,7 @@ if (!requireNamespace("pak")) {
         )
     )
 }
-pak::pkg_install("Yunuuuu/faers@main")
+pak::pkg_install("Yunuuuu/faers")
 ```
 
 ## Pharmacovigilance Analysis using FAERS

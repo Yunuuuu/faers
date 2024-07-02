@@ -4,11 +4,15 @@
 \alias{fda_drugs}
 \title{Read and Parse Drugs@FDA data}
 \usage{
-fda_drugs(pattern = "Products", list = FALSE, force = FALSE)
+fda_drugs(pattern = "Products", url = NULL, list = FALSE, force = FALSE)
 }
 \arguments{
 \item{pattern}{File pattern to use. Must define a file exactly, you can set
 \code{list = TRUE} to see what files can be used.}
+
+\item{url}{A string of the url for \code{Drugs@FDA} file. Try to get the link
+from site:
+\url{https://www.fda.gov/drugs/drug-approvals-and-databases/drugsfda-data-files}.}
 
 \item{list}{A boolean value, should it only list files in the \code{Drugs@FDA}
 dataset?}
@@ -28,7 +32,4 @@ Read and Parse Drugs@FDA data
 \examples{
 fda_drugs(list = TRUE)
 fda_drugs()
-}
-\seealso{
-\url{https://www.fda.gov/drugs/drug-approvals-and-databases/drugsfda-data-files}
 }
