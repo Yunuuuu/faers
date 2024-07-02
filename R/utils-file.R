@@ -99,7 +99,7 @@ cache_download <- function(url, prefix, ext, dir, method = NULL,
         file <- paste(file, ext, sep = ".")
     }
     if (identical(method, "base")) {
-        base_download_inform(url, file)
+        base_download_inform(url, file, ...)
     } else {
         download_inform(url, file, ...)
     }
@@ -158,7 +158,7 @@ unzip2 <- function(path, compress_dir, ignore.case = TRUE) {
         str_remove(basename(path), "\\.zip$", ignore.case = ignore.case)
     )
     exdir <- dir_create2(compress_dir)
-    if (is.null(utils::unzip(path, exdir = exdir, overwrite = TRUE))) {
+    if (length(utils::unzip(path, exdir = exdir, overwrite = TRUE)) == 0L) {
         cli::cli_abort("Cannot uncompress {.file {path}}")
     }
     exdir

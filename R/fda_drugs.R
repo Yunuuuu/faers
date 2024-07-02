@@ -50,7 +50,7 @@ fda_drugs_file <- function(url = NULL, force,
         ext = "zip",
         name = "Drugs@FDA data",
         dir = dir, 
-        method = "base",
+        method = "base", mode = "wb",
         arg = arg, call = call
     )
 }
