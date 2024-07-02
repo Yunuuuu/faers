@@ -83,7 +83,10 @@ download_inform <- function(urls, file_paths, ...) {
                     "status {cli::qty(n_failed_files)} code{?s}:",
                     "{.val {status[!is_success]}}"
                 ),
-                x = "error {cli::qty(n_failed_files)} message{?s}: {.val {status$error[!is_success]}}"
+                x = paste(
+                    "error {cli::qty(n_failed_files)} message{?s}:",
+                    "{.val {status$error[!is_success]}}"
+                )
             ))
         }
     }
@@ -115,7 +118,8 @@ base_download_inform <- function(urls, file_paths, ...) {
             cli::cli_inform("Downloading {.val {l}} files")
         }
         status <- utils::download.file(urls,
-            destfile = file_paths, ..., method = "libcurl"
+            destfile = file_paths, ...,
+            method = "libcurl"
         )
         is_success <- status == 0L
         is_need_deleted <- !is_success & file.exists(file_paths)
