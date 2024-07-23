@@ -31,7 +31,7 @@ NULL
 #' @export
 #' @rdname MedDRA-class
 meddra <- function(path, add_smq = FALSE) {
-    hierarchy <- meddra_load_hierarchy(path, primary_soc = TRUE)
+    hierarchy <- meddra_load_hierarchy(path, primary_soc = FALSE)
     version <- meddra_load_version(path)
     if (add_smq) {
         smq_data <- meddra_load_smq(path)
@@ -155,6 +155,7 @@ methods::setMethod("meddra_version", "MedDRA", function(object) {
 
 ##############################################################
 meddra_standardize_pt <- function(terms, data, use = c("llt", "pt")) {
+    data <- data[primary_soc_fg == "Y"]
     # ignore letter case
     terms <- toupper(terms)
     # prepare data
