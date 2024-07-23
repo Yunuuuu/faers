@@ -42,10 +42,7 @@ faers_download <- function(years, quarters, format = NULL, dir = getwd(), ...) {
 #'   message.
 #' @noRd
 download_inform <- function(urls, file_paths, ...) {
-    out <- list(
-        urls = urls, destfiles = file_paths,
-        is_success = rep_len(TRUE, length(urls))
-    )
+    ans <- file_paths
     if (any(is_existed <- file.exists(file_paths))) {
         cli::cli_inform(paste(
             "Finding {.val {sum(is_existed)}} file{?s} already",
@@ -71,9 +68,7 @@ download_inform <- function(urls, file_paths, ...) {
         status <- do.call(curl::multi_download, arg_list)
         is_success <- is_download_success(status)
         is_need_deleted <- !is_success & file.exists(file_paths)
-        if (any(is_need_deleted)) {
-            file.remove(file_paths[is_need_deleted])
-        }
+        if (any(is_need_deleted)) file.remove(file_paths[is_need_deleted])
         if (!all(is_success)) {
             n_failed_files <- sum(!is_success) # nolint
             cli::cli_abort(c(
@@ -81,7 +76,7 @@ download_inform <- function(urls, file_paths, ...) {
                 "i" = "url{?s}: {.url {urls[!is_success]}}",
                 "!" = paste(
                     "status {cli::qty(n_failed_files)} code{?s}:",
-                    "{.val {status[!is_success]}}"
+                    "{.val {status$status_code[!is_success]}}"
                 ),
                 x = paste(
                     "error {cli::qty(n_failed_files)} message{?s}:",
@@ -90,14 +85,15 @@ download_inform <- function(urls, file_paths, ...) {
             ))
         }
     }
-    out$destfiles
+    ans
 }
 
 #' @param status A data frame returned by [multi_download][curl::multi_download]
 #' @noRd
 is_download_success <- function(status, successful_code = c(200L, 206L, 416L)) {
-    status$success & !is.na(status$success) &
-        status$status_code %in% successful_code
+    !is.na(status$success) &
+        status$success &
+        (status$status_code %in% successful_code)
 }
 
 base_download_inform <- function(urls, file_paths, ...) {
