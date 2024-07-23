@@ -14,7 +14,7 @@
 \alias{meddra_version,MedDRA-method}
 \title{MedDRA class}
 \usage{
-meddra(path, add_smq = FALSE)
+meddra(path, add_smq = FALSE, primary_soc = FALSE)
 
 \S4method{show}{MedDRA}(object)
 
@@ -35,6 +35,8 @@ meddra_version(object, ...)
 
 \item{add_smq}{A bool, indicates whether Standardised MedDRA Queries (SMQ)
 should be added. If \code{TRUE}, "smq_content.asc", and "smq_list.asc" must exist.}
+
+\item{primary_soc}{A bool, indicates whether keep primary soc only.}
 
 \item{object}{A \code{MedDRA} object.}
 

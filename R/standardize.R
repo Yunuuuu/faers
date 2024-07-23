@@ -28,7 +28,7 @@ methods::setMethod("faers_standardize", "FAERSascii", function(object, meddra_pa
     # standardize PT terms
     # for indi
     assert_string(meddra_path)
-    meddra_data <- meddra(meddra_path, add_smq = add_smq)
+    meddra_data <- meddra(meddra_path, add_smq = add_smq, primary_soc = TRUE)
     # https://stackoverflow.com/questions/70181149/is-a-saved-and-loaded-data-table-with-qs-a-correct-data-table
     # fix error: when load a saved FAERS object, don't change by reference
     cli::cli_alert("standardize {.field Preferred Term} in indi")

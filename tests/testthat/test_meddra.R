@@ -8,19 +8,26 @@ testthat::test_that("meddra works well", {
     testthat::expect_true(rlang::is_string(meddra_load_version(path), "26.1"))
     testthat::expect_s3_class(data <- meddra_load_hierarchy(path), "data.table")
     testthat::expect_true(all(data$primary_soc_fg == "Y"))
+    testthat::expect_true(anyDuplicated(data$llt_code) == 0L)
     testthat::expect_s3_class(data <- meddra_load_smq(path), "data.table")
 
     # meddra() works well
-    testthat::expect_s4_class(data <- meddra(path), "MedDRA")
+    testthat::expect_s4_class(
+        data <- meddra(path, primary_soc = TRUE), "MedDRA"
+    )
     testthat::expect_true(rlang::is_string(meddra_version(data), "26.1"))
     testthat::expect_s3_class(hierarchy <- meddra_hierarchy(data), "data.table")
     testthat::expect_null(hierarchy$smq_code)
+    testthat::expect_true(all(hierarchy$primary_soc_fg == "Y"))
+    testthat::expect_true(anyDuplicated(hierarchy$llt_code) == 0L)
     testthat::expect_null(meddra_smq(data))
 
     # meddra() with add_smq = TRUE, works well
-    testthat::expect_s4_class(data <- meddra(path, TRUE), "MedDRA")
+    testthat::expect_s4_class(data <- meddra(path, TRUE, TRUE), "MedDRA")
     testthat::expect_true(rlang::is_string(meddra_version(data), "26.1"))
     testthat::expect_s3_class(hierarchy <- meddra_hierarchy(data), "data.table")
     testthat::expect_true(any(!is.na(hierarchy$smq_code)))
+    testthat::expect_true(all(hierarchy$primary_soc_fg == "Y"))
+    testthat::expect_true(anyDuplicated(hierarchy$llt_code) == 0L)
     testthat::expect_s3_class(meddra_smq(data), "data.table")
 })

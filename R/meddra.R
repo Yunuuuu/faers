@@ -28,10 +28,12 @@ NULL
 #' @param path A string, define the path of MedDRA directory.
 #' @param add_smq A bool, indicates whether Standardised MedDRA Queries (SMQ)
 #' should be added. If `TRUE`, "smq_content.asc", and "smq_list.asc" must exist.
+#' @param primary_soc A bool, indicates whether keep primary soc only.
 #' @export
 #' @rdname MedDRA-class
-meddra <- function(path, add_smq = FALSE) {
-    hierarchy <- meddra_load_hierarchy(path, primary_soc = FALSE)
+meddra <- function(path, add_smq = FALSE, primary_soc = FALSE) {
+    assert_bool(primary_soc)
+    hierarchy <- meddra_load_hierarchy(path, primary_soc = primary_soc)
     version <- meddra_load_version(path)
     if (add_smq) {
         smq_data <- meddra_load_smq(path)

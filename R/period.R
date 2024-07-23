@@ -18,7 +18,7 @@ faers_before_period <- function(years, quarters, y, q, inclusive = TRUE) {
     if (!rlang::is_string(q, string = faers_file_quarters)) {
         cli::cli_abort("{.arg q} must be a string in {.val {faers_file_quarters}}")
     }
-    assert_bool(inclusive, 1L)
+    assert_bool(inclusive)
     do.call(
         is_before_period,
         c(periods, list(y = y, q = q, inclusive = inclusive))
